@@ -33,16 +33,14 @@ jobs:
 
     - name: Build all
       run: zig build --summary all
-
-    - name: Verify artifacts
-      run: |
-        if [[ "${{ runner.os }}" == "Windows" ]]; then
-          dir zig-out/bin
-          dir zig-out/lib
-        else
-          ls -lh zig-out/bin
-          ls -lh zig-out/lib
-        fi
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts-${{ matrix.os }}
+        path: |
+          zig-out/bin
+          zig-out/lib 
   build-docs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
