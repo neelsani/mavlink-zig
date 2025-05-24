@@ -31,11 +31,8 @@ jobs:
     - name: Run tests
       run: zig build test --summary all
 
-    - name: Generate MAVLink code
-      run: zig build generate -Dxml=all -Dout=src/dialects
-
-    - name: Build in release-fast mode
-      run: zig build --release=fast --summary all
+    - name: Build all
+      run: zig build --summary all
 
     - name: Verify artifacts
       run: |
