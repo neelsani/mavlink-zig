@@ -36,9 +36,13 @@ jobs:
 
     - name: Verify artifacts
       run: |
-        ls -lh zig-out/bin
-        ls -lh zig-out/lib
-
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          dir zig-out/bin
+          dir zig-out/lib
+        else
+          ls -lh zig-out/bin
+          ls -lh zig-out/lib
+        fi
   build-docs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
