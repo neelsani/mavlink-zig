@@ -15,15 +15,15 @@ const MAVLINK_CRC_EXTRA = [_][7]u24{ .{ 0, 50, 9, 9, 0, 0, 0 }, .{ 1, 124, 31, 4
 ///
 /// Performs a binary search on the compile-time sorted `MAVLINK_CRC_EXTRA` table.
 ///
-/// @param msgid
-///   The 24-bit message ID to look up.
+/// # Parameters
+/// - `msgid`: The 24-bit message ID to look up.
 ///
-/// @return
-///   A struct containing:
-///     • `crc_extra`:      The CRC extra byte for this message.
-///     • `min_payload_len`: The minimum allowed payload length.
-///     • `max_payload_len`: The maximum allowed payload length.
-///   Returns `null` if the message ID is not found.
+/// # Returns
+/// - A struct containing:
+///     * `crc_extra`:      The CRC extra byte for this message.
+///     * `min_payload_len`: The minimum allowed payload length.
+///     * `max_payload_len`: The maximum allowed payload length.
+/// - `null` if the message ID is not found.
 pub fn get_msg_info(msgid: u24) ?struct {
     crc_extra: u8,
     min_payload_len: u8,
@@ -61,31 +61,31 @@ const Self = @This();
 
 /// Creates a new CRC accumulator initialized to the MAVLink default start value.
 ///
-/// @return A `Self` instance with `.crc` set to 0xFFFF.
+/// # Returns
+/// - `Self` instance with `.crc` set to `0xFFFF`.
 pub fn init() Self {
     return Self{ .crc = 0xFFFF };
 }
 
 /// Incorporates one byte into the running CRC value.
 ///
-/// @param self
-///   Pointer to the CRC accumulator instance.
-/// @param byte
-///   The byte to process.
+/// # Parameters
+/// - `self`: Pointer to the CRC accumulator instance.
+/// - `byte`: The byte to process.
 pub fn accumulate(self: *Self, byte: u8) void {
     var tmp: u8 = byte ^ @as(u8, @truncate(self.crc & 0xFF));
     tmp ^= tmp << 4;
     self.crc = (self.crc >> 8) ^ (@as(u16, tmp) << 8) ^ (@as(u16, tmp) << 3) ^ (@as(u16, tmp) >> 4);
 }
 
-/// Finalizes the CRC by folding in the per-message “CRC_EXTRA” byte (if available).
+/// Finalizes the CRC by folding in the per-message `CRC_EXTRA` byte (if available).
 ///
-/// @param self
-///   Pointer to the CRC accumulator instance.
-/// @param msgid
-///   The 24-bit MAVLink message ID; used to look up the CRC_EXTRA byte.
-/// @return
-///   The final 16-bit CRC value.
+/// # Parameters
+/// - `self`: Pointer to the CRC accumulator instance.
+/// - `msgid`: The 24-bit MAVLink message ID; used to look up the `CRC_EXTRA` byte.
+///
+/// # Returns
+/// - `u16` The final 16-bit CRC value.
 pub fn finalize(self: *Self, msgid: u24) u16 {
     // Only include CRC_EXTRA if msgid is within range
     if (msgid < MAVLINK_CRC_EXTRA.len) {
@@ -96,19 +96,20 @@ pub fn finalize(self: *Self, msgid: u24) u16 {
 
 /// Returns the initial MAVLink CRC value (0xFFFF).
 ///
-/// @return The starting CRC16 value.
+/// # Returns
+/// - `u16` The starting CRC16 value (0xFFFF).
 pub fn crc_init() u16 {
     return 0xFFFF;
 }
 
 /// Accumulates a single byte into an existing CRC value without side effects.
 ///
-/// @param byte
-///   The byte to incorporate.
-/// @param crc
-///   The current CRC value.
-/// @return
-///   The updated CRC after processing `byte`.
+/// # Parameters
+/// - `byte`: The byte to incorporate.
+/// - `crc`: The current CRC value.
+///
+/// # Returns
+/// - `u16` The updated CRC after processing `byte`.
 pub fn crc_accumulate(byte: u8, crc: u16) u16 {
     var tmp = byte ^ @as(u8, @intCast(crc & 0xFF));
     tmp ^= tmp << 4;
@@ -117,12 +118,12 @@ pub fn crc_accumulate(byte: u8, crc: u16) u16 {
 
 /// Processes an entire buffer of bytes into a CRC, byte by byte.
 ///
-/// @param crc
-///   The starting CRC value.
-/// @param buf
-///   Slice of bytes to accumulate.
-/// @return
-///   The resulting CRC after processing all bytes.
+/// # Parameters
+/// - `crc`: The starting CRC value.
+/// - `buf`: Slice of bytes to accumulate.
+///
+/// # Returns
+/// - `u16` The resulting CRC after processing all bytes.
 pub fn crc_accumulate_buf(crc: u16, buf: []const u8) u16 {
     var c = crc;
     for (buf) |b| {

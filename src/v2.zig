@@ -198,7 +198,10 @@ header_idx: u8, // Current header byte index
 
 const Self = @This(); // Type alias for the parser type
 
-/// Creates a new MAVLink parser in initial state
+/// Creates a new MAVLink parser in the initial state.
+///
+/// # Returns
+/// - `Self` instance ready to parse incoming data.
 pub fn init() Self {
     return Self{
         .state = ParseState.WaitingForStart,
@@ -211,7 +214,10 @@ pub fn init() Self {
     };
 }
 
-/// Resets the parser to initial state
+/// Resets the parser to the initial state.
+///
+/// # Parameters
+/// - `self`: Pointer to the parser instance.
 fn reset(self: *Self) void {
     self.state = ParseState.WaitingForStart;
     self.packet = std.mem.zeroes(MavlinkPacket);

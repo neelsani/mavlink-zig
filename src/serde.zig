@@ -3,24 +3,25 @@ const std = @import("std");
 /// Deserialize a fixed-size value of type `T` from the provided buffer without allocations.
 ///
 /// Supports:
-///  - primitive types: integers, floats, bools
-///  - fixed-size arrays
-///  - packed and unpacked structs
+/// - primitive types: integers, floats, bools
+/// - fixed-size arrays
+/// - packed and unpacked structs
 ///
 /// Does NOT support:
-///  - slices or dynamically sized collections
-///  - allocations
-///  - unions
-///  - enums (except as part of struct fields)
+/// - slices or dynamically sized collections
+/// - allocations
+/// - unions
+/// - enums (except as part of struct fields)
 ///
-/// @param comptime T
-///   The compile-time type to deserialize into.
-/// @param buf
-///   A byte slice containing serialized data in little-endian order.
-/// @return
-///   An instance of `T` populated with data from `buf`.
-/// @error
-///   Returns an error if reading beyond `buf` length or encountering an unsupported type.
+/// # Parameters
+/// - `T`: The compile-time type to deserialize into.
+/// - `buf`: A byte slice containing serialized data in little-endian order.
+///
+/// # Returns
+/// - `T` populated with data from `buf`.
+///
+/// # Errors
+/// - Returns an error if reading beyond `buf` length or encountering an unsupported type.
 pub fn deserialize(comptime T: type, buf: []const u8) !T {
     var fbs = std.io.fixedBufferStream(buf);
     const reader = fbs.reader();
@@ -34,14 +35,13 @@ pub fn deserialize(comptime T: type, buf: []const u8) !T {
 /// Handles nested arrays and structs via compile-time reflection. Emits a compile error
 /// for unsupported types like pointers (slices).
 ///
-/// @param comptime T
-///   The type to read.
-/// @param reader
-///   A fixed-buffer reader implementing `readByte`, `readInt`, etc.
-/// @param target
-///   Pointer to the output location where the deserialized value will be stored.
-/// @error
-///   Propagates I/O errors from `reader`.
+/// # Parameters
+/// - `T`: The compile-time type to read.
+/// - `reader`: A fixed-buffer reader implementing `readByte`, `readInt`, etc.
+/// - `target`: Pointer to the output location where the deserialized value will be stored.
+///
+/// # Errors
+/// - Propagates I/O errors from `reader`.
 fn recursiveDeserialize(
     comptime T: type,
     reader: anytype,
@@ -114,14 +114,15 @@ fn recursiveDeserialize(
 ///
 /// Internally writes to a fixed-buffer stream to avoid allocations.
 ///
-/// @param value
-///   The value to serialize (integer, float, bool, array, struct).
-/// @param buffer
-///   Byte slice to which the serialized data will be written.
-/// @return
-///   Number of bytes written to `buffer`.
-/// @error
-///   Propagates errors from the writer (e.g., buffer overflow).
+/// # Parameters
+/// - `value`: The value to serialize (integer, float, bool, array, struct).
+/// - `buffer`: Byte slice to which the serialized data will be written.
+///
+/// # Returns
+/// - `usize` Number of bytes written to `buffer`.
+///
+/// # Errors
+/// - Propagates errors from the writer (e.g., buffer overflow).
 pub fn serialize(
     value: anytype,
     buffer: []u8,
@@ -138,14 +139,13 @@ pub fn serialize(
 /// Supports primitive types, fixed-size arrays, one-element pointers, and structs.
 /// For packed structs, data is copied via `memcpy` to ensure correct layout.
 ///
-/// @param comptime T
-///   The type of `value`.
-/// @param value
-///   The value to write.
-/// @param writer
-///   A writer implementing `writeByte`, `writeInt`, etc.
-/// @error
-///   I/O errors or compile errors for unsupported types.
+/// # Parameters
+/// - `T`: The compile-time type of `value`.
+/// - `value`: The value to write.
+/// - `writer`: A writer implementing `writeByte`, `writeInt`, etc.
+///
+/// # Errors
+/// - Propagates I/O errors or compile-time errors for unsupported types.
 fn recursiveSerialize(
     comptime T: type,
     value: T,
