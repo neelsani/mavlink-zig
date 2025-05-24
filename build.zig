@@ -10,6 +10,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     }).module("xml");
+    const buildExamples: bool = b.option(bool, "examples", "Build examples?") orelse true;
 
     // Main module
     const mavlink = b.addModule("mavlink", .{
@@ -117,19 +118,20 @@ pub fn build(b: *std.Build) void {
             .desc = "Parameters example",
         },
     };
+    if (buildExamples) {
+        for (examples) |example| {
+            const exe = b.addExecutable(.{
+                .name = example.name,
+                .root_source_file = b.path(example.file),
+                .target = target,
+                .optimize = optimize,
+            });
+            exe.root_module.addImport("mavlink", mavlink);
+            b.installArtifact(exe);
 
-    for (examples) |example| {
-        const exe = b.addExecutable(.{
-            .name = example.name,
-            .root_source_file = b.path(example.file),
-            .target = target,
-            .optimize = optimize,
-        });
-        exe.root_module.addImport("mavlink", mavlink);
-        b.installArtifact(exe);
-
-        const run_cmd = b.addRunArtifact(exe);
-        const example_step = b.step(example.name, example.desc);
-        example_step.dependOn(&run_cmd.step);
+            const run_cmd = b.addRunArtifact(exe);
+            const example_step = b.step(example.name, example.desc);
+            example_step.dependOn(&run_cmd.step);
+        }
     }
 }
