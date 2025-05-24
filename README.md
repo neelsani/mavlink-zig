@@ -39,6 +39,13 @@ zig fetch --save https://github.com/neelsani/mavlink-zig/archive/refs/tags/vX.Y.
 # For Zig master branch compatibility:
 zig fetch --save git+https://github.com/neelsani/mavlink-zig
 ```
+Then add the following to `build.zig`:
+
+```zig
+const mavlink = b.dependency("mavlink", .{});
+exe.root_module.addImport("mavlink", mavlink.module("mavlink"));
+```
+
 ## Usage / Examples 🚀
 
 ### 📂 Where to Find Examples
