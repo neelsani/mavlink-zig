@@ -33,9 +33,9 @@ jobs:
 
     - name: Build all
       run: zig build --summary all
-      
+
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-artifacts-${{ matrix.os }}
         path: |
