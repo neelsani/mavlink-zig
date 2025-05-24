@@ -23,12 +23,12 @@ Developers tend to either use
 Depending on which developer you are, you need to run different `zig fetch` commands:
 
 ```sh
-# Version of zig-clap that works with a tagged release of Zig
-# Replace `<REPLACE ME>` with the version of zig-clap that you want to use
+# Version of mavlink-zig that works with a tagged release of Zig
+# Replace `<REPLACE ME>` with the version of mavlink-zig that you want to use
 # See: https://github.com/neelsani/mavlink-zig/releases
 zig fetch --save https://github.com/neelsani/mavlink-zig/archive/refs/tags/<REPLACE ME>.tar.gz
 
-# Version of zig-clap that works with latest build of Zigs master branch
+# Version of mavlink-zig that works with latest build of Zigs master branch
 zig fetch --save git+https://github.com/neelsani/mavlink-zig
 ```
 
