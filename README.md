@@ -2,7 +2,7 @@
 
 [![Zig Version](https://img.shields.io/badge/Zig-0.14.0-%23f7a41d.svg)](https://ziglang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Build Status](https://github.com/neelsani/mavlink-zig/actions/workflows/build.yml/badge.svg)](https://github.com/neelsani/mavlink-zig/actions)
+[![Build Status](https://github.com/neelsani/mavlink-zig/actions/workflows/build.yaml/badge.svg)](https://github.com/neelsani/mavlink-zig/actions)
 
 A lightweight, zero-dependency, zero-allocation MAVLink v2.0 protocol implementation in Zig, designed for embedded systems and high-performance applications.
 
