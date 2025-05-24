@@ -1,0 +1,33 @@
+name: Update MAVLink Dialects
+
+on:
+  schedule:
+    - cron: '4 5 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-dialects:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Install Zig
+      uses: mlugg/setup-zig@v2
+      with:
+        version: 0.14.0
+
+    - uses: actions/checkout@v4
+
+    - name: Generate Dialects
+      run: zig build generate -Dxml=all -Dout=src/dialects || exit 1
+
+    - name: Commit and Push Changes
+      run: |
+        test -z "$(git status --porcelain)" ||
+        ( echo "Changes detected, committing..." \
+        && git checkout master \
+        && git add . \
+        && REV=$(curl -sL https://api.github.com/repos/mavlink/mavlink/branches/master | jq -r '.commit.sha') \
+        && git config user.name mavlink-zig-bot \
+        && git config user.email bot@mavlink-zig.neels.dev \
+        && git commit -m "(automatic) update dialects to rev https://github.com/mavlink/mavlink/tree/${REV}" \
+        && git push ) || exit 1

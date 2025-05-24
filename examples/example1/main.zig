@@ -12,9 +12,9 @@ pub fn main() !void {
     const cmd = D.messages.COMMAND_LONG{
         .target_system = 1,
         .target_component = 0,
-        .command = @intFromEnum(D.enums.MAV_CMD.MAV_CMD_REQUEST_MESSAGE),
+        .command = .MAV_CMD_REQUEST_MESSAGE,
         .confirmation = 0,
-        .param1 = @intFromEnum(D.enums.MAV_MSG_ID.PROTOCOL_VERSION),
+        .param1 = D.messages.PROTOCOL_VERSION.MSG_ID,
         .param2 = 0,
         .param3 = 0,
         .param4 = 0,

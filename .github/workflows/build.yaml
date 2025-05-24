@@ -3,12 +3,23 @@ name: build mavlink-zig
 on:
   push:
     branches: [ "master" ]
+    paths-ignore:
+      - "README.md"
+      - "**.md"
+      - "LICENSE**"
   pull_request:
     branches: [ "master" ]
+    paths-ignore:
+      - "README.md"
+      - "**.md"
+      - "LICENSE**"
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
 

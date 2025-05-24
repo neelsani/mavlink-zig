@@ -1,13 +1,13 @@
 // Auto-generated MAVLink enums
 // DO NOT EDIT MANUALLY
 
-pub const ICAROUS_TRACK_BAND_TYPES = enum(u32) {
+pub const ICAROUS_TRACK_BAND_TYPES = enum(u8) {
     ICAROUS_TRACK_BAND_TYPE_NONE = 0,
     ICAROUS_TRACK_BAND_TYPE_NEAR = 1,
     ICAROUS_TRACK_BAND_TYPE_RECOVERY = 2,
 };
 
-pub const ICAROUS_FMS_STATE = enum(u32) {
+pub const ICAROUS_FMS_STATE = enum(u8) {
     ICAROUS_FMS_STATE_IDLE = 0,
     ICAROUS_FMS_STATE_TAKEOFF = 1,
     ICAROUS_FMS_STATE_CLIMB = 2,
@@ -16,11 +16,6 @@ pub const ICAROUS_FMS_STATE = enum(u32) {
     ICAROUS_FMS_STATE_LAND = 5,
 };
 
-pub const MAV_CMD = enum(u32) {
-};
-
-pub const MAV_MSG_ID = enum(u32) {
-    ICAROUS_KINEMATIC_BANDS = 42001,
-    ICAROUS_HEARTBEAT = 42000,
+pub const MAV_CMD = enum(u16) {
 };
 

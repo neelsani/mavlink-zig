@@ -1,7 +1,7 @@
 // Auto-generated MAVLink enums
 // DO NOT EDIT MANUALLY
 
-pub const MAV_STATE = enum(u32) {
+pub const MAV_STATE = enum(u8) {
     /// Uninitialized system, state is unknown.
     MAV_STATE_UNINIT = 0,
     /// System is booting up.
@@ -24,6 +24,8 @@ pub const MAV_STATE = enum(u32) {
 
 /// These flags encode the MAV mode.
 pub const MAV_MODE_FLAG = enum(u32) {
+    pub const BITMASK = true;
+
     /// 0b10000000 MAV safety set to armed. Motors are enabled / running / can start. Ready to fly. Additional note: this flag is to be ignore when sent in the command MAV_CMD_DO_SET_MODE and MAV_CMD_COMPONENT_ARM_DISARM shall be used instead. The flag can still be used to report the armed state.
     MAV_MODE_FLAG_SAFETY_ARMED = 128,
     /// 0b01000000 remote control input is enabled.
@@ -44,6 +46,8 @@ pub const MAV_MODE_FLAG = enum(u32) {
 
 /// These values encode the bit positions of the decode position. These values can be used to read the value of a flag bit by combining the base_mode variable with AND with the flag position value. The result will be either 0 or 1, depending on if the flag is set or not.
 pub const MAV_MODE_FLAG_DECODE_POSITION = enum(u32) {
+    pub const BITMASK = true;
+
     /// First bit:  10000000
     MAV_MODE_FLAG_DECODE_POSITION_SAFETY = 128,
     /// Second bit: 01000000
@@ -63,7 +67,7 @@ pub const MAV_MODE_FLAG_DECODE_POSITION = enum(u32) {
 };
 
 /// Micro air vehicle / autopilot classes. This identifies the individual model.
-pub const MAV_AUTOPILOT = enum(u32) {
+pub const MAV_AUTOPILOT = enum(u8) {
     /// Generic autopilot, full support for everything
     MAV_AUTOPILOT_GENERIC = 0,
     /// Reserved for future use.
@@ -109,7 +113,7 @@ pub const MAV_AUTOPILOT = enum(u32) {
 };
 
 /// MAVLINK component type reported in HEARTBEAT message. Flight controllers must report the type of the vehicle on which they are mounted (e.g. MAV_TYPE_OCTOROTOR). All other components must report a value appropriate for their type (e.g. a camera must use MAV_TYPE_CAMERA).
-pub const MAV_TYPE = enum(u32) {
+pub const MAV_TYPE = enum(u8) {
     /// Generic micro air vehicle
     MAV_TYPE_GENERIC = 0,
     /// Fixed wing aircraft.
@@ -484,11 +488,6 @@ pub const MAV_COMPONENT = enum(u32) {
     MAV_COMP_ID_SYSTEM_CONTROL = 250,
 };
 
-pub const MAV_CMD = enum(u32) {
-};
-
-pub const MAV_MSG_ID = enum(u32) {
-    PROTOCOL_VERSION = 300,
-    HEARTBEAT = 0,
+pub const MAV_CMD = enum(u16) {
 };
 

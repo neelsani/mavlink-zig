@@ -1,6 +1,8 @@
 // Auto-generated MAVLink messages
 // DO NOT EDIT MANUALLY
 
+const enums = @import("enums.zig");
+
 /// Authorization package
 pub const AIRLINK_AUTH = struct {
     pub const MSG_ID = 52000;
@@ -16,7 +18,7 @@ pub const AIRLINK_AUTH = struct {
 pub const AIRLINK_AUTH_RESPONSE = struct {
     pub const MSG_ID = 52001;
     /// Response type
-    resp_type: u8,
+    resp_type: enums.AIRLINK_AUTH_RESPONSE_TYPE,
 
 };
 

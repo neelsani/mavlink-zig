@@ -83,6 +83,29 @@ fn recursiveDeserialize(
             }
         },
         .pointer => @compileError("Pointers/slices not supported in allocation-free deserializer"),
+        .@"enum" => |enumInfo| {
+            const IntType = enumInfo.tag_type;
+            const raw = try reader.readInt(IntType, .little);
+
+            inline for (std.meta.tags(T)) |tag| {
+                if (@intFromEnum(tag) == raw) {
+                    target.* = tag;
+                    return;
+                }
+            }
+
+            // Debug print before returning error
+            std.debug.print("Invalid enum value for {s}: got {d} (valid values: ", .{ @typeName(T), raw });
+
+            // Print all valid values
+            inline for (std.meta.tags(T), 0..) |tag, i| {
+                if (i > 0) std.debug.print(", ", .{});
+                std.debug.print("{s}={d}", .{ @tagName(tag), @intFromEnum(tag) });
+            }
+            std.debug.print(")\n", .{});
+
+            return error.InvalidEnumValue;
+        },
         else => @compileError("Type not supported: " ++ @typeName(T)),
     }
 }
@@ -169,6 +192,9 @@ fn recursiveSerialize(
                 }
             }
         },
+        .@"enum" => |enumInfo| {
+            try writer.writeInt(enumInfo.tag_type, @intFromEnum(value), .little);
+        },
         else => @compileError("Type not supported: " ++ @typeName(T)),
     }
 }
@@ -178,7 +204,7 @@ test "serialize then deserialize equality" {
     const mavlink = @import("root.zig");
     const dialect = mavlink.dialects.ardupilotmega;
     const data = dialect.messages.BATTERY_INFO{
-        .battery_function = 3,
+        .battery_function = .MAV_BATTERY_FUNCTION_ALL,
         .cells_in_series = 5,
         .charging_maximum_current = 32,
         .charging_maximum_voltage = 34,
@@ -201,7 +227,7 @@ test "serialize then deserialize equality" {
         .resting_minimum_voltage = 3.3,
         .serial_number = std.mem.zeroes([32]u8),
         .state_of_health = 3,
-        .type = 2,
+        .type = .MAV_BATTERY_TYPE_LION,
         .weight = 12,
     };
     var buf: [mavlink.v2.MAVLINK_MAX_PACKET_SIZE]u8 = undefined;

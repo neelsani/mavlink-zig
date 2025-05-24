@@ -59,6 +59,8 @@ pub const MavEnum = struct {
     name: []const u8,
     entries: std.ArrayList(MavEnumEntry),
     description: ?[]const u8,
+    enumtype: ?MavTypeInfo = null,
+    bitmask: bool = false,
 };
 
 pub const MavEnumEntry = struct {
@@ -208,6 +210,8 @@ pub fn parseProfileWithRegistry(
                         const attribute_name = reader.attributeNameNs(i);
                         if (std.mem.eql(u8, attribute_name.local, "name")) {
                             current_enum.?.name = try profile.allocator.dupe(u8, try reader.attributeValue(i));
+                        } else if (std.mem.eql(u8, attribute_name.local, "bitmask")) {
+                            current_enum.?.bitmask = std.mem.eql(u8, try reader.attributeValue(i), "true");
                         }
                     }
                 } else if (std.mem.eql(u8, element_name.local, "entry")) {
@@ -403,12 +407,24 @@ fn parseMavType(type_str: []const u8) MavTypeInfo {
             .Double
         else if (std.mem.eql(u8, base_type, "uint8_t"))
             .UInt8
+        else if (std.mem.eql(u8, base_type, "uint16_t"))
+            .UInt16
+        else if (std.mem.eql(u8, base_type, "uint32_t"))
+            .UInt32
+        else if (std.mem.eql(u8, base_type, "uint64_t"))
+            .UInt64
         else if (std.mem.eql(u8, base_type, "int8_t"))
             .Int8
+        else if (std.mem.eql(u8, base_type, "int16_t"))
+            .Int16
+        else if (std.mem.eql(u8, base_type, "int32_t"))
+            .Int32
+        else if (std.mem.eql(u8, base_type, "int64_t"))
+            .Int64
         else if (std.mem.eql(u8, base_type, "char")) // char arrays are typically uint8_t in MAVLink
             .UInt8
         else
-            .UInt8; // Default fallback
+            @panic(base_type);
 
         return .{ .mavtype = .FixedArray, .array_size = array_size, .array_child_type = base_mavtype };
     } else {

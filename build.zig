@@ -92,11 +92,6 @@ pub fn build(b: *std.Build) void {
         desc: []const u8,
     }{
         .{
-            .name = "simple_encode_decode",
-            .file = "examples/simple_encode_decode/main.zig",
-            .desc = "Simple encode/decode example",
-        },
-        .{
             .name = "net",
             .file = "examples/net/main.zig",
             .desc = "Network example",

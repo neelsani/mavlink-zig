@@ -6,11 +6,11 @@ const dialect = mavlink.dialects.common;
 pub fn main() !void {
     // Prepare a HEARTBEAT indicating this is a GCS
     const hb = dialect.messages.HEARTBEAT{
-        .type = @intFromEnum(dialect.enums.MAV_TYPE.MAV_TYPE_GCS),
-        .autopilot = @intFromEnum(dialect.enums.MAV_AUTOPILOT.MAV_AUTOPILOT_INVALID),
-        .base_mode = @intFromEnum(dialect.enums.MAV_MODE_FLAG.MAV_MODE_FLAG_TEST_ENABLED),
+        .type = .MAV_TYPE_GCS,
+        .autopilot = .MAV_AUTOPILOT_INVALID,
+        .base_mode = @intFromEnum(dialect.enums.MAV_MODE.MAV_MODE_AUTO_ARMED),
         .custom_mode = 0,
-        .system_status = @intFromEnum(dialect.enums.MAV_STATE.MAV_STATE_STANDBY),
+        .system_status = .MAV_STATE_STANDBY,
         .mavlink_version = 3,
     };
 

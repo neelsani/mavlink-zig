@@ -4,7 +4,7 @@ const net = std.net;
 const mavlink = @import("mavlink");
 
 // ArduPilot‐Mega dialect
-const dialect = mavlink.dialects.ardupilotmega;
+const dialect = mavlink.dialects.all;
 
 pub fn main() !void {
     const addr = try net.Address.parseIp4("127.0.0.1", 8888);
@@ -22,11 +22,11 @@ pub fn main() !void {
 
     // Build a GCS HEARTBEAT to send
     const hb = dialect.messages.HEARTBEAT{
-        .autopilot = @intFromEnum(dialect.enums.MAV_AUTOPILOT.MAV_AUTOPILOT_INVALID),
-        .type = @intFromEnum(dialect.enums.MAV_TYPE.MAV_TYPE_GCS),
-        .system_status = @intFromEnum(dialect.enums.MAV_STATE.MAV_STATE_ACTIVE),
+        .autopilot = .MAV_AUTOPILOT_INVALID,
+        .type = .MAV_TYPE_GCS,
+        .system_status = .MAV_STATE_ACTIVE,
         .mavlink_version = 3,
-        .base_mode = 0,
+        .base_mode = @intFromEnum(dialect.enums.MAV_MODE.MAV_MODE_AUTO_ARMED),
         .custom_mode = 0,
     };
 
@@ -62,7 +62,11 @@ pub fn main() !void {
                         inline for (@typeInfo(dialect.messages).@"struct".decls) |decl| {
                             const T = @field(dialect.messages, decl.name);
                             if (id == T.MSG_ID) {
-                                std.debug.print("Unhandled: {s}\n", .{@typeName(T)});
+                                const msgde: T = mavlink.serde.deserialize(T, msg.payload[0..msg.len]) catch |e| {
+                                    std.debug.print("Failed to deserialize {s}: {any}\n{any}\n", .{ @typeName(T), e, msg.payload[0..msg.len] });
+                                    break;
+                                };
+                                std.debug.print("Unhandled: {any}\n", .{msgde});
                             }
                         }
                     },

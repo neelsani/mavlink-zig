@@ -1,6 +1,8 @@
 // Auto-generated MAVLink messages
 // DO NOT EDIT MANUALLY
 
+const enums = @import("enums.zig");
+
 /// Version and capability of protocol version. This message can be requested with MAV_CMD_REQUEST_MESSAGE and is used as part of the handshaking to establish which MAVLink version should be used on the network. Every node should respond to a request for PROTOCOL_VERSION to enable the handshaking. Library implementers should consider adding this into the default decoding state machine to allow the protocol core to respond directly.
 pub const PROTOCOL_VERSION = struct {
     pub const MSG_ID = 300;
@@ -25,10 +27,10 @@ pub const PROTOCOL_VERSION = struct {
 pub const HEARTBEAT = struct {
     pub const MSG_ID = 0;
     /// Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.
-    type: u8,
+    type: enums.MAV_TYPE,
 
     /// Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.
-    autopilot: u8,
+    autopilot: enums.MAV_AUTOPILOT,
 
     /// System mode bitmap.
     base_mode: u8,
@@ -37,7 +39,7 @@ pub const HEARTBEAT = struct {
     custom_mode: u32,
 
     /// System status flag.
-    system_status: u8,
+    system_status: enums.MAV_STATE,
 
     /// MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version
     mavlink_version: u8,
@@ -51,7 +53,7 @@ pub const POSITION_TARGET_GLOBAL_INT = struct {
     time_boot_ms: u32,
 
     /// Valid options are: MAV_FRAME_GLOBAL = 0, MAV_FRAME_GLOBAL_RELATIVE_ALT = 3, MAV_FRAME_GLOBAL_TERRAIN_ALT = 10 (MAV_FRAME_GLOBAL_INT, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT are allowed synonyms, but have been deprecated)
-    coordinate_frame: u8,
+    coordinate_frame: enums.MAV_FRAME,
 
     /// Bitmap to indicate which dimensions should be ignored by the vehicle.
     type_mask: u16,
@@ -132,7 +134,7 @@ pub const VFR_HUD = struct {
 pub const SERIAL_CONTROL = struct {
     pub const MSG_ID = 126;
     /// Serial control device type.
-    device: u8,
+    device: enums.SERIAL_CONTROL_DEV,
 
     /// Bitmap of serial control flags.
     flags: u8,
@@ -355,16 +357,16 @@ pub const BATTERY_STATUS = struct {
     id: u8,
 
     /// Function of the battery
-    battery_function: u8,
+    battery_function: enums.MAV_BATTERY_FUNCTION,
 
     /// Type (chemistry) of the battery
-    type: u8,
+    type: enums.MAV_BATTERY_TYPE,
 
     /// Temperature of the battery. INT16_MAX for unknown temperature.
     temperature: i16,
 
     /// Battery voltage of cells 1 to 10 (see voltages_ext for cells 11-14). Cells in this field above the valid cell count for this battery should have the UINT16_MAX value. If individual cell voltages are unknown or not measured for this battery, then the overall battery voltage should be filled in cell 0, with all others set to UINT16_MAX. If the voltage of the battery is greater than (UINT16_MAX - 1), then cell 0 should be set to (UINT16_MAX - 1), and cell 1 to the remaining voltage. This can be extended to multiple cells if the total voltage is greater than 2 * (UINT16_MAX - 1).
-    voltages: [10]u8,
+    voltages: [10]u16,
 
     /// Battery current, -1: autopilot does not measure the current
     current_battery: i16,
@@ -387,7 +389,7 @@ pub const BATTERY_STATUS = struct {
     charge_state: u8,
 
     /// Battery voltages for cells 11 to 14. Cells above the valid cell count for this battery should have a value of 0, where zero indicates not supported (note, this is different than for the voltages field and allows empty byte truncation). If the measured value is 0 then 1 should be sent instead.
-    voltages_ext: [4]u8,
+    voltages_ext: [4]u16,
 
     /// Battery mode. Default (0) is that battery mode reporting is not supported or battery is in normal-use mode.
     mode: u8,
@@ -456,7 +458,7 @@ pub const PLAY_TUNE_V2 = struct {
     target_component: u8,
 
     /// Tune format
-    format: u32,
+    format: enums.TUNE_FORMAT,
 
     /// Tune definition as a NULL-terminated string.
     tune: [248]u8,
@@ -518,16 +520,16 @@ pub const MEMORY_VECT = struct {
 pub const COLLISION = struct {
     pub const MSG_ID = 247;
     /// Collision data source
-    src: u8,
+    src: enums.MAV_COLLISION_SRC,
 
     /// Unique identifier, domain based on src field
     id: u32,
 
     /// Action that is being taken to avoid this collision
-    action: u8,
+    action: enums.MAV_COLLISION_ACTION,
 
     /// How concerned the aircraft is about this collision
-    threat_level: u8,
+    threat_level: enums.MAV_COLLISION_THREAT_LEVEL,
 
     /// Estimated time until collision occurs
     time_to_minimum_delta: f32,
@@ -692,7 +694,7 @@ pub const UTM_GLOBAL_POSITION = struct {
     update_rate: u16,
 
     /// Flight state
-    flight_state: u8,
+    flight_state: enums.UTM_FLIGHT_STATE,
 
     /// Bitwise OR combination of the data available flags.
     flags: u8,
@@ -729,10 +731,10 @@ pub const OPEN_DRONE_ID_BASIC_ID = struct {
     id_or_mac: [20]u8,
 
     /// Indicates the format for the uas_id field of this message.
-    id_type: u8,
+    id_type: enums.MAV_ODID_ID_TYPE,
 
     /// Indicates the type of UA (Unmanned Aircraft).
-    ua_type: u8,
+    ua_type: enums.MAV_ODID_UA_TYPE,
 
     /// UAS (Unmanned Aircraft System) ID following the format specified by id_type. Shall be filled with nulls in the unused portion of the field.
     uas_id: [20]u8,
@@ -753,10 +755,10 @@ pub const MISSION_ITEM = struct {
     seq: u16,
 
     /// The coordinate system of the waypoint.
-    frame: u8,
+    frame: enums.MAV_FRAME,
 
     /// The scheduled action for the waypoint.
-    command: u16,
+    command: enums.MAV_CMD,
 
     /// false:0, true:1
     current: u8,
@@ -802,7 +804,7 @@ pub const PARAM_VALUE = struct {
     param_value: f32,
 
     /// Onboard parameter type.
-    param_type: u8,
+    param_type: enums.MAV_PARAM_TYPE,
 
     /// Total number of onboard parameters
     param_count: u16,
@@ -1000,7 +1002,7 @@ pub const FUEL_STATUS = struct {
     temperature: f32,
 
     /// Fuel type. Defines units for fuel capacity and consumption fields above.
-    fuel_type: u32,
+    fuel_type: enums.MAV_FUEL_TYPE,
 
 };
 
@@ -1028,7 +1030,7 @@ pub const RAW_PRESSURE = struct {
 pub const STATUSTEXT = struct {
     pub const MSG_ID = 253;
     /// Severity of status. Relies on the definitions within RFC-5424.
-    severity: u8,
+    severity: enums.MAV_SEVERITY,
 
     /// Status text message, without null termination character
     text: [50]u8,
@@ -1130,7 +1132,7 @@ pub const COMMAND_CANCEL = struct {
     target_component: u8,
 
     /// Command ID (of command to cancel).
-    command: u16,
+    command: enums.MAV_CMD,
 
 };
 
@@ -1158,7 +1160,7 @@ pub const PARAM_EXT_VALUE = struct {
     param_value: [128]u8,
 
     /// Parameter type.
-    param_type: u8,
+    param_type: enums.MAV_PARAM_EXT_TYPE,
 
     /// Total number of parameters
     param_count: u16,
@@ -1181,7 +1183,7 @@ pub const OPEN_DRONE_ID_LOCATION = struct {
     id_or_mac: [20]u8,
 
     /// Indicates whether the unmanned aircraft is on the ground or in the air.
-    status: u8,
+    status: enums.MAV_ODID_STATUS,
 
     /// Direction over ground (not heading, but direction of movement) measured clockwise from true North: 0 - 35999 centi-degrees. If unknown: 36100 centi-degrees.
     direction: u16,
@@ -1205,28 +1207,28 @@ pub const OPEN_DRONE_ID_LOCATION = struct {
     altitude_geodetic: f32,
 
     /// Indicates the reference point for the height field.
-    height_reference: u8,
+    height_reference: enums.MAV_ODID_HEIGHT_REF,
 
     /// The current height of the unmanned aircraft above the take-off location or the ground as indicated by height_reference. If unknown: -1000 m.
     height: f32,
 
     /// The accuracy of the horizontal position.
-    horizontal_accuracy: u8,
+    horizontal_accuracy: enums.MAV_ODID_HOR_ACC,
 
     /// The accuracy of the vertical position.
-    vertical_accuracy: u8,
+    vertical_accuracy: enums.MAV_ODID_VER_ACC,
 
     /// The accuracy of the barometric altitude.
-    barometer_accuracy: u8,
+    barometer_accuracy: enums.MAV_ODID_VER_ACC,
 
     /// The accuracy of the horizontal and vertical speed.
-    speed_accuracy: u8,
+    speed_accuracy: enums.MAV_ODID_SPEED_ACC,
 
     /// Seconds after the full hour with reference to UTC time. Typically the GPS outputs a time-of-week value in milliseconds. First convert that to UTC and then convert for this field using ((float) (time_week_ms % (60*60*1000))) / 1000. If unknown: 0xFFFF.
     timestamp: f32,
 
     /// The accuracy of the timestamps.
-    timestamp_accuracy: u8,
+    timestamp_accuracy: enums.MAV_ODID_TIME_ACC,
 
 };
 
@@ -1269,10 +1271,10 @@ pub const COMMAND_INT = struct {
     target_component: u8,
 
     /// The coordinate system of the COMMAND.
-    frame: u8,
+    frame: enums.MAV_FRAME,
 
     /// The scheduled action for the mission item.
-    command: u16,
+    command: enums.MAV_CMD,
 
     /// Not used.
     current: u8,
@@ -1371,7 +1373,7 @@ pub const RESPONSE_EVENT_ERROR = struct {
     sequence_oldest_available: u16,
 
     /// Error reason.
-    reason: u8,
+    reason: enums.MAV_EVENT_ERROR_REASON,
 
 };
 
@@ -1393,10 +1395,10 @@ pub const DEBUG = struct {
 pub const CAMERA_TRACKING_IMAGE_STATUS = struct {
     pub const MSG_ID = 275;
     /// Current tracking status
-    tracking_status: u8,
+    tracking_status: enums.CAMERA_TRACKING_STATUS_FLAGS,
 
     /// Current tracking mode
-    tracking_mode: u8,
+    tracking_mode: enums.CAMERA_TRACKING_MODE,
 
     /// Defines location of target data
     target_data: u8,
@@ -1665,7 +1667,7 @@ pub const GPS_RTK = struct {
     nsats: u8,
 
     /// Coordinate system of baseline
-    baseline_coords_type: u8,
+    baseline_coords_type: enums.RTK_BASELINE_COORDINATE_SYSTEM,
 
     /// Current baseline in ECEF x or NED north component.
     baseline_a_mm: i32,
@@ -1765,7 +1767,7 @@ pub const ENCAPSULATED_DATA = struct {
 pub const DATA_TRANSMISSION_HANDSHAKE = struct {
     pub const MSG_ID = 130;
     /// Type of requested/acknowledged data.
-    type: u8,
+    type: enums.MAVLINK_DATA_STREAM_TYPE,
 
     /// total data size (set on ACK only).
     size: u32,
@@ -1794,10 +1796,10 @@ pub const SMART_BATTERY_INFO = struct {
     id: u8,
 
     /// Function of the battery
-    battery_function: u8,
+    battery_function: enums.MAV_BATTERY_FUNCTION,
 
     /// Type (chemistry) of the battery
-    type: u8,
+    type: enums.MAV_BATTERY_TYPE,
 
     /// Capacity when full according to manufacturer, -1: field not provided.
     capacity_full_specification: i32,
@@ -1936,7 +1938,7 @@ pub const PARAM_SET = struct {
     param_value: f32,
 
     /// Onboard parameter type.
-    param_type: u8,
+    param_type: enums.MAV_PARAM_TYPE,
 
 };
 
@@ -1989,7 +1991,7 @@ pub const ESC_STATUS = struct {
     time_usec: u64,
 
     /// Reported motor RPM from each ESC (negative for reverse rotation).
-    rpm: [4]u8,
+    rpm: [4]i32,
 
     /// Voltage measured from each ESC.
     voltage: [4]f32,
@@ -2009,13 +2011,13 @@ pub const ILLUMINATOR_STATUS = struct {
     enable: u8,
 
     /// Supported illuminator modes
-    mode_bitmask: u8,
+    mode_bitmask: enums.ILLUMINATOR_MODE,
 
     /// Errors
     error_status: u32,
 
     /// Illuminator mode
-    mode: u8,
+    mode: enums.ILLUMINATOR_MODE,
 
     /// Illuminator brightness
     brightness: f32,
@@ -2062,7 +2064,7 @@ pub const GPS2_RTK = struct {
     nsats: u8,
 
     /// Coordinate system of baseline
-    baseline_coords_type: u8,
+    baseline_coords_type: enums.RTK_BASELINE_COORDINATE_SYSTEM,
 
     /// Current baseline in ECEF x or NED north component.
     baseline_a_mm: i32,
@@ -2112,7 +2114,7 @@ pub const ONBOARD_COMPUTER_STATUS = struct {
     temperature_core: [8]i8,
 
     /// Fan speeds. A value of INT16_MAX implies the field is unused.
-    fan_speed: [4]u8,
+    fan_speed: [4]i16,
 
     /// Amount of used RAM on the component system. A value of UINT32_MAX implies the field is unused.
     ram_usage: u32,
@@ -2121,28 +2123,28 @@ pub const ONBOARD_COMPUTER_STATUS = struct {
     ram_total: u32,
 
     /// Storage type: 0: HDD, 1: SSD, 2: EMMC, 3: SD card (non-removable), 4: SD card (removable). A value of UINT32_MAX implies the field is unused.
-    storage_type: [4]u8,
+    storage_type: [4]u32,
 
     /// Amount of used storage space on the component system. A value of UINT32_MAX implies the field is unused.
-    storage_usage: [4]u8,
+    storage_usage: [4]u32,
 
     /// Total amount of storage space on the component system. A value of UINT32_MAX implies the field is unused.
-    storage_total: [4]u8,
+    storage_total: [4]u32,
 
     /// Link type: 0-9: UART, 10-19: Wired network, 20-29: Wifi, 30-39: Point-to-point proprietary, 40-49: Mesh proprietary
-    link_type: [6]u8,
+    link_type: [6]u32,
 
     /// Network traffic from the component system. A value of UINT32_MAX implies the field is unused.
-    link_tx_rate: [6]u8,
+    link_tx_rate: [6]u32,
 
     /// Network traffic to the component system. A value of UINT32_MAX implies the field is unused.
-    link_rx_rate: [6]u8,
+    link_rx_rate: [6]u32,
 
     /// Network capacity from the component system. A value of UINT32_MAX implies the field is unused.
-    link_tx_max: [6]u8,
+    link_tx_max: [6]u32,
 
     /// Network capacity to the component system. A value of UINT32_MAX implies the field is unused.
-    link_rx_max: [6]u8,
+    link_rx_max: [6]u32,
 
 };
 
@@ -2150,7 +2152,7 @@ pub const ONBOARD_COMPUTER_STATUS = struct {
 pub const CAMERA_TRACKING_GEO_STATUS = struct {
     pub const MSG_ID = 276;
     /// Current tracking status
-    tracking_status: u8,
+    tracking_status: enums.CAMERA_TRACKING_STATUS_FLAGS,
 
     /// Latitude of tracked object
     lat: i32,
@@ -2205,7 +2207,7 @@ pub const MAG_CAL_REPORT = struct {
     cal_mask: u8,
 
     /// Calibration Status.
-    cal_status: u8,
+    cal_status: enums.MAG_CAL_STATUS,
 
     /// 0=requires a MAV_CMD_DO_ACCEPT_MAG_CAL, 1=saved to parameters.
     autosaved: u8,
@@ -2283,7 +2285,7 @@ pub const TUNNEL = struct {
     target_component: u8,
 
     /// A code that identifies the content of the payload (0 for unknown, which is the default). If this code is less than 32768, it is a 'registered' payload type and the corresponding code should be added to the MAV_TUNNEL_PAYLOAD_TYPE enum. Software creators can register blocks of types as needed. Codes greater than 32767 are considered local experiments and should not be checked in to any widely distributed codebase.
-    payload_type: u16,
+    payload_type: enums.MAV_TUNNEL_PAYLOAD_TYPE,
 
     /// Length of the data transported in payload
     payload_length: u8,
@@ -2306,13 +2308,13 @@ pub const CAN_FILTER_MODIFY = struct {
     bus: u8,
 
     /// what operation to perform on the filter list. See CAN_FILTER_OP enum.
-    operation: u8,
+    operation: enums.CAN_FILTER_OP,
 
     /// number of IDs in filter list
     num_ids: u8,
 
     /// filter IDs, length num_ids
-    ids: [16]u8,
+    ids: [16]u16,
 
 };
 
@@ -2352,10 +2354,10 @@ pub const BATTERY_INFO = struct {
     id: u8,
 
     /// Function of the battery.
-    battery_function: u8,
+    battery_function: enums.MAV_BATTERY_FUNCTION,
 
     /// Type (chemistry) of the battery.
-    type: u8,
+    type: enums.MAV_BATTERY_TYPE,
 
     /// State of Health (SOH) estimate. Typically 100% at the time of manufacture and will decrease over time and use. -1: field not provided.
     state_of_health: u8,
@@ -2751,10 +2753,10 @@ pub const AIS_VESSEL = struct {
     turn_rate: i8,
 
     /// Navigational status
-    navigational_status: u8,
+    navigational_status: enums.AIS_NAV_STATUS,
 
     /// Type of vessels
-    type: u8,
+    type: enums.AIS_TYPE,
 
     /// Distance from lat/lon location to bow
     dimension_bow: u16,
@@ -2923,7 +2925,7 @@ pub const CELLULAR_CONFIG = struct {
     roaming: u8,
 
     /// Message acceptance response (sent back to GS).
-    response: u8,
+    response: enums.CELLULAR_CONFIG_RESPONSE,
 
 };
 
@@ -2934,7 +2936,7 @@ pub const CURRENT_EVENT_SEQUENCE = struct {
     sequence: u16,
 
     /// Flag bitset.
-    flags: u8,
+    flags: enums.MAV_EVENT_CURRENT_SEQUENCE_FLAGS,
 
 };
 
@@ -3028,10 +3030,10 @@ pub const SET_ATTITUDE_TARGET = struct {
 pub const EXTENDED_SYS_STATE = struct {
     pub const MSG_ID = 245;
     /// The VTOL state if applicable. Is set to MAV_VTOL_STATE_UNDEFINED if UAV is not in VTOL configuration.
-    vtol_state: u8,
+    vtol_state: enums.MAV_VTOL_STATE,
 
     /// The landed state. Is set to MAV_LANDED_STATE_UNDEFINED if landed state is unknown.
-    landed_state: u8,
+    landed_state: enums.MAV_LANDED_STATE,
 
 };
 
@@ -3075,7 +3077,7 @@ pub const GLOBAL_POSITION_INT_COV = struct {
     time_usec: u64,
 
     /// Class id of the estimator this estimate originated from.
-    estimator_type: u8,
+    estimator_type: enums.MAV_ESTIMATOR_TYPE,
 
     /// Latitude
     lat: i32,
@@ -3181,7 +3183,7 @@ pub const GLOBAL_VISION_POSITION_ESTIMATE = struct {
 pub const CURRENT_MODE = struct {
     pub const MSG_ID = 436;
     /// Standard mode.
-    standard_mode: u8,
+    standard_mode: enums.MAV_STANDARD_MODE,
 
     /// A bitfield for use for autopilot-specific flags
     custom_mode: u32,
@@ -3346,13 +3348,13 @@ pub const DISTANCE_SENSOR = struct {
     current_distance: u16,
 
     /// Type of distance sensor.
-    type: u8,
+    type: enums.MAV_DISTANCE_SENSOR,
 
     /// Onboard ID of the sensor
     id: u8,
 
     /// Direction the sensor faces. downward-facing: ROTATION_PITCH_270, upward-facing: ROTATION_PITCH_90, backward-facing: ROTATION_PITCH_180, forward-facing: ROTATION_NONE, left-facing: ROTATION_YAW_90, right-facing: ROTATION_YAW_270
-    orientation: u8,
+    orientation: enums.MAV_SENSOR_ORIENTATION,
 
     /// Measurement variance. Max standard deviation is 6cm. UINT8_MAX if unknown.
     covariance: u8,
@@ -3383,7 +3385,7 @@ pub const LANDING_TARGET = struct {
     target_num: u8,
 
     /// Coordinate frame used for following fields.
-    frame: u8,
+    frame: enums.MAV_FRAME,
 
     /// X-axis angular offset of the target from the center of the image
     angle_x: f32,
@@ -3533,10 +3535,10 @@ pub const RC_CHANNELS_SCALED = struct {
 pub const COMMAND_ACK = struct {
     pub const MSG_ID = 77;
     /// Command ID (of acknowledged command).
-    command: u16,
+    command: enums.MAV_CMD,
 
     /// Result of command.
-    result: u8,
+    result: enums.MAV_RESULT,
 
 
     //Extensions
@@ -3595,7 +3597,7 @@ pub const CAMERA_SETTINGS = struct {
     time_boot_ms: u32,
 
     /// Camera mode
-    mode_id: u8,
+    mode_id: enums.CAMERA_MODE,
 
 
     //Extensions
@@ -3617,7 +3619,7 @@ pub const LOCAL_POSITION_NED_COV = struct {
     time_usec: u64,
 
     /// Class id of the estimator this estimate originated from.
-    estimator_type: u8,
+    estimator_type: enums.MAV_ESTIMATOR_TYPE,
 
     /// X Position
     x: f32,
@@ -3787,7 +3789,7 @@ pub const GPS2_RAW = struct {
     time_usec: u64,
 
     /// GPS fix type.
-    fix_type: u8,
+    fix_type: enums.GPS_FIX_TYPE,
 
     /// Latitude (WGS84)
     lat: i32,
@@ -4005,10 +4007,10 @@ pub const HIGH_LATENCY2 = struct {
     timestamp: u32,
 
     /// Type of the MAV (quadrotor, helicopter, etc.)
-    type: u8,
+    type: enums.MAV_TYPE,
 
     /// Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.
-    autopilot: u8,
+    autopilot: enums.MAV_AUTOPILOT,
 
     /// A bitfield for use for autopilot-specific flags (2 byte version).
     custom_mode: u16,
@@ -4281,7 +4283,7 @@ pub const POSITION_TARGET_LOCAL_NED = struct {
     time_boot_ms: u32,
 
     /// Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9
-    coordinate_frame: u8,
+    coordinate_frame: enums.MAV_FRAME,
 
     /// Bitmap to indicate which dimensions should be ignored by the vehicle.
     type_mask: u16,
@@ -4357,7 +4359,7 @@ pub const SAFETY_SET_ALLOWED_AREA = struct {
     target_component: u8,
 
     /// Coordinate frame. Can be either global, GPS, right-handed with Z axis up or local, right handed, Z axis down.
-    frame: u8,
+    frame: enums.MAV_FRAME,
 
     /// x position 1 / Latitude 1
     p1x: f32,
@@ -4422,19 +4424,19 @@ pub const ESC_INFO = struct {
     count: u8,
 
     /// Connection type protocol for all ESC.
-    connection_type: u8,
+    connection_type: enums.ESC_CONNECTION_TYPE,
 
     /// Information regarding online/offline status of each ESC.
     info: u8,
 
     /// Bitmap of ESC failure flags.
-    failure_flags: [4]u8,
+    failure_flags: [4]u16,
 
     /// Number of reported errors by each ESC since boot.
-    error_count: [4]u8,
+    error_count: [4]u32,
 
     /// Temperature of each ESC. INT16_MAX: if data not supplied by ESC.
-    temperature: [4]u8,
+    temperature: [4]i16,
 
 };
 
@@ -4451,7 +4453,7 @@ pub const OPEN_DRONE_ID_OPERATOR_ID = struct {
     id_or_mac: [20]u8,
 
     /// Indicates the type of the operator_id field.
-    operator_id_type: u8,
+    operator_id_type: enums.MAV_ODID_OPERATOR_ID_TYPE,
 
     /// Text description or numeric value expressed as ASCII characters. Shall be filled with nulls in the unused portion of the field.
     operator_id: [20]u8,
@@ -4520,7 +4522,7 @@ pub const COMMAND_LONG = struct {
     target_component: u8,
 
     /// Command ID (of command to send).
-    command: u16,
+    command: enums.MAV_CMD,
 
     /// 0: First transmission of this command. 1-255: Confirmation transmissions (e.g. for kill command)
     confirmation: u8,
@@ -4558,10 +4560,10 @@ pub const UAVCAN_NODE_STATUS = struct {
     uptime_sec: u32,
 
     /// Generalized node health status.
-    health: u8,
+    health: enums.UAVCAN_NODE_HEALTH,
 
     /// Generalized operating mode.
-    mode: u8,
+    mode: enums.UAVCAN_NODE_MODE,
 
     /// Not used currently.
     sub_mode: u8,
@@ -4719,7 +4721,7 @@ pub const ORBIT_EXECUTION_STATUS = struct {
     radius: f32,
 
     /// The coordinate system of the fields: x, y, z.
-    frame: u8,
+    frame: enums.MAV_FRAME,
 
     /// X coordinate of center point. Coordinate system depends on frame field: local = x position in meters * 1e4, global = latitude in degrees * 1e7.
     x: i32,
@@ -4775,7 +4777,7 @@ pub const MISSION_CLEAR_ALL = struct {
 pub const SAFETY_ALLOWED_AREA = struct {
     pub const MSG_ID = 55;
     /// Coordinate frame. Can be either global, GPS, right-handed with Z axis up or local, right handed, Z axis down.
-    frame: u8,
+    frame: enums.MAV_FRAME,
 
     /// x position 1 / Latitude 1
     p1x: f32,
@@ -4904,10 +4906,10 @@ pub const OPEN_DRONE_ID_SYSTEM = struct {
     id_or_mac: [20]u8,
 
     /// Specifies the operator location type.
-    operator_location_type: u8,
+    operator_location_type: enums.MAV_ODID_OPERATOR_LOCATION_TYPE,
 
     /// Specifies the classification type of the UA.
-    classification_type: u8,
+    classification_type: enums.MAV_ODID_CLASSIFICATION_TYPE,
 
     /// Latitude of the operator. If unknown: 0 (both Lat/Lon).
     operator_latitude: i32,
@@ -4928,10 +4930,10 @@ pub const OPEN_DRONE_ID_SYSTEM = struct {
     area_floor: f32,
 
     /// When classification_type is MAV_ODID_CLASSIFICATION_TYPE_EU, specifies the category of the UA.
-    category_eu: u8,
+    category_eu: enums.MAV_ODID_CATEGORY_EU,
 
     /// When classification_type is MAV_ODID_CLASSIFICATION_TYPE_EU, specifies the class of the UA.
-    class_eu: u8,
+    class_eu: enums.MAV_ODID_CLASS_EU,
 
     /// Geodetic altitude of the operator relative to WGS84. If unknown: -1000 m.
     operator_altitude_geo: f32,
@@ -4965,7 +4967,7 @@ pub const TIME_ESTIMATE_TO_TARGET = struct {
 pub const OPEN_DRONE_ID_ARM_STATUS = struct {
     pub const MSG_ID = 12918;
     /// Status level indicating if arming is allowed.
-    status: u8,
+    status: enums.MAV_ODID_ARM_STATUS,
 
     /// Text error message, should be empty if status is good to arm. Fill with nulls in unused portion.
     mError: [50]u8,
@@ -5056,7 +5058,7 @@ pub const GPS_RAW_INT = struct {
     time_usec: u64,
 
     /// GPS fix type.
-    fix_type: u8,
+    fix_type: enums.GPS_FIX_TYPE,
 
     /// Latitude (WGS84, EGM96 ellipsoid)
     lat: i32,
@@ -5135,7 +5137,7 @@ pub const HIL_CONTROLS = struct {
     aux4: f32,
 
     /// System mode.
-    mode: u8,
+    mode: enums.MAV_MODE,
 
     /// Navigation mode (MAV_NAV_MODE)
     nav_mode: u8,
@@ -5152,7 +5154,7 @@ pub const HIGH_LATENCY = struct {
     custom_mode: u32,
 
     /// The landed state. Is set to MAV_LANDED_STATE_UNDEFINED if landed state is unknown.
-    landed_state: u8,
+    landed_state: enums.MAV_LANDED_STATE,
 
     /// roll
     roll: i16,
@@ -5197,7 +5199,7 @@ pub const HIGH_LATENCY = struct {
     gps_nsat: u8,
 
     /// GPS Fix type.
-    gps_fix_type: u8,
+    gps_fix_type: enums.GPS_FIX_TYPE,
 
     /// Remaining battery (percentage)
     battery_remaining: u8,
@@ -5325,7 +5327,7 @@ pub const SET_POSITION_TARGET_GLOBAL_INT = struct {
     target_component: u8,
 
     /// Valid options are: MAV_FRAME_GLOBAL = 0, MAV_FRAME_GLOBAL_RELATIVE_ALT = 3, MAV_FRAME_GLOBAL_TERRAIN_ALT = 10 (MAV_FRAME_GLOBAL_INT, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT are allowed synonyms, but have been deprecated)
-    coordinate_frame: u8,
+    coordinate_frame: enums.MAV_FRAME,
 
     /// Bitmap to indicate which dimensions should be ignored by the vehicle.
     type_mask: u16,
@@ -5382,7 +5384,7 @@ pub const AVAILABLE_MODES = struct {
     mode_index: u8,
 
     /// Standard mode.
-    standard_mode: u8,
+    standard_mode: enums.MAV_STANDARD_MODE,
 
     /// A bitfield for use for autopilot-specific flags
     custom_mode: u32,
@@ -5405,7 +5407,7 @@ pub const SUPPORTED_TUNES = struct {
     target_component: u8,
 
     /// Bitfield of supported tune formats.
-    format: u32,
+    format: enums.TUNE_FORMAT,
 
 };
 
@@ -5456,10 +5458,10 @@ pub const OBSTACLE_DISTANCE = struct {
     time_usec: u64,
 
     /// Class id of the distance sensor type.
-    sensor_type: u8,
+    sensor_type: enums.MAV_DISTANCE_SENSOR,
 
     /// Distance of obstacles around the vehicle with index 0 corresponding to north + angle_offset, unless otherwise specified in the frame. A value of 0 is valid and means that the obstacle is practically touching the sensor. A value of max_distance +1 means no obstacle is present. A value of UINT16_MAX for unknown/not used. In a array element, one unit corresponds to 1cm.
-    distances: [72]u8,
+    distances: [72]u16,
 
     /// Angular width in degrees of each array element. Increment direction is clockwise. This field is ignored if increment_f is non-zero.
     increment: u8,
@@ -5678,7 +5680,7 @@ pub const SET_MODE = struct {
     target_system: u8,
 
     /// The new base mode.
-    base_mode: u8,
+    base_mode: enums.MAV_MODE,
 
     /// The new autopilot-specific mode. This field can be ignored by an autopilot.
     custom_mode: u32,
@@ -5826,7 +5828,7 @@ pub const OPEN_DRONE_ID_AUTHENTICATION = struct {
     id_or_mac: [20]u8,
 
     /// Indicates the type of authentication.
-    authentication_type: u8,
+    authentication_type: enums.MAV_ODID_AUTH_TYPE,
 
     /// Allowed range is 0 - 15.
     data_page: u8,
@@ -5943,7 +5945,7 @@ pub const TRAJECTORY_REPRESENTATION_WAYPOINTS = struct {
     vel_yaw: [5]f32,
 
     /// MAV_CMD command id of waypoint, set to UINT16_MAX if not being used.
-    command: [5]u8,
+    command: [5]u16,
 
 };
 
@@ -5981,10 +5983,10 @@ pub const MISSION_ITEM_INT = struct {
     seq: u16,
 
     /// The coordinate system of the waypoint.
-    frame: u8,
+    frame: enums.MAV_FRAME,
 
     /// The scheduled action for the waypoint.
-    command: u16,
+    command: enums.MAV_CMD,
 
     /// false:0, true:1
     current: u8,
@@ -6176,7 +6178,7 @@ pub const TERRAIN_DATA = struct {
     gridbit: u8,
 
     /// Terrain data MSL
-    data: [16]u8,
+    data: [16]i16,
 
 };
 
@@ -6257,7 +6259,7 @@ pub const ADSB_VEHICLE = struct {
     lon: i32,
 
     /// ADSB altitude type.
-    altitude_type: u8,
+    altitude_type: enums.ADSB_ALTITUDE_TYPE,
 
     /// Altitude(ASL)
     altitude: i32,
@@ -6275,7 +6277,7 @@ pub const ADSB_VEHICLE = struct {
     callsign: [9]u8,
 
     /// ADSB emitter type.
-    emitter_type: u8,
+    emitter_type: enums.ADSB_EMITTER_TYPE,
 
     /// Time since last communication in seconds
     tslc: u8,
@@ -6377,7 +6379,7 @@ pub const PARAM_EXT_SET = struct {
     param_value: [128]u8,
 
     /// Parameter type.
-    param_type: u8,
+    param_type: enums.MAV_PARAM_EXT_TYPE,
 
 };
 
@@ -6394,7 +6396,7 @@ pub const STORAGE_INFORMATION = struct {
     storage_count: u8,
 
     /// Status of storage
-    status: u8,
+    status: enums.STORAGE_STATUS,
 
     /// Total capacity. If storage is not ready (STORAGE_STATUS_READY) value will be ignored.
     total_capacity: f32,
@@ -6437,7 +6439,7 @@ pub const MISSION_ACK = struct {
     target_component: u8,
 
     /// Mission result.
-    type: u8,
+    type: enums.MAV_MISSION_RESULT,
 
 
     //Extensions
@@ -6561,7 +6563,7 @@ pub const AUTOPILOT_STATE_FOR_GIMBAL_DEVICE = struct {
     estimator_status: u16,
 
     /// The landed state. Is set to MAV_LANDED_STATE_UNDEFINED if landed state is unknown.
-    landed_state: u8,
+    landed_state: enums.MAV_LANDED_STATE,
 
 
     //Extensions
@@ -6688,10 +6690,10 @@ pub const ODOMETRY = struct {
     time_usec: u64,
 
     /// Coordinate frame of reference for the pose data.
-    frame_id: u8,
+    frame_id: enums.MAV_FRAME,
 
     /// Coordinate frame of reference for the velocity in free space (twist) data.
-    child_frame_id: u8,
+    child_frame_id: enums.MAV_FRAME,
 
     /// X Position
     x: f32,
@@ -6849,13 +6851,13 @@ pub const GENERATOR_STATUS = struct {
 pub const CELLULAR_STATUS = struct {
     pub const MSG_ID = 334;
     /// Cellular modem status
-    status: u8,
+    status: enums.CELLULAR_STATUS_FLAG,
 
     /// Failure reason when status in in CELLULAR_STATUS_FLAG_FAILED
-    failure_reason: u8,
+    failure_reason: enums.CELLULAR_NETWORK_FAILED_REASON,
 
     /// Cellular network radio type: gsm, cdma, lte...
-    type: u8,
+    type: enums.CELLULAR_NETWORK_RADIO_TYPE,
 
     /// Signal quality in percent. If unknown, set to UINT8_MAX
     quality: u8,
@@ -6884,7 +6886,7 @@ pub const OPEN_DRONE_ID_SELF_ID = struct {
     id_or_mac: [20]u8,
 
     /// Indicates the type of the description field.
-    description_type: u8,
+    description_type: enums.MAV_ODID_DESC_TYPE,
 
     /// Text description or numeric value expressed as ASCII characters. Shall be filled with nulls in the unused portion of the field.
     description: [23]u8,
@@ -6901,10 +6903,10 @@ pub const PARAM_EXT_ACK = struct {
     param_value: [128]u8,
 
     /// Parameter type.
-    param_type: u8,
+    param_type: enums.MAV_PARAM_EXT_TYPE,
 
     /// Result code.
-    param_result: u8,
+    param_result: enums.PARAM_ACK,
 
 };
 
@@ -6958,7 +6960,7 @@ pub const SET_POSITION_TARGET_LOCAL_NED = struct {
     target_component: u8,
 
     /// Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9
-    coordinate_frame: u8,
+    coordinate_frame: enums.MAV_FRAME,
 
     /// Bitmap to indicate which dimensions should be ignored by the vehicle.
     type_mask: u16,
@@ -7008,7 +7010,7 @@ pub const FENCE_STATUS = struct {
     breach_count: u16,
 
     /// Last breach type.
-    breach_type: u8,
+    breach_type: enums.FENCE_BREACH,
 
     /// Time (since boot) of last breach.
     breach_time: u32,
@@ -7030,7 +7032,7 @@ pub const VIDEO_STREAM_INFORMATION = struct {
     count: u8,
 
     /// Type of stream.
-    type: u8,
+    type: enums.VIDEO_STREAM_TYPE,
 
     /// Bitmap of stream status flags.
     flags: u16,
@@ -7149,10 +7151,10 @@ pub const COMMAND_INT_STAMPED = struct {
     target_component: u8,
 
     /// The coordinate system of the COMMAND, as defined by MAV_FRAME enum
-    frame: u8,
+    frame: enums.MAV_FRAME,
 
     /// The scheduled action for the mission item, as defined by MAV_CMD enum
-    command: u16,
+    command: enums.MAV_CMD,
 
     /// false:0, true:1
     current: u8,
@@ -7579,10 +7581,10 @@ pub const GSM_LINK_STATUS = struct {
     timestamp: u64,
 
     /// GSM modem used
-    gsm_modem_type: u8,
+    gsm_modem_type: enums.GSM_MODEM_TYPE,
 
     /// GSM link type
-    gsm_link_type: u8,
+    gsm_link_type: enums.GSM_LINK_TYPE,
 
     /// RSSI as reported by modem (unconverted)
     rssi: u8,
@@ -7643,7 +7645,7 @@ pub const COMMAND_LONG_STAMPED = struct {
     target_component: u8,
 
     /// Command ID, as defined by MAV_CMD enum.
-    command: u16,
+    command: enums.MAV_CMD,
 
     /// 0: First transmission of this command. 1-255: Confirmation transmissions (e.g. for kill command)
     confirmation: u8,

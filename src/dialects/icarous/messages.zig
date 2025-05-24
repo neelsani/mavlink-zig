@@ -1,6 +1,8 @@
 // Auto-generated MAVLink messages
 // DO NOT EDIT MANUALLY
 
+const enums = @import("enums.zig");
+
 /// Kinematic multi bands (track) output from Daidalus
 pub const ICAROUS_KINEMATIC_BANDS = struct {
     pub const MSG_ID = 42001;
@@ -8,7 +10,7 @@ pub const ICAROUS_KINEMATIC_BANDS = struct {
     numBands: i8,
 
     /// See the TRACK_BAND_TYPES enum.
-    type1: u8,
+    type1: enums.ICAROUS_TRACK_BAND_TYPES,
 
     /// min angle (degrees)
     min1: f32,
@@ -17,7 +19,7 @@ pub const ICAROUS_KINEMATIC_BANDS = struct {
     max1: f32,
 
     /// See the TRACK_BAND_TYPES enum.
-    type2: u8,
+    type2: enums.ICAROUS_TRACK_BAND_TYPES,
 
     /// min angle (degrees)
     min2: f32,
@@ -26,7 +28,7 @@ pub const ICAROUS_KINEMATIC_BANDS = struct {
     max2: f32,
 
     /// See the TRACK_BAND_TYPES enum.
-    type3: u8,
+    type3: enums.ICAROUS_TRACK_BAND_TYPES,
 
     /// min angle (degrees)
     min3: f32,
@@ -35,7 +37,7 @@ pub const ICAROUS_KINEMATIC_BANDS = struct {
     max3: f32,
 
     /// See the TRACK_BAND_TYPES enum.
-    type4: u8,
+    type4: enums.ICAROUS_TRACK_BAND_TYPES,
 
     /// min angle (degrees)
     min4: f32,
@@ -44,7 +46,7 @@ pub const ICAROUS_KINEMATIC_BANDS = struct {
     max4: f32,
 
     /// See the TRACK_BAND_TYPES enum.
-    type5: u8,
+    type5: enums.ICAROUS_TRACK_BAND_TYPES,
 
     /// min angle (degrees)
     min5: f32,
@@ -58,7 +60,7 @@ pub const ICAROUS_KINEMATIC_BANDS = struct {
 pub const ICAROUS_HEARTBEAT = struct {
     pub const MSG_ID = 42000;
     /// See the FMS_STATE enum.
-    status: u8,
+    status: enums.ICAROUS_FMS_STATE,
 
 };
 

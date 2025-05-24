@@ -1,6 +1,8 @@
 // Auto-generated MAVLink messages
 // DO NOT EDIT MANUALLY
 
+const enums = @import("enums.zig");
+
 /// Version and capability of protocol version. This message can be requested with MAV_CMD_REQUEST_MESSAGE and is used as part of the handshaking to establish which MAVLink version should be used on the network. Every node should respond to a request for PROTOCOL_VERSION to enable the handshaking. Library implementers should consider adding this into the default decoding state machine to allow the protocol core to respond directly.
 pub const PROTOCOL_VERSION = struct {
     pub const MSG_ID = 300;
@@ -25,10 +27,10 @@ pub const PROTOCOL_VERSION = struct {
 pub const HEARTBEAT = struct {
     pub const MSG_ID = 0;
     /// Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.
-    type: u8,
+    type: enums.MAV_TYPE,
 
     /// Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.
-    autopilot: u8,
+    autopilot: enums.MAV_AUTOPILOT,
 
     /// System mode bitmap.
     base_mode: u8,
@@ -37,7 +39,7 @@ pub const HEARTBEAT = struct {
     custom_mode: u32,
 
     /// System status flag.
-    system_status: u8,
+    system_status: enums.MAV_STATE,
 
     /// MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version
     mavlink_version: u8,
