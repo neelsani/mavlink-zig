@@ -16,6 +16,3 @@ pub const ICAROUS_FMS_STATE = enum(u8) {
     ICAROUS_FMS_STATE_LAND = 5,
 };
 
-pub const MAV_CMD = enum(u16) {
-};
-

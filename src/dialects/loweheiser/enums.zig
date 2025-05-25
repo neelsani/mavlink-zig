@@ -1,31 +1,8 @@
 // Auto-generated MAVLink enums
 // DO NOT EDIT MANUALLY
 
-pub const MAV_STATE = enum(u8) {
-    /// Uninitialized system, state is unknown.
-    MAV_STATE_UNINIT = 0,
-    /// System is booting up.
-    MAV_STATE_BOOT = 1,
-    /// System is calibrating and not flight-ready.
-    MAV_STATE_CALIBRATING = 2,
-    /// System is grounded and on standby. It can be launched any time.
-    MAV_STATE_STANDBY = 3,
-    /// System is active and might be already airborne. Motors are engaged.
-    MAV_STATE_ACTIVE = 4,
-    /// System is in a non-normal flight mode (failsafe). It can however still navigate.
-    MAV_STATE_CRITICAL = 5,
-    /// System is in a non-normal flight mode (failsafe). It lost control over parts or over the whole airframe. It is in mayday and going down.
-    MAV_STATE_EMERGENCY = 6,
-    /// System just initialized its power-down sequence, will shut down now.
-    MAV_STATE_POWEROFF = 7,
-    /// System is terminating itself (failsafe or commanded).
-    MAV_STATE_FLIGHT_TERMINATION = 8,
-};
-
 /// These flags encode the MAV mode.
-pub const MAV_MODE_FLAG = enum(u32) {
-    pub const BITMASK = true;
-
+pub const MAV_MODE_FLAG = enum(u8) {
     /// 0b10000000 MAV safety set to armed. Motors are enabled / running / can start. Ready to fly. Additional note: this flag is to be ignore when sent in the command MAV_CMD_DO_SET_MODE and MAV_CMD_COMPONENT_ARM_DISARM shall be used instead. The flag can still be used to report the armed state.
     MAV_MODE_FLAG_SAFETY_ARMED = 128,
     /// 0b01000000 remote control input is enabled.
@@ -42,28 +19,6 @@ pub const MAV_MODE_FLAG = enum(u32) {
     MAV_MODE_FLAG_TEST_ENABLED = 2,
     /// 0b00000001 Reserved for future use.
     MAV_MODE_FLAG_CUSTOM_MODE_ENABLED = 1,
-};
-
-/// These values encode the bit positions of the decode position. These values can be used to read the value of a flag bit by combining the base_mode variable with AND with the flag position value. The result will be either 0 or 1, depending on if the flag is set or not.
-pub const MAV_MODE_FLAG_DECODE_POSITION = enum(u32) {
-    pub const BITMASK = true;
-
-    /// First bit:  10000000
-    MAV_MODE_FLAG_DECODE_POSITION_SAFETY = 128,
-    /// Second bit: 01000000
-    MAV_MODE_FLAG_DECODE_POSITION_MANUAL = 64,
-    /// Third bit:  00100000
-    MAV_MODE_FLAG_DECODE_POSITION_HIL = 32,
-    /// Fourth bit: 00010000
-    MAV_MODE_FLAG_DECODE_POSITION_STABILIZE = 16,
-    /// Fifth bit:  00001000
-    MAV_MODE_FLAG_DECODE_POSITION_GUIDED = 8,
-    /// Sixth bit:   00000100
-    MAV_MODE_FLAG_DECODE_POSITION_AUTO = 4,
-    /// Seventh bit: 00000010
-    MAV_MODE_FLAG_DECODE_POSITION_TEST = 2,
-    /// Eighth bit: 00000001
-    MAV_MODE_FLAG_DECODE_POSITION_CUSTOM_MODE = 1,
 };
 
 /// Micro air vehicle / autopilot classes. This identifies the individual model.
@@ -110,6 +65,11 @@ pub const MAV_AUTOPILOT = enum(u8) {
     MAV_AUTOPILOT_AIRRAILS = 19,
     /// Fusion Reflex - https://fusion.engineering
     MAV_AUTOPILOT_REFLEX = 20,
+};
+
+pub const MAV_CMD = enum(u32) {
+    /// Set Loweheiser desired states
+    MAV_CMD_LOWEHEISER_SET_STATE = 10151,
 };
 
 /// MAVLINK component type reported in HEARTBEAT message. Flight controllers must report the type of the vehicle on which they are mounted (e.g. MAV_TYPE_OCTOROTOR). All other components must report a value appropriate for their type (e.g. a camera must use MAV_TYPE_CAMERA).
@@ -208,6 +168,47 @@ pub const MAV_TYPE = enum(u8) {
     MAV_TYPE_SPACECRAFT_ORBITER = 45,
     /// A generic four-legged ground vehicle (e.g., a robot dog).
     MAV_TYPE_GROUND_QUADRUPED = 46,
+};
+
+pub const MAV_STATE = enum(u8) {
+    /// Uninitialized system, state is unknown.
+    MAV_STATE_UNINIT = 0,
+    /// System is booting up.
+    MAV_STATE_BOOT = 1,
+    /// System is calibrating and not flight-ready.
+    MAV_STATE_CALIBRATING = 2,
+    /// System is grounded and on standby. It can be launched any time.
+    MAV_STATE_STANDBY = 3,
+    /// System is active and might be already airborne. Motors are engaged.
+    MAV_STATE_ACTIVE = 4,
+    /// System is in a non-normal flight mode (failsafe). It can however still navigate.
+    MAV_STATE_CRITICAL = 5,
+    /// System is in a non-normal flight mode (failsafe). It lost control over parts or over the whole airframe. It is in mayday and going down.
+    MAV_STATE_EMERGENCY = 6,
+    /// System just initialized its power-down sequence, will shut down now.
+    MAV_STATE_POWEROFF = 7,
+    /// System is terminating itself (failsafe or commanded).
+    MAV_STATE_FLIGHT_TERMINATION = 8,
+};
+
+/// These values encode the bit positions of the decode position. These values can be used to read the value of a flag bit by combining the base_mode variable with AND with the flag position value. The result will be either 0 or 1, depending on if the flag is set or not.
+pub const MAV_MODE_FLAG_DECODE_POSITION = enum(u32) {
+    /// First bit:  10000000
+    MAV_MODE_FLAG_DECODE_POSITION_SAFETY = 128,
+    /// Second bit: 01000000
+    MAV_MODE_FLAG_DECODE_POSITION_MANUAL = 64,
+    /// Third bit:  00100000
+    MAV_MODE_FLAG_DECODE_POSITION_HIL = 32,
+    /// Fourth bit: 00010000
+    MAV_MODE_FLAG_DECODE_POSITION_STABILIZE = 16,
+    /// Fifth bit:  00001000
+    MAV_MODE_FLAG_DECODE_POSITION_GUIDED = 8,
+    /// Sixth bit:   00000100
+    MAV_MODE_FLAG_DECODE_POSITION_AUTO = 4,
+    /// Seventh bit: 00000010
+    MAV_MODE_FLAG_DECODE_POSITION_TEST = 2,
+    /// Eighth bit: 00000001
+    MAV_MODE_FLAG_DECODE_POSITION_CUSTOM_MODE = 1,
 };
 
 /// Component ids (values) for the different types and instances of onboard hardware/software that might make up a MAVLink system (autopilot, cameras, servos, GPS systems, avoidance systems etc.).
@@ -486,10 +487,5 @@ pub const MAV_COMPONENT = enum(u32) {
     MAV_COMP_ID_ILLUMINATOR = 243,
     /// Deprecated, don't use. Component for handling system messages (e.g. to ARM, takeoff, etc.).
     MAV_COMP_ID_SYSTEM_CONTROL = 250,
-};
-
-pub const MAV_CMD = enum(u16) {
-    /// Set Loweheiser desired states
-    MAV_CMD_LOWEHEISER_SET_STATE = 10151,
 };
 

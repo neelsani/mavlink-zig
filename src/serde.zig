@@ -203,36 +203,36 @@ test "serialize then deserialize equality" {
     const testing = std.testing;
     const mavlink = @import("root.zig");
     const dialect = mavlink.dialects.ardupilotmega;
-    const data = dialect.messages.BATTERY_INFO{
+    const data = dialect.messages.BATTERY_STATUS{
         .battery_function = .MAV_BATTERY_FUNCTION_ALL,
-        .cells_in_series = 5,
-        .charging_maximum_current = 32,
-        .charging_maximum_voltage = 34,
-        .charging_minimum_voltage = 23.2,
-        .cycle_count = 4,
-        .design_capacity = 43.2,
-        .discharge_maximum_burst_current = 4,
-        .discharge_maximum_current = 43,
-        .discharge_minimum_voltage = 2.3,
-        .full_charge_capacity = 4.3,
+        .battery_remaining = 0,
+        .charge_state = .MAV_BATTERY_CHARGE_STATE_EMERGENCY,
+        .current_battery = 2,
+        .current_consumed = 2,
+        .energy_consumed = 3,
+        .fault_bitmask = .BATTERY_FAULT_INCOMPATIBLE_CELLS_CONFIGURATION,
         .id = 4,
-        .manufacture_date = .{ 1, 2, 3, 4, 4, 4, 4, 4, 4 },
-        .name = blk: {
-            var tmp = std.mem.zeroes([50]u8);
-            const text = "hello I like to eat food hello I like to eat food.";
-            @memcpy(&tmp, text);
-            break :blk tmp;
-        },
-        .nominal_voltage = 32,
-        .resting_minimum_voltage = 3.3,
-        .serial_number = std.mem.zeroes([32]u8),
-        .state_of_health = 3,
+        .mode = .MAV_BATTERY_MODE_AUTO_DISCHARGING,
+        .temperature = 3,
+        .time_remaining = 1,
         .type = .MAV_BATTERY_TYPE_LION,
-        .weight = 12,
+        .voltages = [_]u16{
+            1,
+            4,
+            1,
+            2,
+            4,
+            1,
+            4,
+            1,
+            2,
+            4,
+        },
+        .voltages_ext = [_]u16{ 3, 4, 2, 4 },
     };
     var buf: [mavlink.v2.MAVLINK_MAX_PACKET_SIZE]u8 = undefined;
     const mlen = try serialize(data, buf[0..]);
-    const pak = try deserialize(dialect.messages.BATTERY_INFO, buf[0..mlen]);
+    const pak = try deserialize(dialect.messages.BATTERY_STATUS, buf[0..mlen]);
     try testing.expectEqualDeep(pak, data);
 
     var buf1: [mavlink.v2.MAVLINK_MAX_PACKET_SIZE]u8 = undefined;

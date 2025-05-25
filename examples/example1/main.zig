@@ -14,7 +14,7 @@ pub fn main() !void {
         .target_component = 0,
         .command = .MAV_CMD_REQUEST_MESSAGE,
         .confirmation = 0,
-        .param1 = D.messages.PROTOCOL_VERSION.MSG_ID,
+        .param1 = 0,
         .param2 = 0,
         .param3 = 0,
         .param4 = 0,
@@ -32,9 +32,9 @@ pub fn main() !void {
         const n = try conn.reader().read(&rb);
         for (rb[0..n]) |b| {
             if (parser.parseChar(b)) |msg| {
-                if (msg.msgid == D.messages.PROTOCOL_VERSION.MSG_ID) {
-                    const pv = try mavlink.serde.deserialize(D.messages.PROTOCOL_VERSION, msg.payload[0..msg.len]);
-                    std.debug.print("Proto v{d} (min {d}, max {d})\n", .{ pv.version, pv.min_version, pv.max_version });
+                if (msg.msgid == D.messages.ATTITUDE.MSG_ID) {
+                    const pv = try mavlink.serde.deserialize(D.messages.ATTITUDE, msg.payload[0..msg.len]);
+                    std.debug.print("ATTITUDE {any}\n", .{pv});
                     return;
                 }
             }

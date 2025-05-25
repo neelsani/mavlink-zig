@@ -45,6 +45,21 @@ Then add the following to `build.zig`:
 const mavlink = b.dependency("mavlink", .{});
 exe.root_module.addImport("mavlink", mavlink.module("mavlink"));
 ```
+## Build
+### Build and Test 
+```sh
+zig build test --summary all
+zig build -Dexamples=false --summary all
+zig build -Dexamples=true --summary all
+```
+### Generate Definitions
+```sh
+zig build genv2 -Ddialect_to_use=ardupilotmega.xml --summary all
+or
+zig build genv2 -Ddialect_to_use=all --summary all
+
+zig build genv2 -Ddialect_to_use=ardupilotmega.xml -Dmavlink_xml_def_dir=<path/to/mavlink/xml/dir> -Ddialect_out_dir=<path/to/output> --summary all
+```
 
 ## Usage / Examples 🚀
 
@@ -83,7 +98,7 @@ pub fn main() !void {
     const hb = D.messages.HEARTBEAT{
         .type = .MAV_TYPE_GCS, // Identify as GCS
         .autopilot = .MAV_AUTOPILOT_INVALID, // Not a flight controller
-        .base_mode = @intFromEnum(D.enums.MAV_MODE.MAV_MODE_AUTO_ARMED),
+        .base_mode = .MAV_MODE_FLAG_AUTO_ENABLED,
         // Armed in AUTO mode
         .custom_mode = 0, // No custom mode flags
         .system_status = .MAV_STATE_STANDBY, // Standby state
@@ -112,12 +127,12 @@ pub fn main() !void {
         const n = try conn.reader().read(&readBuf); // Read up to `readBuf.len` bytes
         for (readBuf[0..n]) |b| { // Iterate each received byte
             if (parser.parseChar(b)) |msg| { // If a full MAVLink message is parsed
-                // Check if it’s a HEARTBEAT response
-                if (msg.msgid == D.messages.HEARTBEAT.MSG_ID) {
+                // Check if it’s a ATTITUDE response
+                if (msg.msgid == D.messages.ATTITUDE.MSG_ID) {
                     // Deserialize the payload into a HEARTBEAT struct
-                    const reply = try mavlink.serde.deserialize(D.messages.HEARTBEAT, msg.payload[0..msg.len]);
+                    const reply = try mavlink.serde.deserialize(D.messages.ATTITUDE, msg.payload[0..msg.len]);
                     // Print the received heartbeat in debug output
-                    std.debug.print("GCS got HEARTBEAT: {any}\n", .{reply});
+                    std.debug.print("GCS got ATTITUDE: {any}\n", .{reply});
                 }
             }
         }
@@ -138,6 +153,7 @@ For detailed documentation and the full API reference, visit:
 ## Acknowledgements
 - [mavlink](https://mavlink.io/en/) — Protocol specification
 - [zig-xml](https://github.com/ianprime0509/zig-xml) — the XML parsing library used by the code generator to transform MAVLink XML definitions into Zig code.  
+- [rust-mavlink](https://github.com/mavlink/rust-mavlink) - mavlink in rust
 
 ## Support
 

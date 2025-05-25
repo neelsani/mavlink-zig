@@ -8,6 +8,3 @@ pub const AIRLINK_AUTH_RESPONSE_TYPE = enum(u8) {
     AIRLINK_AUTH_OK = 1,
 };
 
-pub const MAV_CMD = enum(u16) {
-};
-

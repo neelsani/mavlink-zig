@@ -26,7 +26,7 @@ pub fn main() !void {
         .type = .MAV_TYPE_GCS,
         .system_status = .MAV_STATE_ACTIVE,
         .mavlink_version = 3,
-        .base_mode = @intFromEnum(dialect.enums.MAV_MODE.MAV_MODE_AUTO_ARMED),
+        .base_mode = .MAV_MODE_FLAG_AUTO_ENABLED,
         .custom_mode = 0,
     };
 

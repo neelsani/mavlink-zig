@@ -23,9 +23,7 @@ pub const MAV_STATE = enum(u8) {
 };
 
 /// These flags encode the MAV mode.
-pub const MAV_MODE_FLAG = enum(u32) {
-    pub const BITMASK = true;
-
+pub const MAV_MODE_FLAG = enum(u8) {
     /// 0b10000000 MAV safety set to armed. Motors are enabled / running / can start. Ready to fly. Additional note: this flag is to be ignore when sent in the command MAV_CMD_DO_SET_MODE and MAV_CMD_COMPONENT_ARM_DISARM shall be used instead. The flag can still be used to report the armed state.
     MAV_MODE_FLAG_SAFETY_ARMED = 128,
     /// 0b01000000 remote control input is enabled.
@@ -46,8 +44,6 @@ pub const MAV_MODE_FLAG = enum(u32) {
 
 /// These values encode the bit positions of the decode position. These values can be used to read the value of a flag bit by combining the base_mode variable with AND with the flag position value. The result will be either 0 or 1, depending on if the flag is set or not.
 pub const MAV_MODE_FLAG_DECODE_POSITION = enum(u32) {
-    pub const BITMASK = true;
-
     /// First bit:  10000000
     MAV_MODE_FLAG_DECODE_POSITION_SAFETY = 128,
     /// Second bit: 01000000
@@ -486,8 +482,5 @@ pub const MAV_COMPONENT = enum(u32) {
     MAV_COMP_ID_ILLUMINATOR = 243,
     /// Deprecated, don't use. Component for handling system messages (e.g. to ARM, takeoff, etc.).
     MAV_COMP_ID_SYSTEM_CONTROL = 250,
-};
-
-pub const MAV_CMD = enum(u16) {
 };
 

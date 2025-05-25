@@ -82,7 +82,30 @@ pub fn build(b: *std.Build) void {
         run_cmd.addArg(b.option([]const u8, "xml", "XML file to process (default: 'ardupilotmega.xml')") orelse "all");
         run_cmd.addArg(b.option([]const u8, "out", "Output directory (default: 'src/dialects')") orelse "src/dialects");
 
-        const tool_step = b.step("generate", "Generate MAVLink code from XML definitions");
+        const tool_step = b.step("generate", "Generate MAVLink code from XML definitions (deprecated)");
+        tool_step.dependOn(&run_cmd.step);
+    }
+
+    { // The dialect zig generator
+
+        const genoptions = b.addOptions();
+        genoptions.addOption([]const u8, "dialect_to_use", b.option([]const u8, "dialect_to_use", "The dialect to use or (all) for all of them") orelse "all");
+        genoptions.addOption([]const u8, "dialect_out_dir", b.option([]const u8, "dialect_out_dir", "The output directory of the generated dialects") orelse b.path("src/dialects").getPath(b));
+        genoptions.addOption([]const u8, "mavlink_xml_def_dir", b.option([]const u8, "mavlink_xml_def_dir", "The output directory of the definitions") orelse b.path("mavlink/message_definitions/v1.0").getPath(b));
+
+        const exe = b.addExecutable(.{
+            .name = "genv2",
+            .root_source_file = b.path("tools/genv2/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        });
+        exe.root_module.addImport("mavlink", mavlink);
+        exe.root_module.addImport("xml", xml);
+        exe.root_module.addOptions("config", genoptions);
+        b.installArtifact(exe);
+
+        const run_cmd = b.addRunArtifact(exe);
+        const tool_step = b.step("genv2", "Generate MAVLink code from XML definitions");
         tool_step.dependOn(&run_cmd.step);
     }
 

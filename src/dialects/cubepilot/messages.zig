@@ -3,49 +3,6 @@
 
 const enums = @import("enums.zig");
 
-/// Version and capability of protocol version. This message can be requested with MAV_CMD_REQUEST_MESSAGE and is used as part of the handshaking to establish which MAVLink version should be used on the network. Every node should respond to a request for PROTOCOL_VERSION to enable the handshaking. Library implementers should consider adding this into the default decoding state machine to allow the protocol core to respond directly.
-pub const PROTOCOL_VERSION = struct {
-    pub const MSG_ID = 300;
-    /// Currently active MAVLink version number * 100: v1.0 is 100, v2.0 is 200, etc.
-    version: u16,
-
-    /// Minimum MAVLink version supported
-    min_version: u16,
-
-    /// Maximum MAVLink version supported (set to the same value as version by default)
-    max_version: u16,
-
-    /// The first 8 bytes (not characters printed in hex!) of the git hash.
-    spec_version_hash: [8]u8,
-
-    /// The first 8 bytes (not characters printed in hex!) of the git hash.
-    library_version_hash: [8]u8,
-
-};
-
-/// The heartbeat message shows that a system or component is present and responding. The type and autopilot fields (along with the message component id), allow the receiving system to treat further messages from this system appropriately (e.g. by laying out the user interface based on the autopilot). This microservice is documented at https://mavlink.io/en/services/heartbeat.html
-pub const HEARTBEAT = struct {
-    pub const MSG_ID = 0;
-    /// Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.
-    type: enums.MAV_TYPE,
-
-    /// Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.
-    autopilot: enums.MAV_AUTOPILOT,
-
-    /// System mode bitmap.
-    base_mode: u8,
-
-    /// A bitfield for use for autopilot-specific flags
-    custom_mode: u32,
-
-    /// System status flag.
-    system_status: enums.MAV_STATE,
-
-    /// MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version
-    mavlink_version: u8,
-
-};
-
 /// Reports the current commanded vehicle position, velocity, and acceleration as specified by the autopilot. This should match the commands sent in SET_POSITION_TARGET_GLOBAL_INT if the vehicle is being controlled this way.
 pub const POSITION_TARGET_GLOBAL_INT = struct {
     pub const MSG_ID = 87;
@@ -56,7 +13,7 @@ pub const POSITION_TARGET_GLOBAL_INT = struct {
     coordinate_frame: enums.MAV_FRAME,
 
     /// Bitmap to indicate which dimensions should be ignored by the vehicle.
-    type_mask: u16,
+    type_mask: enums.POSITION_TARGET_TYPEMASK,
 
     /// Latitude in WGS84 frame
     lat_int: i32,
@@ -137,7 +94,7 @@ pub const SERIAL_CONTROL = struct {
     device: enums.SERIAL_CONTROL_DEV,
 
     /// Bitmap of serial control flags.
-    flags: u8,
+    flags: enums.SERIAL_CONTROL_FLAG,
 
     /// Timeout for reply data
     timeout: u16,
@@ -151,11 +108,11 @@ pub const SERIAL_CONTROL = struct {
     /// serial data
     data: [70]u8,
 
-
-    //Extensions
+    //Extension Field
     /// System ID
     target_system: u8,
 
+    //Extension Field
     /// Component ID
     target_component: u8,
 
@@ -170,7 +127,7 @@ pub const OPEN_DRONE_ID_MESSAGE_PACK = struct {
     /// Component ID (0 for broadcast).
     target_component: u8,
 
-    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html.
+    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html. 
     id_or_mac: [20]u8,
 
     /// This field must currently always be equal to 25 (bytes), since all encoded OpenDroneID messages are specified to have this length.
@@ -196,8 +153,7 @@ pub const GPS_GLOBAL_ORIGIN = struct {
     /// Altitude (MSL). Positive for up.
     altitude: i32,
 
-
-    //Extensions
+    //Extension Field
     /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
     time_usec: u64,
 
@@ -236,29 +192,35 @@ pub const SERVO_OUTPUT_RAW = struct {
     /// Servo output 8 value
     servo8_raw: u16,
 
-
-    //Extensions
+    //Extension Field
     /// Servo output 9 value
     servo9_raw: u16,
 
+    //Extension Field
     /// Servo output 10 value
     servo10_raw: u16,
 
+    //Extension Field
     /// Servo output 11 value
     servo11_raw: u16,
 
+    //Extension Field
     /// Servo output 12 value
     servo12_raw: u16,
 
+    //Extension Field
     /// Servo output 13 value
     servo13_raw: u16,
 
+    //Extension Field
     /// Servo output 14 value
     servo14_raw: u16,
 
+    //Extension Field
     /// Servo output 15 value
     servo15_raw: u16,
 
+    //Extension Field
     /// Servo output 16 value
     servo16_raw: u16,
 
@@ -279,10 +241,9 @@ pub const MISSION_WRITE_PARTIAL_LIST = struct {
     /// End index, equal or greater than start index.
     end_index: i16,
 
-
-    //Extensions
+    //Extension Field
     /// Mission type.
-    mission_type: u8,
+    mission_type: enums.MAV_MISSION_TYPE,
 
 };
 
@@ -294,25 +255,55 @@ pub const MISSION_CURRENT = struct {
     /// Sequence
     seq: u16,
 
-
-    //Extensions
+    //Extension Field
     /// Total number of mission items on vehicle (on last item, sequence == total). If the autopilot stores its home location as part of the mission this will be excluded from the total. 0: Not supported, UINT16_MAX if no mission is present on the vehicle.
     total: u16,
 
+    //Extension Field
     /// Mission state machine state. MISSION_STATE_UNKNOWN if state reporting not supported.
-    mission_state: u8,
+    mission_state: enums.MISSION_STATE,
 
+    //Extension Field
     /// Vehicle is in a mode that can execute mission items or suspended. 0: Unknown, 1: In mission mode, 2: Suspended (not in mission mode).
     mission_mode: u8,
 
+    //Extension Field
     /// Id of current on-vehicle mission plan, or 0 if IDs are not supported or there is no mission loaded. GCS can use this to track changes to the mission plan type. The same value is returned on mission upload (in the MISSION_ACK).
     mission_id: u32,
 
+    //Extension Field
     /// Id of current on-vehicle fence plan, or 0 if IDs are not supported or there is no fence loaded. GCS can use this to track changes to the fence plan type. The same value is returned on fence upload (in the MISSION_ACK).
     fence_id: u32,
 
+    //Extension Field
     /// Id of current on-vehicle rally point plan, or 0 if IDs are not supported or there are no rally points loaded. GCS can use this to track changes to the rally point plan type. The same value is returned on rally point upload (in the MISSION_ACK).
     rally_points_id: u32,
+
+};
+
+/// Herelink Telemetry
+pub const HERELINK_TELEM = struct {
+    pub const MSG_ID = 50003;
+    /// 
+    rssi: u8,
+
+    /// 
+    snr: i16,
+
+    /// 
+    rf_freq: u32,
+
+    /// 
+    link_bw: u32,
+
+    /// 
+    link_rate: u32,
+
+    /// 
+    cpu_temp: i16,
+
+    /// 
+    board_temp: i16,
 
 };
 
@@ -380,22 +371,25 @@ pub const BATTERY_STATUS = struct {
     /// Remaining battery energy. Values: [0-100], -1: autopilot does not estimate the remaining battery.
     battery_remaining: i8,
 
-
-    //Extensions
+    //Extension Field
     /// Remaining battery time, 0: autopilot does not provide remaining battery time estimate
     time_remaining: i32,
 
+    //Extension Field
     /// State for extent of discharge, provided by autopilot for warning or external reactions
-    charge_state: u8,
+    charge_state: enums.MAV_BATTERY_CHARGE_STATE,
 
+    //Extension Field
     /// Battery voltages for cells 11 to 14. Cells above the valid cell count for this battery should have a value of 0, where zero indicates not supported (note, this is different than for the voltages field and allows empty byte truncation). If the measured value is 0 then 1 should be sent instead.
     voltages_ext: [4]u16,
 
+    //Extension Field
     /// Battery mode. Default (0) is that battery mode reporting is not supported or battery is in normal-use mode.
-    mode: u8,
+    mode: enums.MAV_BATTERY_MODE,
 
+    //Extension Field
     /// Fault/health indications. These should be set when charge_state is MAV_BATTERY_CHARGE_STATE_FAILED or MAV_BATTERY_CHARGE_STATE_UNHEALTHY (if not, fault reporting is not supported).
-    fault_bitmask: u32,
+    fault_bitmask: enums.MAV_BATTERY_FAULT,
 
 };
 
@@ -441,8 +435,7 @@ pub const SET_HOME_POSITION = struct {
     /// Local Z position of the end of the approach vector. Multicopters should set this position based on their takeoff path. Grass-landing fixed wing aircraft should set it the same way as multicopters. Runway-landing fixed wing aircraft should set it to the opposite direction of the takeoff, assuming the takeoff happened from the threshold / touchdown zone.
     approach_z: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
     time_usec: u64,
 
@@ -554,7 +547,7 @@ pub const CAMERA_INFORMATION = struct {
     /// Name of the camera model
     model_name: [32]u8,
 
-    /// Version of the camera firmware, encoded as: (Dev
+    /// Version of the camera firmware, encoded as: (Dev & 0xff) << 24 | (Patch & 0xff) << 16 | (Minor & 0xff) << 8 | (Major & 0xff). Use 0 if not known.
     firmware_version: u32,
 
     /// Focal length. Use NaN if not known.
@@ -576,7 +569,7 @@ pub const CAMERA_INFORMATION = struct {
     lens_id: u8,
 
     /// Bitmap of camera capability flags.
-    flags: u32,
+    flags: enums.CAMERA_CAP_FLAGS,
 
     /// Camera definition version (iteration).  Use 0 if not known.
     cam_definition_version: u16,
@@ -584,11 +577,11 @@ pub const CAMERA_INFORMATION = struct {
     /// Camera definition URI (if any, otherwise only basic functions will be available). HTTP- (http://) and MAVLink FTP- (mavlinkftp://) formatted URIs are allowed (and both must be supported by any GCS that implements the Camera Protocol). The definition file may be xz compressed, which will be indicated by the file extension .xml.xz (a GCS that implements the protocol must support decompressing the file). The string needs to be zero terminated.  Use a zero-length string if not known.
     cam_definition_uri: [140]u8,
 
-
-    //Extensions
+    //Extension Field
     /// Gimbal id of a gimbal associated with this camera. This is the component id of the gimbal device, or 1-6 for non mavlink gimbals. Use 0 if no gimbal is associated with the camera.
     gimbal_device_id: u8,
 
+    //Extension Field
     /// Camera id of a non-MAVLink camera attached to an autopilot (1-6).  0 if the component is a MAVLink camera (with its own component id).
     camera_device_id: u8,
 
@@ -623,7 +616,7 @@ pub const GIMBAL_MANAGER_SET_PITCHYAW = struct {
     target_component: u8,
 
     /// High level gimbal manager flags to use.
-    flags: u32,
+    flags: enums.GIMBAL_MANAGER_FLAGS,
 
     /// Component ID of gimbal device to address (or 1-6 for non-MAVLink gimbal), 0 for all gimbal device components. Send command multiple times for more than one gimbal (but not all gimbals).
     gimbal_device_id: u8,
@@ -697,7 +690,7 @@ pub const UTM_GLOBAL_POSITION = struct {
     flight_state: enums.UTM_FLIGHT_STATE,
 
     /// Bitwise OR combination of the data available flags.
-    flags: u8,
+    flags: enums.UTM_DATA_AVAIL_FLAGS,
 
 };
 
@@ -727,7 +720,7 @@ pub const OPEN_DRONE_ID_BASIC_ID = struct {
     /// Component ID (0 for broadcast).
     target_component: u8,
 
-    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html.
+    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html. 
     id_or_mac: [20]u8,
 
     /// Indicates the format for the uas_id field of this message.
@@ -787,10 +780,9 @@ pub const MISSION_ITEM = struct {
     /// PARAM7 / local: Z coordinate, global: altitude (relative or absolute, depending on frame).
     z: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Mission type.
-    mission_type: u8,
+    mission_type: enums.MAV_MISSION_TYPE,
 
 };
 
@@ -860,10 +852,9 @@ pub const HIGHRES_IMU = struct {
     temperature: f32,
 
     /// Bitmap for fields that have updated since last message
-    fields_updated: u16,
+    fields_updated: enums.HIGHRES_IMU_UPDATED_FLAGS,
 
-
-    //Extensions
+    //Extension Field
     /// Id. Ids are numbered from 0 and map to IMUs numbered from 1 (e.g. IMU1 will have a message with id=0)
     id: u8,
 
@@ -1035,11 +1026,11 @@ pub const STATUSTEXT = struct {
     /// Status text message, without null termination character
     text: [50]u8,
 
-
-    //Extensions
+    //Extension Field
     /// Unique (opaque) identifier for this statustext message.  May be used to reassemble a logical long-statustext message from a sequence of chunks.  A value of zero indicates this is the only chunk in the sequence and the message can be emitted immediately.
     id: u16,
 
+    //Extension Field
     /// This chunk's sequence number; indexing is from zero.  Any null character in the text field is taken to mean this was the last chunk.
     chunk_seq: u8,
 
@@ -1052,7 +1043,7 @@ pub const GIMBAL_MANAGER_STATUS = struct {
     time_boot_ms: u32,
 
     /// High level gimbal manager flags currently applied.
-    flags: u32,
+    flags: enums.GIMBAL_MANAGER_FLAGS,
 
     /// Gimbal device ID that this gimbal manager is responsible for. Component ID of gimbal device (or 1-6 for non-MAVLink gimbal).
     gimbal_device_id: u8,
@@ -1074,7 +1065,7 @@ pub const GIMBAL_MANAGER_STATUS = struct {
 /// Accept / deny control of this MAV
 pub const CHANGE_OPERATOR_CONTROL_ACK = struct {
     pub const MSG_ID = 6;
-    /// ID of the GCS this message
+    /// ID of the GCS this message 
     gcs_system_id: u8,
 
     /// 0: request control of this MAV, 1: Release control of this MAV
@@ -1122,20 +1113,6 @@ pub const TERRAIN_CHECK = struct {
 
 };
 
-/// Cancel a long running command. The target system should respond with a COMMAND_ACK to the original command with result=MAV_RESULT_CANCELLED if the long running process was cancelled. If it has already completed, the cancel action can be ignored. The cancel action can be retried until some sort of acknowledgement to the original command has been received. The command microservice is documented at https://mavlink.io/en/services/command.html
-pub const COMMAND_CANCEL = struct {
-    pub const MSG_ID = 80;
-    /// System executing long running command. Should not be broadcast (0).
-    target_system: u8,
-
-    /// Component executing long running command.
-    target_component: u8,
-
-    /// Command ID (of command to cancel).
-    command: enums.MAV_CMD,
-
-};
-
 /// Send a key-value pair as float. The use of this message is discouraged for normal packets, but a quite efficient way for testing new messages and getting experimental debug output.
 pub const NAMED_VALUE_FLOAT = struct {
     pub const MSG_ID = 251;
@@ -1179,7 +1156,7 @@ pub const OPEN_DRONE_ID_LOCATION = struct {
     /// Component ID (0 for broadcast).
     target_component: u8,
 
-    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html.
+    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html. 
     id_or_mac: [20]u8,
 
     /// Indicates whether the unmanned aircraft is on the ground or in the air.
@@ -1242,7 +1219,7 @@ pub const GIMBAL_MANAGER_SET_MANUAL_CONTROL = struct {
     target_component: u8,
 
     /// High level gimbal manager flags.
-    flags: u32,
+    flags: enums.GIMBAL_MANAGER_FLAGS,
 
     /// Component ID of gimbal device to address (or 1-6 for non-MAVLink gimbal), 0 for all gimbal device components. Send command multiple times for more than one gimbal (but not all gimbals).
     gimbal_device_id: u8,
@@ -1357,26 +1334,6 @@ pub const CAMERA_THERMAL_RANGE = struct {
 
 };
 
-/// Response to a REQUEST_EVENT in case of an error (e.g. the event is not available anymore).
-pub const RESPONSE_EVENT_ERROR = struct {
-    pub const MSG_ID = 413;
-    /// System ID
-    target_system: u8,
-
-    /// Component ID
-    target_component: u8,
-
-    /// Sequence number.
-    sequence: u16,
-
-    /// Oldest Sequence number that is still available after the sequence set in REQUEST_EVENT.
-    sequence_oldest_available: u16,
-
-    /// Error reason.
-    reason: enums.MAV_EVENT_ERROR_REASON,
-
-};
-
 /// Send a debug value. The index is used to discriminate between values. These values show up in the plot of QGroundControl as DEBUG N.
 pub const DEBUG = struct {
     pub const MSG_ID = 254;
@@ -1401,7 +1358,7 @@ pub const CAMERA_TRACKING_IMAGE_STATUS = struct {
     tracking_mode: enums.CAMERA_TRACKING_MODE,
 
     /// Defines location of target data
-    target_data: u8,
+    target_data: enums.CAMERA_TRACKING_TARGET_DATA,
 
     /// Current tracked point x value if CAMERA_TRACKING_MODE_POINT (normalized 0..1, 0 is left, 1 is right), NAN if unknown
     point_x: f32,
@@ -1424,8 +1381,7 @@ pub const CAMERA_TRACKING_IMAGE_STATUS = struct {
     /// Current tracked rectangle bottom y value if CAMERA_TRACKING_MODE_RECTANGLE (normalized 0..1, 0 is top, 1 is bottom), NAN if unknown
     rec_bottom_y: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Camera id of a non-MAVLink camera attached to an autopilot (1-6).  0 if the component is a MAVLink camera (with its own component id).
     camera_device_id: u8,
 
@@ -1464,8 +1420,7 @@ pub const SCALED_IMU2 = struct {
     /// Z Magnetic field
     zmag: i16,
 
-
-    //Extensions
+    //Extension Field
     /// Temperature, 0: IMU does not provide temperature values. If the IMU is at 0C it must send 1 (0.01C).
     temperature: i16,
 
@@ -1515,10 +1470,9 @@ pub const MISSION_REQUEST_INT = struct {
     /// Sequence
     seq: u16,
 
-
-    //Extensions
+    //Extension Field
     /// Mission type.
-    mission_type: u8,
+    mission_type: enums.MAV_MISSION_TYPE,
 
 };
 
@@ -1635,8 +1589,7 @@ pub const ATTITUDE_QUATERNION = struct {
     /// Yaw angular speed
     yawspeed: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Rotation offset by which the attitude quaternion and angular speed vector should be rotated for user display (quaternion with [w, x, y, z] order, zero-rotation is [1, 0, 0, 0], send [0, 0, 0, 0] if field not supported). This field is intended for systems in which the reference attitude may change during flight. For example, tailsitters VTOLs rotate their reference attitude by 90 degrees between hover mode and fixed wing mode, thus repr_offset_q is equal to [1, 0, 0, 0] in hover mode and equal to [0.7071, 0, 0.7071, 0] in fixed wing mode.
     repr_offset_q: [4]f32,
 
@@ -1748,7 +1701,7 @@ pub const POWER_STATUS = struct {
     Vservo: u16,
 
     /// Bitmap of power supply status flags.
-    flags: u16,
+    flags: enums.MAV_POWER_STATUS,
 
 };
 
@@ -1828,20 +1781,23 @@ pub const SMART_BATTERY_INFO = struct {
     /// Minimum per-cell voltage when resting. If not supplied set to UINT16_MAX value.
     resting_minimum_voltage: u16,
 
-
-    //Extensions
+    //Extension Field
     /// Maximum per-cell voltage when charged. 0: field not provided.
     charging_maximum_voltage: u16,
 
+    //Extension Field
     /// Number of battery cells in series. 0: field not provided.
     cells_in_series: u8,
 
+    //Extension Field
     /// Maximum pack discharge current. 0: field not provided.
     discharge_maximum_current: u32,
 
+    //Extension Field
     /// Maximum pack discharge burst current. 0: field not provided.
     discharge_maximum_burst_current: u32,
 
+    //Extension Field
     /// Manufacture date (DD/MM/YYYY) in ASCII characters, 0 terminated. All 0: field not provided.
     manufacture_date: [11]u8,
 
@@ -1914,10 +1870,9 @@ pub const MISSION_REQUEST = struct {
     /// Sequence
     seq: u16,
 
-
-    //Extensions
+    //Extension Field
     /// Mission type.
-    mission_type: u8,
+    mission_type: enums.MAV_MISSION_TYPE,
 
 };
 
@@ -1957,8 +1912,7 @@ pub const SCALED_PRESSURE = struct {
     /// Absolute pressure temperature
     temperature: i16,
 
-
-    //Extensions
+    //Extension Field
     /// Differential pressure temperature (0, if not available). Report values of 0 (or 1) as 1 cdegC.
     temperature_press_diff: i16,
 
@@ -1981,26 +1935,6 @@ pub const TERRAIN_REQUEST = struct {
 
 };
 
-/// ESC information for higher rate streaming. Recommended streaming rate is ~10 Hz. Information that changes more slowly is sent in ESC_INFO. It should typically only be streamed on high-bandwidth links (i.e. to a companion computer).
-pub const ESC_STATUS = struct {
-    pub const MSG_ID = 291;
-    /// Index of the first ESC in this message. minValue = 0, maxValue = 60, increment = 4.
-    index: u8,
-
-    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
-    time_usec: u64,
-
-    /// Reported motor RPM from each ESC (negative for reverse rotation).
-    rpm: [4]i32,
-
-    /// Voltage measured from each ESC.
-    voltage: [4]f32,
-
-    /// Current measured from each ESC.
-    current: [4]f32,
-
-};
-
 /// Illuminator status
 pub const ILLUMINATOR_STATUS = struct {
     pub const MSG_ID = 440;
@@ -2014,7 +1948,7 @@ pub const ILLUMINATOR_STATUS = struct {
     mode_bitmask: enums.ILLUMINATOR_MODE,
 
     /// Errors
-    error_status: u32,
+    error_status: enums.ILLUMINATOR_ERROR_FLAGS,
 
     /// Illuminator mode
     mode: enums.ILLUMINATOR_MODE,
@@ -2083,71 +2017,6 @@ pub const GPS2_RTK = struct {
 
 };
 
-/// Hardware status sent by an onboard computer.
-pub const ONBOARD_COMPUTER_STATUS = struct {
-    pub const MSG_ID = 390;
-    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
-    time_usec: u64,
-
-    /// Time since system boot.
-    uptime: u32,
-
-    /// Type of the onboard computer: 0: Mission computer primary, 1: Mission computer backup 1, 2: Mission computer backup 2, 3: Compute node, 4-5: Compute spares, 6-9: Payload computers.
-    type: u8,
-
-    /// CPU usage on the component in percent (100 - idle). A value of UINT8_MAX implies the field is unused.
-    cpu_cores: [8]u8,
-
-    /// Combined CPU usage as the last 10 slices of 100 MS (a histogram). This allows to identify spikes in load that max out the system, but only for a short amount of time. A value of UINT8_MAX implies the field is unused.
-    cpu_combined: [10]u8,
-
-    /// GPU usage on the component in percent (100 - idle). A value of UINT8_MAX implies the field is unused.
-    gpu_cores: [4]u8,
-
-    /// Combined GPU usage as the last 10 slices of 100 MS (a histogram). This allows to identify spikes in load that max out the system, but only for a short amount of time. A value of UINT8_MAX implies the field is unused.
-    gpu_combined: [10]u8,
-
-    /// Temperature of the board. A value of INT8_MAX implies the field is unused.
-    temperature_board: i8,
-
-    /// Temperature of the CPU core. A value of INT8_MAX implies the field is unused.
-    temperature_core: [8]i8,
-
-    /// Fan speeds. A value of INT16_MAX implies the field is unused.
-    fan_speed: [4]i16,
-
-    /// Amount of used RAM on the component system. A value of UINT32_MAX implies the field is unused.
-    ram_usage: u32,
-
-    /// Total amount of RAM on the component system. A value of UINT32_MAX implies the field is unused.
-    ram_total: u32,
-
-    /// Storage type: 0: HDD, 1: SSD, 2: EMMC, 3: SD card (non-removable), 4: SD card (removable). A value of UINT32_MAX implies the field is unused.
-    storage_type: [4]u32,
-
-    /// Amount of used storage space on the component system. A value of UINT32_MAX implies the field is unused.
-    storage_usage: [4]u32,
-
-    /// Total amount of storage space on the component system. A value of UINT32_MAX implies the field is unused.
-    storage_total: [4]u32,
-
-    /// Link type: 0-9: UART, 10-19: Wired network, 20-29: Wifi, 30-39: Point-to-point proprietary, 40-49: Mesh proprietary
-    link_type: [6]u32,
-
-    /// Network traffic from the component system. A value of UINT32_MAX implies the field is unused.
-    link_tx_rate: [6]u32,
-
-    /// Network traffic to the component system. A value of UINT32_MAX implies the field is unused.
-    link_rx_rate: [6]u32,
-
-    /// Network capacity from the component system. A value of UINT32_MAX implies the field is unused.
-    link_tx_max: [6]u32,
-
-    /// Network capacity to the component system. A value of UINT32_MAX implies the field is unused.
-    link_rx_max: [6]u32,
-
-};
-
 /// Camera tracking status, sent while in active tracking. Use MAV_CMD_SET_MESSAGE_INTERVAL to define message interval.
 pub const CAMERA_TRACKING_GEO_STATUS = struct {
     pub const MSG_ID = 276;
@@ -2190,8 +2059,7 @@ pub const CAMERA_TRACKING_GEO_STATUS = struct {
     /// Accuracy of heading, in NED. NAN if unknown
     hdg_acc: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Camera id of a non-MAVLink camera attached to an autopilot (1-6).  0 if the component is a MAVLink camera (with its own component id).
     camera_device_id: u8,
 
@@ -2242,23 +2110,25 @@ pub const MAG_CAL_REPORT = struct {
     /// Z off-diagonal (matrix 32 and 23).
     offdiag_z: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Confidence in orientation (higher is better).
     orientation_confidence: f32,
 
+    //Extension Field
     /// orientation before calibration.
-    old_orientation: u8,
+    old_orientation: enums.MAV_SENSOR_ORIENTATION,
 
+    //Extension Field
     /// orientation after calibration.
-    new_orientation: u8,
+    new_orientation: enums.MAV_SENSOR_ORIENTATION,
 
+    //Extension Field
     /// field radius correction factor
     scale_factor: f32,
 
 };
 
-/// value[float]. This allows to send a parameter to any other component (such as the GCS) without the need of previous knowledge of possible parameter names. Thus the same GCS can store different parameters for different autopilots. See also https://mavlink.io/en/services/parameter.html for a full documentation of QGroundControl and IMU code.
+/// Request to read the onboard parameter with the param_id string id. Onboard parameters are stored as key[const char*] -> value[float]. This allows to send a parameter to any other component (such as the GCS) without the need of previous knowledge of possible parameter names. Thus the same GCS can store different parameters for different autopilots. See also https://mavlink.io/en/services/parameter.html for a full documentation of QGroundControl and IMU code.
 pub const PARAM_REQUEST_READ = struct {
     pub const MSG_ID = 20;
     /// System ID
@@ -2330,85 +2200,19 @@ pub const MISSION_COUNT = struct {
     /// Number of mission items in the sequence
     count: u16,
 
-
-    //Extensions
+    //Extension Field
     /// Mission type.
-    mission_type: u8,
+    mission_type: enums.MAV_MISSION_TYPE,
 
+    //Extension Field
     /// Id of current on-vehicle mission, fence, or rally point plan (on download from vehicle).
     ///         This field is used when downloading a plan from a vehicle to a GCS.
     ///         0 on upload to the vehicle from GCS.
     ///         0 if plan ids are not supported.
     ///         The current on-vehicle plan ids are streamed in `MISSION_CURRENT`, allowing a GCS to determine if any part of the plan has changed and needs to be re-uploaded.
     ///         The ids are recalculated by the vehicle when any part of the on-vehicle plan changes (when a new plan is uploaded, the vehicle returns the new id to the GCS in MISSION_ACK).
+    ///       
     opaque_id: u32,
-
-};
-
-/// Battery information that is static, or requires infrequent update.
-///         This message should requested using MAV_CMD_REQUEST_MESSAGE and/or streamed at very low rate.
-///         BATTERY_STATUS_V2 is used for higher-rate battery status information.
-pub const BATTERY_INFO = struct {
-    pub const MSG_ID = 372;
-    /// Battery ID
-    id: u8,
-
-    /// Function of the battery.
-    battery_function: enums.MAV_BATTERY_FUNCTION,
-
-    /// Type (chemistry) of the battery.
-    type: enums.MAV_BATTERY_TYPE,
-
-    /// State of Health (SOH) estimate. Typically 100% at the time of manufacture and will decrease over time and use. -1: field not provided.
-    state_of_health: u8,
-
-    /// Number of battery cells in series. 0: field not provided.
-    cells_in_series: u8,
-
-    /// Lifetime count of the number of charge/discharge cycles (https://en.wikipedia.org/wiki/Charge_cycle). UINT16_MAX: field not provided.
-    cycle_count: u16,
-
-    /// Battery weight. 0: field not provided.
-    weight: u16,
-
-    /// Minimum per-cell voltage when discharging. 0: field not provided.
-    discharge_minimum_voltage: f32,
-
-    /// Minimum per-cell voltage when charging. 0: field not provided.
-    charging_minimum_voltage: f32,
-
-    /// Minimum per-cell voltage when resting. 0: field not provided.
-    resting_minimum_voltage: f32,
-
-    /// Maximum per-cell voltage when charged. 0: field not provided.
-    charging_maximum_voltage: f32,
-
-    /// Maximum pack continuous charge current. 0: field not provided.
-    charging_maximum_current: f32,
-
-    /// Battery nominal voltage. Used for conversion between Wh and Ah. 0: field not provided.
-    nominal_voltage: f32,
-
-    /// Maximum pack discharge current. 0: field not provided.
-    discharge_maximum_current: f32,
-
-    /// Maximum pack discharge burst current. 0: field not provided.
-    discharge_maximum_burst_current: f32,
-
-    /// Fully charged design capacity. 0: field not provided.
-    design_capacity: f32,
-
-    /// Predicted battery capacity when fully charged (accounting for battery degradation). NAN: field not provided.
-    full_charge_capacity: f32,
-
-    /// Manufacture date (DDMMYYYY) in ASCII characters, 0 terminated. All 0: field not provided.
-    manufacture_date: [9]u8,
-
-    /// Serial number in ASCII characters, 0 terminated. All 0: field not provided.
-    serial_number: [32]u8,
-
-    /// Battery device name. Formatted as manufacturer name then product name, separated with an underscore (in ASCII characters), 0 terminated. All 0: field not provided.
-    name: [50]u8,
 
 };
 
@@ -2479,8 +2283,7 @@ pub const DEBUG_FLOAT_ARRAY = struct {
     /// Unique ID used to discriminate between arrays
     array_id: u16,
 
-
-    //Extensions
+    //Extension Field
     /// data
     data: [58]f32,
 
@@ -2519,8 +2322,7 @@ pub const SCALED_IMU = struct {
     /// Z Magnetic field
     zmag: i16,
 
-
-    //Extensions
+    //Extension Field
     /// Temperature, 0: IMU does not provide temperature values. If the IMU is at 0C it must send 1 (0.01C).
     temperature: i16,
 
@@ -2564,6 +2366,20 @@ pub const RC_CHANNELS_RAW = struct {
 
 };
 
+/// offset response to encapsulated data.
+pub const CUBEPILOT_FIRMWARE_UPDATE_RESP = struct {
+    pub const MSG_ID = 50005;
+    /// System ID.
+    target_system: u8,
+
+    /// Component ID.
+    target_component: u8,
+
+    /// FW Offset.
+    offset: u32,
+
+};
+
 /// The interval between messages for a particular MAVLink message ID.
 ///         This message is sent in response to the MAV_CMD_REQUEST_MESSAGE command with param1=244 (this message) and param2=message_id (the id of the message for which the interval is required).
 /// It may also be sent in response to MAV_CMD_GET_MESSAGE_INTERVAL.
@@ -2573,7 +2389,7 @@ pub const MESSAGE_INTERVAL = struct {
     /// The ID of the requested MAVLink message. v1.0 is limited to 254 messages.
     message_id: u16,
 
-    /// The interval between two messages. A value of -1 indicates this stream is disabled, 0 indicates it is not available,
+    /// The interval between two messages. A value of -1 indicates this stream is disabled, 0 indicates it is not available, > 0 indicates the interval at which it is sent.
     interval_us: i32,
 
 };
@@ -2595,6 +2411,23 @@ pub const MISSION_SET_CURRENT = struct {
 
     /// Sequence
     seq: u16,
+
+};
+
+/// Start firmware update with encapsulated data.
+pub const CUBEPILOT_FIRMWARE_UPDATE_START = struct {
+    pub const MSG_ID = 50004;
+    /// System ID.
+    target_system: u8,
+
+    /// Component ID.
+    target_component: u8,
+
+    /// FW Size.
+    size: u32,
+
+    /// FW CRC.
+    crc: u32,
 
 };
 
@@ -2704,11 +2537,11 @@ pub const HIL_GPS = struct {
     /// Number of satellites visible. If unknown, set to UINT8_MAX
     satellites_visible: u8,
 
-
-    //Extensions
+    //Extension Field
     /// GPS ID (zero indexed). Used for multiple GPS inputs
     id: u8,
 
+    //Extension Field
     /// Yaw of vehicle relative to Earth's North, zero means not available, use 36000 for north
     yaw: u16,
 
@@ -2780,7 +2613,7 @@ pub const AIS_VESSEL = struct {
     tslc: u16,
 
     /// Bitmask to indicate various statuses including valid data fields
-    flags: u16,
+    flags: enums.AIS_FLAGS,
 
 };
 
@@ -2831,7 +2664,7 @@ pub const GIMBAL_MANAGER_INFORMATION = struct {
     time_boot_ms: u32,
 
     /// Bitmap of gimbal capability flags.
-    cap_flags: u32,
+    cap_flags: enums.GIMBAL_MANAGER_CAP_FLAGS,
 
     /// Gimbal device ID that this gimbal manager is responsible for. Component ID of gimbal device (or 1-6 for non-MAVLink gimbal).
     gimbal_device_id: u8,
@@ -2891,8 +2724,7 @@ pub const SET_GPS_GLOBAL_ORIGIN = struct {
     /// Altitude (MSL). Positive for up.
     altitude: i32,
 
-
-    //Extensions
+    //Extension Field
     /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
     time_usec: u64,
 
@@ -2929,14 +2761,32 @@ pub const CELLULAR_CONFIG = struct {
 
 };
 
-/// Regular broadcast for the current latest event sequence number for a component. This is used to check for dropped events.
-pub const CURRENT_EVENT_SEQUENCE = struct {
-    pub const MSG_ID = 411;
-    /// Sequence number.
-    sequence: u16,
+/// Information about video stream
+pub const HERELINK_VIDEO_STREAM_INFORMATION = struct {
+    pub const MSG_ID = 50002;
+    /// Video Stream ID (1 for first, 2 for second, etc.)
+    camera_id: u8,
 
-    /// Flag bitset.
-    flags: enums.MAV_EVENT_CURRENT_SEQUENCE_FLAGS,
+    /// Number of streams available.
+    status: u8,
+
+    /// Frame rate.
+    framerate: f32,
+
+    /// Horizontal resolution.
+    resolution_h: u16,
+
+    /// Vertical resolution.
+    resolution_v: u16,
+
+    /// Bit rate.
+    bitrate: u32,
+
+    /// Video image rotation clockwise.
+    rotation: u16,
+
+    /// Video stream URI (TCP or RTSP URI ground station should connect to) or port number (UDP port ground station should listen to).
+    uri: [230]u8,
 
 };
 
@@ -3002,7 +2852,7 @@ pub const SET_ATTITUDE_TARGET = struct {
     target_component: u8,
 
     /// Bitmap to indicate which dimensions should be ignored by the vehicle.
-    type_mask: u8,
+    type_mask: enums.ATTITUDE_TARGET_TYPEMASK,
 
     /// Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0) from MAV_FRAME_LOCAL_NED to MAV_FRAME_BODY_FRD
     q: [4]f32,
@@ -3019,8 +2869,7 @@ pub const SET_ATTITUDE_TARGET = struct {
     /// Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)
     thrust: f32,
 
-
-    //Extensions
+    //Extension Field
     /// 3D thrust setpoint in the body NED frame, normalized to -1 .. 1
     thrust_body: [3]f32,
 
@@ -3063,8 +2912,7 @@ pub const MOUNT_ORIENTATION = struct {
     /// Yaw relative to vehicle (set to NaN for invalid).
     yaw: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Yaw in absolute frame relative to Earth's North, north is 0 (set to NaN for invalid).
     yaw_absolute: f32,
 
@@ -3166,11 +3014,11 @@ pub const GLOBAL_VISION_POSITION_ESTIMATE = struct {
     /// Yaw angle
     yaw: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Row-major representation of pose 6x6 cross-covariance matrix upper right triangle (states: x_global, y_global, z_global, roll, pitch, yaw; first six entries are the first ROW, next five entries are the second ROW, etc.). If unknown, assign NaN value to first element in the array.
     covariance: [21]f32,
 
+    //Extension Field
     /// Estimate reset counter. This should be incremented when the estimate resets in any of the dimensions (position, velocity, attitude, angular speed). This is designed to be used when e.g an external SLAM system detects a loop-closure and the estimate jumps.
     reset_counter: u8,
 
@@ -3241,10 +3089,11 @@ pub const CAMERA_IMAGE_CAPTURED = struct {
 pub const AUTOPILOT_VERSION = struct {
     pub const MSG_ID = 148;
     /// Bitmap of capabilities
-    capabilities: u64,
+    capabilities: enums.MAV_PROTOCOL_CAPABILITY,
 
     /// Firmware version number.
     ///         The field must be encoded as 4 bytes, where each byte (shown from MSB to LSB) is part of a semantic version: (major) (minor) (patch) (FIRMWARE_VERSION_TYPE).
+    ///       
     flight_sw_version: u32,
 
     /// Middleware version number
@@ -3274,8 +3123,7 @@ pub const AUTOPILOT_VERSION = struct {
     /// UID if provided by hardware (see uid2)
     uid: u64,
 
-
-    //Extensions
+    //Extension Field
     /// UID if provided by hardware (supersedes the uid field. If this is non-zero, use this field, otherwise use uid)
     uid2: [18]u8,
 
@@ -3306,7 +3154,7 @@ pub const WINCH_STATUS = struct {
     temperature: i16,
 
     /// Status flags
-    status: u32,
+    status: enums.MAV_WINCH_STATUS_FLAG,
 
 };
 
@@ -3325,10 +3173,9 @@ pub const MISSION_REQUEST_PARTIAL_LIST = struct {
     /// End index, -1 by default (-1: send list to end). Else a valid index of the list
     end_index: i16,
 
-
-    //Extensions
+    //Extension Field
     /// Mission type.
-    mission_type: u8,
+    mission_type: enums.MAV_MISSION_TYPE,
 
 };
 
@@ -3359,17 +3206,19 @@ pub const DISTANCE_SENSOR = struct {
     /// Measurement variance. Max standard deviation is 6cm. UINT8_MAX if unknown.
     covariance: u8,
 
-
-    //Extensions
+    //Extension Field
     /// Horizontal Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.
     horizontal_fov: f32,
 
+    //Extension Field
     /// Vertical Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.
     vertical_fov: f32,
 
+    //Extension Field
     /// Quaternion of the sensor orientation in vehicle body frame (w, x, y, z order, zero-rotation is 1, 0, 0, 0). Zero-rotation is along the vehicle body x-axis. This field is required if the orientation is set to MAV_SENSOR_ROTATION_CUSTOM. Set it to 0 if invalid."
     quaternion: [4]f32,
 
+    //Extension Field
     /// Signal quality of the sensor. Specific to each sensor type, representing the relation of the signal strength with the target reflectivity, distance, size or aspect, but normalised as a percentage. 0 = unknown/unset signal quality, 1 = invalid signal, 100 = perfect signal.
     signal_quality: u8,
 
@@ -3402,23 +3251,27 @@ pub const LANDING_TARGET = struct {
     /// Size of target along y-axis
     size_y: f32,
 
-
-    //Extensions
+    //Extension Field
     /// X Position of the landing target in MAV_FRAME
     x: f32,
 
+    //Extension Field
     /// Y Position of the landing target in MAV_FRAME
     y: f32,
 
+    //Extension Field
     /// Z Position of the landing target in MAV_FRAME
     z: f32,
 
+    //Extension Field
     /// Quaternion of landing target orientation (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
     q: [4]f32,
 
+    //Extension Field
     /// Type of landing target
-    type: u8,
+    type: enums.LANDING_TARGET_TYPE,
 
+    //Extension Field
     /// Boolean indicating whether the position fields (x, y, z, q, type) contain valid target position information (valid: 1, invalid: 0). Default is 0 (invalid).
     position_valid: u8,
 
@@ -3540,17 +3393,19 @@ pub const COMMAND_ACK = struct {
     /// Result of command.
     result: enums.MAV_RESULT,
 
-
-    //Extensions
+    //Extension Field
     /// The progress percentage when result is MAV_RESULT_IN_PROGRESS. Values: [0-100], or UINT8_MAX if the progress is unknown.
     progress: u8,
 
+    //Extension Field
     /// Additional result information. Can be set with a command-specific enum containing command-specific error reasons for why the command might be denied. If used, the associated enum must be documented in the corresponding MAV_CMD (this enum should have a 0 value to indicate "unused" or "unknown").
     result_param2: i32,
 
+    //Extension Field
     /// System ID of the target recipient. This is the ID of the system that sent the command for which this COMMAND_ACK is an acknowledgement.
     target_system: u8,
 
+    //Extension Field
     /// Component ID of the target recipient. This is the ID of the system that sent the command for which this COMMAND_ACK is an acknowledgement.
     target_component: u8,
 
@@ -3563,7 +3418,7 @@ pub const VIDEO_STREAM_STATUS = struct {
     stream_id: u8,
 
     /// Bitmap of stream status flags
-    flags: u16,
+    flags: enums.VIDEO_STREAM_STATUS_FLAGS,
 
     /// Frame rate
     framerate: f32,
@@ -3583,8 +3438,7 @@ pub const VIDEO_STREAM_STATUS = struct {
     /// Horizontal Field of view
     hfov: u16,
 
-
-    //Extensions
+    //Extension Field
     /// Camera id of a non-MAVLink camera attached to an autopilot (1-6).  0 if the component is a MAVLink camera (with its own component id).
     camera_device_id: u8,
 
@@ -3599,14 +3453,15 @@ pub const CAMERA_SETTINGS = struct {
     /// Camera mode
     mode_id: enums.CAMERA_MODE,
 
-
-    //Extensions
+    //Extension Field
     /// Current zoom level as a percentage of the full range (0.0 to 100.0, NaN if not known)
     zoomLevel: f32,
 
+    //Extension Field
     /// Current focus level as a percentage of the full range (0.0 to 100.0, NaN if not known)
     focusLevel: f32,
 
+    //Extension Field
     /// Camera id of a non-MAVLink camera attached to an autopilot (1-6).  0 if the component is a MAVLink camera (with its own component id).
     camera_device_id: u8,
 
@@ -3686,35 +3541,43 @@ pub const RC_CHANNELS_OVERRIDE = struct {
     /// RC channel 8 value. A value of UINT16_MAX means to ignore this field. A value of 0 means to release this channel back to the RC radio.
     chan8_raw: u16,
 
-
-    //Extensions
+    //Extension Field
     /// RC channel 9 value. A value of 0 or UINT16_MAX means to ignore this field. A value of UINT16_MAX-1 means to release this channel back to the RC radio.
     chan9_raw: u16,
 
+    //Extension Field
     /// RC channel 10 value. A value of 0 or UINT16_MAX means to ignore this field. A value of UINT16_MAX-1 means to release this channel back to the RC radio.
     chan10_raw: u16,
 
+    //Extension Field
     /// RC channel 11 value. A value of 0 or UINT16_MAX means to ignore this field. A value of UINT16_MAX-1 means to release this channel back to the RC radio.
     chan11_raw: u16,
 
+    //Extension Field
     /// RC channel 12 value. A value of 0 or UINT16_MAX means to ignore this field. A value of UINT16_MAX-1 means to release this channel back to the RC radio.
     chan12_raw: u16,
 
+    //Extension Field
     /// RC channel 13 value. A value of 0 or UINT16_MAX means to ignore this field. A value of UINT16_MAX-1 means to release this channel back to the RC radio.
     chan13_raw: u16,
 
+    //Extension Field
     /// RC channel 14 value. A value of 0 or UINT16_MAX means to ignore this field. A value of UINT16_MAX-1 means to release this channel back to the RC radio.
     chan14_raw: u16,
 
+    //Extension Field
     /// RC channel 15 value. A value of 0 or UINT16_MAX means to ignore this field. A value of UINT16_MAX-1 means to release this channel back to the RC radio.
     chan15_raw: u16,
 
+    //Extension Field
     /// RC channel 16 value. A value of 0 or UINT16_MAX means to ignore this field. A value of UINT16_MAX-1 means to release this channel back to the RC radio.
     chan16_raw: u16,
 
+    //Extension Field
     /// RC channel 17 value. A value of 0 or UINT16_MAX means to ignore this field. A value of UINT16_MAX-1 means to release this channel back to the RC radio.
     chan17_raw: u16,
 
+    //Extension Field
     /// RC channel 18 value. A value of 0 or UINT16_MAX means to ignore this field. A value of UINT16_MAX-1 means to release this channel back to the RC radio.
     chan18_raw: u16,
 
@@ -3775,8 +3638,7 @@ pub const CAMERA_FOV_STATUS = struct {
     /// Vertical field of view (NaN if unknown).
     vfov: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Camera id of a non-MAVLink camera attached to an autopilot (1-6).  0 if the component is a MAVLink camera (with its own component id).
     camera_device_id: u8,
 
@@ -3821,23 +3683,27 @@ pub const GPS2_RAW = struct {
     /// Age of DGPS info
     dgps_age: u32,
 
-
-    //Extensions
+    //Extension Field
     /// Yaw in earth frame from north. Use 0 if this GPS does not provide yaw. Use UINT16_MAX if this GPS is configured to provide yaw and is currently unable to provide it. Use 36000 for north.
     yaw: u16,
 
+    //Extension Field
     /// Altitude (above WGS84, EGM96 ellipsoid). Positive for up.
     alt_ellipsoid: i32,
 
+    //Extension Field
     /// Position uncertainty.
     h_acc: u32,
 
+    //Extension Field
     /// Altitude uncertainty.
     v_acc: u32,
 
+    //Extension Field
     /// Speed uncertainty.
     vel_acc: u32,
 
+    //Extension Field
     /// Heading / track uncertainty
     hdg_acc: u32,
 
@@ -3909,11 +3775,11 @@ pub const SIM_STATE = struct {
     /// True velocity in down direction in earth-fixed NED frame
     vd: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Latitude (higher precision). If 0, recipients should use the lat field value (otherwise this field is preferred).
     lat_int: i32,
 
+    //Extension Field
     /// Longitude (higher precision). If 0, recipients should use the lon field value (otherwise this field is preferred).
     lon_int: i32,
 
@@ -3993,8 +3859,7 @@ pub const ATT_POS_MOCAP = struct {
     /// Z position (NED)
     z: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Row-major representation of a pose 6x6 cross-covariance matrix upper right triangle (states: x, y, z, roll, pitch, yaw; first six entries are the first ROW, next five entries are the second ROW, etc.). If unknown, assign NaN value to first element in the array.
     covariance: [21]f32,
 
@@ -4073,7 +3938,7 @@ pub const HIGH_LATENCY2 = struct {
     wp_num: u16,
 
     /// Bitmap of failure flags.
-    failure_flags: u16,
+    failure_flags: enums.HL_FAILURE_FLAG,
 
     /// Field for custom payload.
     custom0: i8,
@@ -4083,29 +3948,6 @@ pub const HIGH_LATENCY2 = struct {
 
     /// Field for custom payload.
     custom2: i8,
-
-};
-
-/// Component metadata message, which may be requested using MAV_CMD_REQUEST_MESSAGE.
-/// 
-///         This contains the MAVLink FTP URI and CRC for the component's general metadata file.
-///         The file must be hosted on the component, and may be xz compressed.
-///         The file CRC can be used for file caching.
-/// 
-///         The general metadata file can be read to get the locations of other metadata files (COMP_METADATA_TYPE) and translations, which may be hosted either on the vehicle or the internet.
-///         For more information see: https://mavlink.io/en/services/component_information.html.
-/// 
-///         Note: Camera components should use CAMERA_INFORMATION instead, and autopilots may use both this message and AUTOPILOT_VERSION.
-pub const COMPONENT_METADATA = struct {
-    pub const MSG_ID = 397;
-    /// Timestamp (time since system boot).
-    time_boot_ms: u32,
-
-    /// CRC32 of the general metadata file.
-    file_crc: u32,
-
-    /// MAVLink FTP URI for the general metadata file (COMP_METADATA_TYPE_GENERAL), which may be compressed with xz. The file contains general component metadata, and may contain URI links for additional metadata (see COMP_METADATA_TYPE). The information is static from boot, and may be generated at compile time. The string needs to be zero terminated.
-    uri: [100]u8,
 
 };
 
@@ -4133,11 +3975,11 @@ pub const VISION_POSITION_ESTIMATE = struct {
     /// Yaw angle
     yaw: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Row-major representation of pose 6x6 cross-covariance matrix upper right triangle (states: x, y, z, roll, pitch, yaw; first six entries are the first ROW, next five entries are the second ROW, etc.). If unknown, assign NaN value to first element in the array.
     covariance: [21]f32,
 
+    //Extension Field
     /// Estimate reset counter. This should be incremented when the estimate resets in any of the dimensions (position, velocity, attitude, angular speed). This is designed to be used when e.g an external SLAM system detects a loop-closure and the estimate jumps.
     reset_counter: u8,
 
@@ -4167,8 +4009,7 @@ pub const VICON_POSITION_ESTIMATE = struct {
     /// Yaw angle
     yaw: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Row-major representation of 6x6 pose cross-covariance matrix upper right triangle (states: x, y, z, roll, pitch, yaw; first six entries are the first ROW, next five entries are the second ROW, etc.). If unknown, assign NaN value to first element in the array.
     covariance: [21]f32,
 
@@ -4201,7 +4042,7 @@ pub const GIMBAL_DEVICE_ATTITUDE_STATUS = struct {
     time_boot_ms: u32,
 
     /// Current gimbal flags set.
-    flags: u16,
+    flags: enums.GIMBAL_DEVICE_FLAGS,
 
     /// Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation). The frame is described in the message description.
     q: [4]f32,
@@ -4216,16 +4057,17 @@ pub const GIMBAL_DEVICE_ATTITUDE_STATUS = struct {
     angular_velocity_z: f32,
 
     /// Failure flags (0 for no failure)
-    failure_flags: u32,
+    failure_flags: enums.GIMBAL_DEVICE_ERROR_FLAGS,
 
-
-    //Extensions
+    //Extension Field
     /// Yaw angle relating the quaternions in earth and body frames (see message description). NaN if unknown.
     delta_yaw: f32,
 
+    //Extension Field
     /// Yaw angular velocity relating the angular velocities in earth and body frames (see message description). NaN if unknown.
     delta_yaw_velocity: f32,
 
+    //Extension Field
     /// This field is to be used if the gimbal manager and the gimbal device are the same component and hence have the same component ID. This field is then set a number between 1-6. If the component ID is separate, this field is not required and must be set to 0.
     gimbal_device_id: u8,
 
@@ -4243,8 +4085,7 @@ pub const PLAY_TUNE = struct {
     /// tune in board specific format
     tune: [30]u8,
 
-
-    //Extensions
+    //Extension Field
     /// tune extension (appended to tune)
     tune2: [200]u8,
 
@@ -4286,7 +4127,7 @@ pub const POSITION_TARGET_LOCAL_NED = struct {
     coordinate_frame: enums.MAV_FRAME,
 
     /// Bitmap to indicate which dimensions should be ignored by the vehicle.
-    type_mask: u16,
+    type_mask: enums.POSITION_TARGET_TYPEMASK,
 
     /// X Position in NED frame
     x: f32,
@@ -4320,32 +4161,6 @@ pub const POSITION_TARGET_LOCAL_NED = struct {
 
     /// yaw rate setpoint
     yaw_rate: f32,
-
-};
-
-/// Event message. Each new event from a particular component gets a new sequence number. The same message might be sent multiple times if (re-)requested. Most events are broadcast, some can be specific to a target component (as receivers keep track of the sequence for missed events, all events need to be broadcast. Thus we use destination_component instead of target_component).
-pub const EVENT = struct {
-    pub const MSG_ID = 410;
-    /// Component ID
-    destination_component: u8,
-
-    /// System ID
-    destination_system: u8,
-
-    /// Event ID (as defined in the component metadata)
-    id: u32,
-
-    /// Timestamp (time since system boot when the event happened).
-    event_time_boot_ms: u32,
-
-    /// Sequence number.
-    sequence: u16,
-
-    /// Log levels: 4 bits MSB: internal (for logging purposes), 4 bits LSB: external. Levels: Emergency = 0, Alert = 1, Critical = 2, Error = 3, Warning = 4, Notice = 5, Info = 6, Debug = 7, Protocol = 8, Disabled = 9
-    log_levels: u8,
-
-    /// Arguments (depend on event ID).
-    arguments: [40]u8,
 
 };
 
@@ -4398,45 +4213,13 @@ pub const TIMESYNC = struct {
     /// Time sync timestamp 2. Timestamp of syncing component (mirrored in response).
     ts1: i64,
 
-
-    //Extensions
+    //Extension Field
     /// Target system id. Request: 0 (broadcast) or id of specific system. Response must contain system id of the requesting component.
     target_system: u8,
 
+    //Extension Field
     /// Target component id. Request: 0 (broadcast) or id of specific component. Response must contain component id of the requesting component.
     target_component: u8,
-
-};
-
-/// ESC information for lower rate streaming. Recommended streaming rate 1Hz. See ESC_STATUS for higher-rate ESC data.
-pub const ESC_INFO = struct {
-    pub const MSG_ID = 290;
-    /// Index of the first ESC in this message. minValue = 0, maxValue = 60, increment = 4.
-    index: u8,
-
-    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
-    time_usec: u64,
-
-    /// Counter of data packets received.
-    counter: u16,
-
-    /// Total number of ESCs in all messages of this type. Message fields with an index higher than this should be ignored because they contain invalid data.
-    count: u8,
-
-    /// Connection type protocol for all ESC.
-    connection_type: enums.ESC_CONNECTION_TYPE,
-
-    /// Information regarding online/offline status of each ESC.
-    info: u8,
-
-    /// Bitmap of ESC failure flags.
-    failure_flags: [4]u16,
-
-    /// Number of reported errors by each ESC since boot.
-    error_count: [4]u32,
-
-    /// Temperature of each ESC. INT16_MAX: if data not supplied by ESC.
-    temperature: [4]i16,
 
 };
 
@@ -4449,7 +4232,7 @@ pub const OPEN_DRONE_ID_OPERATOR_ID = struct {
     /// Component ID (0 for broadcast).
     target_component: u8,
 
-    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html.
+    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html. 
     id_or_mac: [20]u8,
 
     /// Indicates the type of the operator_id field.
@@ -4484,7 +4267,7 @@ pub const ESTIMATOR_STATUS = struct {
     time_usec: u64,
 
     /// Bitmap indicating which EKF outputs are valid.
-    flags: u16,
+    flags: enums.ESTIMATOR_STATUS_FLAGS,
 
     /// Velocity innovation test ratio
     vel_ratio: f32,
@@ -4588,17 +4371,17 @@ pub const GIMBAL_DEVICE_INFORMATION = struct {
     /// Custom name of the gimbal given to it by the user.
     custom_name: [32]u8,
 
-    /// Version of the gimbal firmware, encoded as: (Dev
+    /// Version of the gimbal firmware, encoded as: (Dev & 0xff) << 24 | (Patch & 0xff) << 16 | (Minor & 0xff) << 8 | (Major & 0xff).
     firmware_version: u32,
 
-    /// Version of the gimbal hardware, encoded as: (Dev
+    /// Version of the gimbal hardware, encoded as: (Dev & 0xff) << 24 | (Patch & 0xff) << 16 | (Minor & 0xff) << 8 | (Major & 0xff).
     hardware_version: u32,
 
     /// UID of gimbal hardware (0 if unknown).
     uid: u64,
 
     /// Bitmap of gimbal capability flags.
-    cap_flags: u16,
+    cap_flags: enums.GIMBAL_DEVICE_CAP_FLAGS,
 
     /// Bitmap for use for gimbal-specific capability flags.
     custom_cap_flags: u16,
@@ -4621,8 +4404,7 @@ pub const GIMBAL_DEVICE_INFORMATION = struct {
     /// Maximum hardware yaw angle (positive: to the right, negative: to the left). NAN if unknown.
     yaw_max: f32,
 
-
-    //Extensions
+    //Extension Field
     /// This field is to be used if the gimbal manager and the gimbal device are the same component and hence have the same component ID. This field is then set to a number between 1-6. If the component ID is separate, this field is not required and must be set to 0.
     gimbal_device_id: u8,
 
@@ -4661,11 +4443,11 @@ pub const RAW_IMU = struct {
     /// Z Magnetic field (raw)
     zmag: i16,
 
-
-    //Extensions
+    //Extension Field
     /// Id. Ids are numbered from 0 and map to IMUs numbered from 1 (e.g. IMU1 will have a message with id=0)
     id: u8,
 
+    //Extension Field
     /// Temperature, 0: IMU does not provide temperature values. If the IMU is at 0C it must send 1 (0.01C).
     temperature: i16,
 
@@ -4704,33 +4486,9 @@ pub const SCALED_IMU3 = struct {
     /// Z Magnetic field
     zmag: i16,
 
-
-    //Extensions
+    //Extension Field
     /// Temperature, 0: IMU does not provide temperature values. If the IMU is at 0C it must send 1 (0.01C).
     temperature: i16,
-
-};
-
-/// Vehicle status report that is sent out while orbit execution is in progress (see MAV_CMD_DO_ORBIT).
-pub const ORBIT_EXECUTION_STATUS = struct {
-    pub const MSG_ID = 360;
-    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
-    time_usec: u64,
-
-    /// Radius of the orbit circle. Positive values orbit clockwise, negative values orbit counter-clockwise.
-    radius: f32,
-
-    /// The coordinate system of the fields: x, y, z.
-    frame: enums.MAV_FRAME,
-
-    /// X coordinate of center point. Coordinate system depends on frame field: local = x position in meters * 1e4, global = latitude in degrees * 1e7.
-    x: i32,
-
-    /// Y coordinate of center point.  Coordinate system depends on frame field: local = x position in meters * 1e4, global = latitude in degrees * 1e7.
-    y: i32,
-
-    /// Altitude of center point. Coordinate system depends on frame field.
-    z: f32,
 
 };
 
@@ -4766,10 +4524,9 @@ pub const MISSION_CLEAR_ALL = struct {
     /// Component ID
     target_component: u8,
 
-
-    //Extensions
+    //Extension Field
     /// Mission type.
-    mission_type: u8,
+    mission_type: enums.MAV_MISSION_TYPE,
 
 };
 
@@ -4835,8 +4592,7 @@ pub const FLIGHT_INFORMATION = struct {
     /// Flight number. Note, field is misnamed UUID.
     flight_uuid: u64,
 
-
-    //Extensions
+    //Extension Field
     /// Timestamp at landing (in ms since system boot). Set to 0 at boot and on arming.
     landing_time: u32,
 
@@ -4902,7 +4658,7 @@ pub const OPEN_DRONE_ID_SYSTEM = struct {
     /// Component ID (0 for broadcast).
     target_component: u8,
 
-    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html.
+    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html. 
     id_or_mac: [20]u8,
 
     /// Specifies the operator location type.
@@ -4943,26 +4699,6 @@ pub const OPEN_DRONE_ID_SYSTEM = struct {
 
 };
 
-/// Time/duration estimates for various events and actions given the current vehicle state and position.
-pub const TIME_ESTIMATE_TO_TARGET = struct {
-    pub const MSG_ID = 380;
-    /// Estimated time to complete the vehicle's configured "safe return" action from its current position (e.g. RTL, Smart RTL, etc.). -1 indicates that the vehicle is landed, or that no time estimate available.
-    safe_return: i32,
-
-    /// Estimated time for vehicle to complete the LAND action from its current position. -1 indicates that the vehicle is landed, or that no time estimate available.
-    land: i32,
-
-    /// Estimated time for reaching/completing the currently active mission item. -1 means no time estimate available.
-    mission_next_item: i32,
-
-    /// Estimated time for completing the current mission. -1 means no mission active and/or no estimate available.
-    mission_end: i32,
-
-    /// Estimated time for completing the current commanded action (i.e. Go To, Takeoff, Land, etc.). -1 means no action active and/or no estimate available.
-    commanded_action: i32,
-
-};
-
 /// Transmitter (remote ID system) is enabled and ready to start sending location and other required information. This is streamed by transmitter. A flight controller uses it as a condition to arm.
 pub const OPEN_DRONE_ID_ARM_STATUS = struct {
     pub const MSG_ID = 12918;
@@ -4970,45 +4706,7 @@ pub const OPEN_DRONE_ID_ARM_STATUS = struct {
     status: enums.MAV_ODID_ARM_STATUS,
 
     /// Text error message, should be empty if status is good to arm. Fill with nulls in unused portion.
-    mError: [50]u8,
-
-};
-
-/// Status generated in each node in the communication chain and injected into MAVLink stream.
-pub const LINK_NODE_STATUS = struct {
-    pub const MSG_ID = 8;
-    /// Timestamp (time since system boot).
-    timestamp: u64,
-
-    /// Remaining free transmit buffer space
-    tx_buf: u8,
-
-    /// Remaining free receive buffer space
-    rx_buf: u8,
-
-    /// Transmit rate
-    tx_rate: u32,
-
-    /// Receive rate
-    rx_rate: u32,
-
-    /// Number of bytes that could not be parsed correctly.
-    rx_parse_err: u16,
-
-    /// Transmit buffer overflows. This number wraps around as it reaches UINT16_MAX
-    tx_overflows: u16,
-
-    /// Receive buffer overflows. This number wraps around as it reaches UINT16_MAX
-    rx_overflows: u16,
-
-    /// Messages sent
-    messages_sent: u32,
-
-    /// Messages received (estimated from counting seq)
-    messages_received: u32,
-
-    /// Messages lost (estimated from counting seq)
-    messages_lost: u32,
+    @"error": [50]u8,
 
 };
 
@@ -5084,23 +4782,27 @@ pub const GPS_RAW_INT = struct {
     /// Number of satellites visible. If unknown, set to UINT8_MAX
     satellites_visible: u8,
 
-
-    //Extensions
+    //Extension Field
     /// Altitude (above WGS84, EGM96 ellipsoid). Positive for up.
     alt_ellipsoid: i32,
 
+    //Extension Field
     /// Position uncertainty.
     h_acc: u32,
 
+    //Extension Field
     /// Altitude uncertainty.
     v_acc: u32,
 
+    //Extension Field
     /// Speed uncertainty.
     vel_acc: u32,
 
+    //Extension Field
     /// Heading / track uncertainty
     hdg_acc: u32,
 
+    //Extension Field
     /// Yaw in earth frame from north. Use 0 if this GPS does not provide yaw. Use UINT16_MAX if this GPS is configured to provide yaw and is currently unable to provide it. Use 36000 for north.
     yaw: u16,
 
@@ -5148,7 +4850,7 @@ pub const HIL_CONTROLS = struct {
 pub const HIGH_LATENCY = struct {
     pub const MSG_ID = 234;
     /// Bitmap of enabled system modes.
-    base_mode: u8,
+    base_mode: enums.MAV_MODE_FLAG,
 
     /// A bitfield for use for autopilot-specific flags.
     custom_mode: u32,
@@ -5275,11 +4977,11 @@ pub const EFI_STATUS = struct {
     /// Pressure/temperature compensation
     pt_compensation: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Supply voltage to EFI sparking system.  Zero in this value means "unknown", so if the supply voltage really is zero volts use 0.0001 instead.
     ignition_voltage: f32,
 
+    //Extension Field
     /// Fuel pressure. Zero in this value means "unknown", so if the fuel pressure really is zero kPa use 0.0001 instead.
     fuel_pressure: f32,
 
@@ -5292,7 +4994,7 @@ pub const COMPONENT_INFORMATION_BASIC = struct {
     time_boot_ms: u32,
 
     /// Component capability flags
-    capabilities: u64,
+    capabilities: enums.MAV_PROTOCOL_CAPABILITY,
 
     /// Date of manufacture as a UNIX Epoch time (since 1.1.1970) in seconds.
     time_manufacture_s: u32,
@@ -5330,7 +5032,7 @@ pub const SET_POSITION_TARGET_GLOBAL_INT = struct {
     coordinate_frame: enums.MAV_FRAME,
 
     /// Bitmap to indicate which dimensions should be ignored by the vehicle.
-    type_mask: u16,
+    type_mask: enums.POSITION_TARGET_TYPEMASK,
 
     /// Latitude in WGS84 frame
     lat_int: i32,
@@ -5390,7 +5092,7 @@ pub const AVAILABLE_MODES = struct {
     custom_mode: u32,
 
     /// Mode properties.
-    properties: u32,
+    properties: enums.MAV_MODE_PROPERTY,
 
     /// Name of custom mode, with null termination character. Should be omitted for standard modes.
     mode_name: [35]u8,
@@ -5472,33 +5174,17 @@ pub const OBSTACLE_DISTANCE = struct {
     /// Maximum distance the sensor can measure.
     max_distance: u16,
 
-
-    //Extensions
+    //Extension Field
     /// Angular width in degrees of each array element as a float. If non-zero then this value is used instead of the uint8_t increment field. Positive is clockwise direction, negative is counter-clockwise.
     increment_f: f32,
 
+    //Extension Field
     /// Relative angle offset of the 0-index element in the distances array. Value of 0 corresponds to forward. Positive is clockwise direction, negative is counter-clockwise.
     angle_offset: f32,
 
+    //Extension Field
     /// Coordinate frame of reference for the yaw rotation and offset of the sensor data. Defaults to MAV_FRAME_GLOBAL, which is north aligned. For body-mounted sensors use MAV_FRAME_BODY_FRD, which is vehicle front aligned.
-    frame: u8,
-
-};
-
-/// Request one or more events to be (re-)sent. If first_sequence==last_sequence, only a single event is requested. Note that first_sequence can be larger than last_sequence (because the sequence number can wrap). Each sequence will trigger an EVENT or EVENT_ERROR response.
-pub const REQUEST_EVENT = struct {
-    pub const MSG_ID = 412;
-    /// System ID
-    target_system: u8,
-
-    /// Component ID
-    target_component: u8,
-
-    /// First sequence number of the requested event.
-    first_sequence: u16,
-
-    /// Last sequence number of the requested event.
-    last_sequence: u16,
+    frame: enums.MAV_FRAME,
 
 };
 
@@ -5526,13 +5212,13 @@ pub const LOG_ENTRY = struct {
 pub const SYS_STATUS = struct {
     pub const MSG_ID = 1;
     /// Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.
-    onboard_control_sensors_present: u32,
+    onboard_control_sensors_present: enums.MAV_SYS_STATUS_SENSOR,
 
     /// Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.
-    onboard_control_sensors_enabled: u32,
+    onboard_control_sensors_enabled: enums.MAV_SYS_STATUS_SENSOR,
 
     /// Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error. Value of 1: healthy.
-    onboard_control_sensors_health: u32,
+    onboard_control_sensors_health: enums.MAV_SYS_STATUS_SENSOR,
 
     /// Maximum usage in percent of the mainloop time. Values: [0-1000] - should always be below 1000
     load: u16,
@@ -5564,16 +5250,17 @@ pub const SYS_STATUS = struct {
     /// Autopilot-specific errors
     errors_count4: u16,
 
-
-    //Extensions
+    //Extension Field
     /// Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.
-    onboard_control_sensors_present_extended: u32,
+    onboard_control_sensors_present_extended: enums.MAV_SYS_STATUS_SENSOR_EXTENDED,
 
+    //Extension Field
     /// Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.
-    onboard_control_sensors_enabled_extended: u32,
+    onboard_control_sensors_enabled_extended: enums.MAV_SYS_STATUS_SENSOR_EXTENDED,
 
+    //Extension Field
     /// Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error. Value of 1: healthy.
-    onboard_control_sensors_health_extended: u32,
+    onboard_control_sensors_health_extended: enums.MAV_SYS_STATUS_SENSOR_EXTENDED,
 
 };
 
@@ -5598,35 +5285,43 @@ pub const MANUAL_CONTROL = struct {
     /// A bitfield corresponding to the joystick buttons' 0-15 current state, 1 for pressed, 0 for released. The lowest bit corresponds to Button 1.
     buttons: u16,
 
-
-    //Extensions
+    //Extension Field
     /// A bitfield corresponding to the joystick buttons' 16-31 current state, 1 for pressed, 0 for released. The lowest bit corresponds to Button 16.
     buttons2: u16,
 
+    //Extension Field
     /// Set bits to 1 to indicate which of the following extension fields contain valid data: bit 0: pitch, bit 1: roll, bit 2: aux1, bit 3: aux2, bit 4: aux3, bit 5: aux4, bit 6: aux5, bit 7: aux6
     enabled_extensions: u8,
 
+    //Extension Field
     /// Pitch-only-axis, normalized to the range [-1000,1000]. Generally corresponds to pitch on vehicles with additional degrees of freedom. Valid if bit 0 of enabled_extensions field is set. Set to 0 if invalid.
     s: i16,
 
+    //Extension Field
     /// Roll-only-axis, normalized to the range [-1000,1000]. Generally corresponds to roll on vehicles with additional degrees of freedom. Valid if bit 1 of enabled_extensions field is set. Set to 0 if invalid.
     t: i16,
 
+    //Extension Field
     /// Aux continuous input field 1. Normalized in the range [-1000,1000]. Purpose defined by recipient. Valid data if bit 2 of enabled_extensions field is set. 0 if bit 2 is unset.
     aux1: i16,
 
+    //Extension Field
     /// Aux continuous input field 2. Normalized in the range [-1000,1000]. Purpose defined by recipient. Valid data if bit 3 of enabled_extensions field is set. 0 if bit 3 is unset.
     aux2: i16,
 
+    //Extension Field
     /// Aux continuous input field 3. Normalized in the range [-1000,1000]. Purpose defined by recipient. Valid data if bit 4 of enabled_extensions field is set. 0 if bit 4 is unset.
     aux3: i16,
 
+    //Extension Field
     /// Aux continuous input field 4. Normalized in the range [-1000,1000]. Purpose defined by recipient. Valid data if bit 5 of enabled_extensions field is set. 0 if bit 5 is unset.
     aux4: i16,
 
+    //Extension Field
     /// Aux continuous input field 5. Normalized in the range [-1000,1000]. Purpose defined by recipient. Valid data if bit 6 of enabled_extensions field is set. 0 if bit 6 is unset.
     aux5: i16,
 
+    //Extension Field
     /// Aux continuous input field 6. Normalized in the range [-1000,1000]. Purpose defined by recipient. Valid data if bit 7 of enabled_extensions field is set. 0 if bit 7 is unset.
     aux6: i16,
 
@@ -5734,7 +5429,7 @@ pub const ATTITUDE_TARGET = struct {
     time_boot_ms: u32,
 
     /// Bitmap to indicate which dimensions should be ignored by the vehicle.
-    type_mask: u8,
+    type_mask: enums.ATTITUDE_TARGET_TYPEMASK,
 
     /// Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
     q: [4]f32,
@@ -5794,9 +5489,11 @@ pub const HOME_POSITION = struct {
     /// Local Z position of this position in the local coordinate frame (NED: positive "down")
     z: f32,
 
-    /// Quaternion indicating world-to-surface-normal and heading transformation of the takeoff position.
+    /// 
+    ///         Quaternion indicating world-to-surface-normal and heading transformation of the takeoff position.
     ///         Used to indicate the heading and slope of the ground.
     ///         All fields should be set to NaN if an accurate quaternion for both heading and surface slope cannot be supplied.
+    ///       
     q: [4]f32,
 
     /// Local X position of the end of the approach vector. Multicopters should set this position based on their takeoff path. Grass-landing fixed wing aircraft should set it the same way as multicopters. Runway-landing fixed wing aircraft should set it to the opposite direction of the takeoff, assuming the takeoff happened from the threshold / touchdown zone.
@@ -5808,8 +5505,7 @@ pub const HOME_POSITION = struct {
     /// Local Z position of the end of the approach vector. Multicopters should set this position based on their takeoff path. Grass-landing fixed wing aircraft should set it the same way as multicopters. Runway-landing fixed wing aircraft should set it to the opposite direction of the takeoff, assuming the takeoff happened from the threshold / touchdown zone.
     approach_z: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
     time_usec: u64,
 
@@ -5824,7 +5520,7 @@ pub const OPEN_DRONE_ID_AUTHENTICATION = struct {
     /// Component ID (0 for broadcast).
     target_component: u8,
 
-    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html.
+    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html. 
     id_or_mac: [20]u8,
 
     /// Indicates the type of authentication.
@@ -5893,10 +5589,9 @@ pub const HIL_SENSOR = struct {
     temperature: f32,
 
     /// Bitmap for fields that have updated since last message
-    fields_updated: u32,
+    fields_updated: enums.HIL_SENSOR_UPDATED_FLAGS,
 
-
-    //Extensions
+    //Extension Field
     /// Sensor ID (zero indexed). Used for multiple sensor inputs
     id: u8,
 
@@ -5945,7 +5640,7 @@ pub const TRAJECTORY_REPRESENTATION_WAYPOINTS = struct {
     vel_yaw: [5]f32,
 
     /// MAV_CMD command id of waypoint, set to UINT16_MAX if not being used.
-    command: [5]u16,
+    command: enums.MAV_CMD,
 
 };
 
@@ -6015,10 +5710,9 @@ pub const MISSION_ITEM_INT = struct {
     /// PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame.
     z: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Mission type.
-    mission_type: u8,
+    mission_type: enums.MAV_MISSION_TYPE,
 
 };
 
@@ -6037,11 +5731,11 @@ pub const VISION_SPEED_ESTIMATE = struct {
     /// Global Z speed
     z: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Row-major representation of 3x3 linear velocity covariance matrix (states: vx, vy, vz; 1st three entries - 1st row, etc.). If unknown, assign NaN value to first element in the array.
     covariance: [9]f32,
 
+    //Extension Field
     /// Estimate reset counter. This should be incremented when the estimate resets in any of the dimensions (position, velocity, attitude, angular speed). This is designed to be used when e.g an external SLAM system detects a loop-closure and the estimate jumps.
     reset_counter: u8,
 
@@ -6080,10 +5774,10 @@ pub const HIL_ACTUATOR_CONTROLS = struct {
     controls: [16]f32,
 
     /// System mode. Includes arming state.
-    mode: u8,
+    mode: enums.MAV_MODE_FLAG,
 
     /// Flags bitmask.
-    flags: u64,
+    flags: enums.HIL_ACTUATOR_CONTROLS_FLAGS,
 
 };
 
@@ -6096,10 +5790,9 @@ pub const MISSION_REQUEST_LIST = struct {
     /// Component ID
     target_component: u8,
 
-
-    //Extensions
+    //Extension Field
     /// Mission type.
-    mission_type: u8,
+    mission_type: enums.MAV_MISSION_TYPE,
 
 };
 
@@ -6130,11 +5823,11 @@ pub const OPTICAL_FLOW = struct {
     /// Ground distance. Positive value: distance known. Negative value: Unknown distance
     ground_distance: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Flow rate about X axis
     flow_rate_x: f32,
 
+    //Extension Field
     /// Flow rate about Y axis
     flow_rate_y: f32,
 
@@ -6155,8 +5848,7 @@ pub const SCALED_PRESSURE2 = struct {
     /// Absolute pressure temperature
     temperature: i16,
 
-
-    //Extensions
+    //Extension Field
     /// Differential pressure temperature (0, if not available). Report values of 0 (or 1) as 1 cdegC.
     temperature_press_diff: i16,
 
@@ -6192,7 +5884,7 @@ pub const GPS_INPUT = struct {
     gps_id: u8,
 
     /// Bitmap indicating which GPS input flags fields to ignore.  All other fields must be provided.
-    ignore_flags: u16,
+    ignore_flags: enums.GPS_INPUT_IGNORE_FLAGS,
 
     /// GPS time (from start of GPS week)
     time_week_ms: u32,
@@ -6239,8 +5931,7 @@ pub const GPS_INPUT = struct {
     /// Number of satellites visible.
     satellites_visible: u8,
 
-
-    //Extensions
+    //Extension Field
     /// Yaw of vehicle relative to Earth's North, zero means not available, use 36000 for north
     yaw: u16,
 
@@ -6283,7 +5974,7 @@ pub const ADSB_VEHICLE = struct {
     tslc: u8,
 
     /// Bitmap to indicate various statuses including valid data fields
-    flags: u16,
+    flags: enums.ADSB_FLAGS,
 
     /// Squawk code. Note that the code is in decimal: e.g. 7700 (general emergency) is encoded as binary 0b0001_1110_0001_0100, not(!) as 0b0000_111_111_000_000
     squawk: u16,
@@ -6311,13 +6002,36 @@ pub const CAMERA_CAPTURE_STATUS = struct {
     /// Available storage capacity.
     available_capacity: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Total number of images captured ('forever', or until reset using MAV_CMD_STORAGE_FORMAT).
     image_count: i32,
 
+    //Extension Field
     /// Camera id of a non-MAVLink camera attached to an autopilot (1-6).  0 if the component is a MAVLink camera (with its own component id).
     camera_device_id: u8,
+
+};
+
+/// The heartbeat message shows that a system or component is present and responding. The type and autopilot fields (along with the message component id), allow the receiving system to treat further messages from this system appropriately (e.g. by laying out the user interface based on the autopilot). This microservice is documented at https://mavlink.io/en/services/heartbeat.html
+pub const HEARTBEAT = struct {
+    pub const MSG_ID = 0;
+    /// Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.
+    type: enums.MAV_TYPE,
+
+    /// Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.
+    autopilot: enums.MAV_AUTOPILOT,
+
+    /// System mode bitmap.
+    base_mode: enums.MAV_MODE_FLAG,
+
+    /// A bitfield for use for autopilot-specific flags
+    custom_mode: u32,
+
+    /// System status flag.
+    system_status: enums.MAV_STATE,
+
+    /// MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version
+    mavlink_version: u8,
 
 };
 
@@ -6356,8 +6070,7 @@ pub const SCALED_PRESSURE3 = struct {
     /// Absolute pressure temperature
     temperature: i16,
 
-
-    //Extensions
+    //Extension Field
     /// Differential pressure temperature (0, if not available). Report values of 0 (or 1) as 1 cdegC.
     temperature_press_diff: i16,
 
@@ -6413,19 +6126,20 @@ pub const STORAGE_INFORMATION = struct {
     /// Write speed.
     write_speed: f32,
 
-
-    //Extensions
+    //Extension Field
     /// Type of storage
-    type: u8,
+    type: enums.STORAGE_TYPE,
 
+    //Extension Field
     /// Textual storage name to be used in UI (microSD 1, Internal Memory, etc.) This is a NULL terminated string. If it is exactly 32 characters long, add a terminating NULL. If this string is empty, the generic type is shown to the user.
     name: [32]u8,
 
+    //Extension Field
     /// Flags indicating whether this instance is preferred storage for photos, videos, etc.
     ///         Note: Implementations should initially set the flags on the system-default storage id used for saving media (if possible/supported).
     ///         This setting can then be overridden using MAV_CMD_SET_STORAGE_USAGE.
     ///         If the media usage flags are not set, a GCS may assume storage ID 1 is the default storage for all media types.
-    storage_usage: u8,
+    storage_usage: enums.STORAGE_USAGE_FLAG,
 
 };
 
@@ -6441,17 +6155,18 @@ pub const MISSION_ACK = struct {
     /// Mission result.
     type: enums.MAV_MISSION_RESULT,
 
-
-    //Extensions
+    //Extension Field
     /// Mission type.
-    mission_type: u8,
+    mission_type: enums.MAV_MISSION_TYPE,
 
+    //Extension Field
     /// Id of new on-vehicle mission, fence, or rally point plan (on upload to vehicle).
     ///         The id is calculated and returned by a vehicle when a new plan is uploaded by a GCS.
     ///         The only requirement on the id is that it must change when there is any change to the on-vehicle plan type (there is no requirement that the id be globally unique).
     ///         0 on download from the vehicle to the GCS (on download the ID is set in MISSION_COUNT).
     ///         0 if plan ids are not supported.
     ///         The current on-vehicle plan ids are streamed in `MISSION_CURRENT`, allowing a GCS to determine if any part of the plan has changed and needs to be re-uploaded.
+    ///       
     opaque_id: u32,
 
 };
@@ -6560,13 +6275,12 @@ pub const AUTOPILOT_STATE_FOR_GIMBAL_DEVICE = struct {
     feed_forward_angular_velocity_z: f32,
 
     /// Bitmap indicating which estimator outputs are valid.
-    estimator_status: u16,
+    estimator_status: enums.ESTIMATOR_STATUS_FLAGS,
 
     /// The landed state. Is set to MAV_LANDED_STATE_UNDEFINED if landed state is unknown.
     landed_state: enums.MAV_LANDED_STATE,
 
-
-    //Extensions
+    //Extension Field
     /// Z component of angular velocity in NED (North, East, Down). NaN if unknown.
     angular_velocity_z: f32,
 
@@ -6612,6 +6326,14 @@ pub const TERRAIN_REPORT = struct {
 
     /// Number of 4x4 terrain blocks in memory
     loaded: u16,
+
+};
+
+/// Raw RC Data
+pub const CUBEPILOT_RAW_RC = struct {
+    pub const MSG_ID = 50001;
+    /// 
+    rc_raw: [32]u8,
 
 };
 
@@ -6731,14 +6453,15 @@ pub const ODOMETRY = struct {
     /// Row-major representation of a 6x6 velocity cross-covariance matrix upper right triangle (states: vx, vy, vz, rollspeed, pitchspeed, yawspeed; first six entries are the first ROW, next five entries are the second ROW, etc.). If unknown, assign NaN value to first element in the array.
     velocity_covariance: [21]f32,
 
-
-    //Extensions
+    //Extension Field
     /// Estimate reset counter. This should be incremented when the estimate resets in any of the dimensions (position, velocity, attitude, angular speed). This is designed to be used when e.g an external SLAM system detects a loop-closure and the estimate jumps.
     reset_counter: u8,
 
+    //Extension Field
     /// Type of estimator that is providing the odometry.
-    estimator_type: u8,
+    estimator_type: enums.MAV_ESTIMATOR_TYPE,
 
+    //Extension Field
     /// Optional odometry quality metric as a percentage. -1 = odometry has failed, 0 = unknown/unset quality, 1 = worst quality, 100 = best quality
     quality: i8,
 
@@ -6753,13 +6476,13 @@ pub const WIFI_CONFIG_AP = struct {
     /// Password. Blank for an open AP. MD5 hash when message is sent back as a response.
     password: [64]u8,
 
-
-    //Extensions
+    //Extension Field
     /// WiFi Mode.
-    mode: i8,
+    mode: enums.WIFI_CONFIG_AP_MODE,
 
+    //Extension Field
     /// Message acceptance response (sent back to GS).
-    response: i8,
+    response: enums.WIFI_CONFIG_AP_RESPONSE,
 
 };
 
@@ -6790,7 +6513,7 @@ pub const GIMBAL_MANAGER_SET_ATTITUDE = struct {
     target_component: u8,
 
     /// High level gimbal manager flags to use.
-    flags: u32,
+    flags: enums.GIMBAL_MANAGER_FLAGS,
 
     /// Component ID of gimbal device to address (or 1-6 for non-MAVLink gimbal), 0 for all gimbal device components. Send command multiple times for more than one gimbal (but not all gimbals).
     gimbal_device_id: u8,
@@ -6813,7 +6536,7 @@ pub const GIMBAL_MANAGER_SET_ATTITUDE = struct {
 pub const GENERATOR_STATUS = struct {
     pub const MSG_ID = 373;
     /// Status flags.
-    status: u64,
+    status: enums.MAV_GENERATOR_STATUS_FLAG,
 
     /// Speed of electrical generator or alternator. UINT16_MAX: field not provided.
     generator_speed: u16,
@@ -6882,7 +6605,7 @@ pub const OPEN_DRONE_ID_SELF_ID = struct {
     /// Component ID (0 for broadcast).
     target_component: u8,
 
-    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html.
+    /// Only used for drone ID data received from other UAs. See detailed description at https://mavlink.io/en/services/opendroneid.html. 
     id_or_mac: [20]u8,
 
     /// Indicates the type of the description field.
@@ -6931,7 +6654,7 @@ pub const GIMBAL_DEVICE_SET_ATTITUDE = struct {
     target_component: u8,
 
     /// Low level gimbal flags.
-    flags: u16,
+    flags: enums.GIMBAL_DEVICE_FLAGS,
 
     /// Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation). The frame is described in the message description. Set fields to NaN to be ignored.
     q: [4]f32,
@@ -6963,7 +6686,7 @@ pub const SET_POSITION_TARGET_LOCAL_NED = struct {
     coordinate_frame: enums.MAV_FRAME,
 
     /// Bitmap to indicate which dimensions should be ignored by the vehicle.
-    type_mask: u16,
+    type_mask: enums.POSITION_TARGET_TYPEMASK,
 
     /// X Position in NED frame
     x: f32,
@@ -7015,10 +6738,9 @@ pub const FENCE_STATUS = struct {
     /// Time (since boot) of last breach.
     breach_time: u32,
 
-
-    //Extensions
+    //Extension Field
     /// Active action to prevent fence breach
-    breach_mitigation: u8,
+    breach_mitigation: enums.FENCE_MITIGATE,
 
 };
 
@@ -7035,7 +6757,7 @@ pub const VIDEO_STREAM_INFORMATION = struct {
     type: enums.VIDEO_STREAM_TYPE,
 
     /// Bitmap of stream status flags.
-    flags: u16,
+    flags: enums.VIDEO_STREAM_STATUS_FLAGS,
 
     /// Frame rate.
     framerate: f32,
@@ -7061,99 +6783,13 @@ pub const VIDEO_STREAM_INFORMATION = struct {
     /// Video stream URI (TCP or RTSP URI ground station should connect to) or port number (UDP port ground station should listen to).
     uri: [160]u8,
 
-
-    //Extensions
+    //Extension Field
     /// Encoding of stream.
-    encoding: u8,
+    encoding: enums.VIDEO_STREAM_ENCODING,
 
+    //Extension Field
     /// Camera id of a non-MAVLink camera attached to an autopilot (1-6).  0 if the component is a MAVLink camera (with its own component id).
     camera_device_id: u8,
-
-};
-
-/// Start firmware update with encapsulated data.
-pub const CUBEPILOT_FIRMWARE_UPDATE_START = struct {
-    pub const MSG_ID = 50004;
-    /// System ID.
-    target_system: u8,
-
-    /// Component ID.
-    target_component: u8,
-
-    /// FW Size.
-    size: u32,
-
-    /// FW CRC.
-    crc: u32,
-
-};
-
-/// Information about video stream
-pub const HERELINK_VIDEO_STREAM_INFORMATION = struct {
-    pub const MSG_ID = 50002;
-    /// Video Stream ID (1 for first, 2 for second, etc.)
-    camera_id: u8,
-
-    /// Number of streams available.
-    status: u8,
-
-    /// Frame rate.
-    framerate: f32,
-
-    /// Horizontal resolution.
-    resolution_h: u16,
-
-    /// Vertical resolution.
-    resolution_v: u16,
-
-    /// Bit rate.
-    bitrate: u32,
-
-    /// Video image rotation clockwise.
-    rotation: u16,
-
-    /// Video stream URI (TCP or RTSP URI ground station should connect to) or port number (UDP port ground station should listen to).
-    uri: [230]u8,
-
-};
-
-/// offset response to encapsulated data.
-pub const CUBEPILOT_FIRMWARE_UPDATE_RESP = struct {
-    pub const MSG_ID = 50005;
-    /// System ID.
-    target_system: u8,
-
-    /// Component ID.
-    target_component: u8,
-
-    /// FW Offset.
-    offset: u32,
-
-};
-
-/// Raw RC Data
-pub const CUBEPILOT_RAW_RC = struct {
-    pub const MSG_ID = 50001;
-    rc_raw: [32]u8,
-
-};
-
-/// Herelink Telemetry
-pub const HERELINK_TELEM = struct {
-    pub const MSG_ID = 50003;
-    rssi: u8,
-
-    snr: i16,
-
-    rf_freq: u32,
-
-    link_bw: u32,
-
-    link_rate: u32,
-
-    cpu_temp: i16,
-
-    board_temp: i16,
 
 };
 
