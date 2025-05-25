@@ -18,26 +18,55 @@ jobs:
     - name: Checkout repository (with submodules)
       uses: actions/checkout@v4
       with:
-        submodules: recursive
+        submodules: 'true'
+        fetch-depth: 0
 
-    - name: Update submodules to latest
+    - name: Update top-level submodules only
+      id: update-subs
       run: |
-        git submodule update --remote --recursive
+        # Initialize variables
+        changed=false
+        submodule_updates=""
+        
+        # Get list of top-level submodules
+        submodules=$(git config --file .gitmodules --get-regexp path | awk '{ print $2 }')
+        
+        for submodule in $submodules; do
+          echo "Checking submodule: $submodule"
+          
+          # Get current and remote commit hashes
+          cd $submodule
+          current_commit=$(git rev-parse HEAD)
+          git fetch origin
+          remote_commit=$(git rev-parse origin/HEAD)
+          cd ..
+          
+          if [ "$current_commit" != "$remote_commit" ]; then
+            echo "Updating $submodule from $current_commit to $remote_commit"
+            git submodule update --remote --checkout $submodule
+            changed=true
+            submodule_updates+="$submodule: $remote_commit, "
+          else
+            echo "$submodule is already up to date"
+          fi
+        done
+        
+        # Remove trailing comma and space
+        submodule_updates=${submodule_updates%, }
+        
+        # Set outputs
+        echo "changed=$changed" >> $GITHUB_OUTPUT
+        echo "submodule_updates=${submodule_updates}" >> $GITHUB_OUTPUT
 
     - name: Generate Dialects
+      if: steps.update-subs.outputs.changed == 'true'
       run: zig build genv2
 
     - name: Commit and Push Changes
+      if: steps.update-subs.outputs.changed == 'true'
       run: |
-        SUBMODULES=$(git submodule status | awk '{print $2 ": " $1}' | paste -sd ', ' -)
+        git config user.name mavlink-zig-bot
+        git config user.email bot@mavlink-zig.neels.dev
         git add .
-        git submodule foreach 'git add $name'
-        if ! git diff --cached --quiet; then
-          git config user.name mavlink-zig-bot
-          git config user.email bot@mavlink-zig.neels.dev
-          git commit -m "(automatic) update dialects and submodules to: ${SUBMODULES}"
-          git push
-        else
-          echo "No changes to commit."
-        fi
-
+        git commit -m "(automatic) update dialects and submodules to: ${{ steps.update-subs.outputs.submodule_updates }}"
+        git push
