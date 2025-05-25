@@ -30,11 +30,14 @@ jobs:
     - name: Commit and Push Changes
       run: |
         SUBMODULES=$(git submodule status | awk '{print $2 ": " $1}' | paste -sd ', ' -)
-        if [ -n "$(git status --porcelain)" ]; then
+        git add .
+        git submodule foreach 'git add $name'
+        if ! git diff --cached --quiet; then
           git config user.name mavlink-zig-bot
           git config user.email bot@mavlink-zig.neels.dev
-          git add .
-          git add -u
           git commit -m "(automatic) update dialects and submodules to: ${SUBMODULES}"
           git push
+        else
+          echo "No changes to commit."
         fi
+
