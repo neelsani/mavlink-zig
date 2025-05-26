@@ -126,10 +126,17 @@ pub fn buildIR(ast: *Ast.Dialect, allocator: std.mem.Allocator) !IR {
             if (field.enumname) |enum_name| {
                 const safe_enum_name = try escapeZigIdent(enum_name, allocator);
                 if (ir.enums.getPtr(safe_enum_name)) |found_enum| {
-                    found_enum.c_type = switch (field.ctype) {
-                        .array => |arr| Ast.c_type{ .primitive = arr.ctype },
-                        .primitive => field.ctype,
-                    };
+                    if (field.display) |disp| {
+                        if (std.mem.eql(u8, disp, "bitmask")) {
+                            found_enum.*.bitmask = true;
+                        }
+                        if (found_enum.bitmask) {
+                            found_enum.c_type = switch (field.ctype) {
+                                .array => |arr| Ast.c_type{ .primitive = arr.ctype },
+                                .primitive => field.ctype,
+                            };
+                        }
+                    }
 
                     enum_ref = found_enum;
                 } else {
@@ -152,19 +159,14 @@ pub fn buildIR(ast: *Ast.Dialect, allocator: std.mem.Allocator) !IR {
             //  } or (enum_ref != null and enum_ref.?.bitmask)) {
             //      enum_ref = null;
             //  }
-            var display: ?[]const u8 = null;
-            if (enum_ref) |eref| {
-                if (eref.bitmask) {
-                    display = try allocator.dupe(u8, "bitmask");
-                }
-            }
+
             try ir_fields.append(IR_Field{
                 .name = safe_field_name,
                 .c_type = field.ctype,
                 .enum_ref = enum_ref,
                 .description = field.description,
                 .is_extension = field.is_extension,
-                .display = display,
+                .display = field.display,
             });
         }
 

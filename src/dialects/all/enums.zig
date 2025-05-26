@@ -2280,7 +2280,7 @@ pub const MAV_ODID_ID_TYPE = enum(u8) {
 };
 
 /// Gimbal device (low level) capability flags (bitmap).
-pub const GIMBAL_DEVICE_CAP_FLAGS = enum(u16) {
+pub const GIMBAL_DEVICE_CAP_FLAGS = enum(u32) {
     /// Gimbal device supports a retracted position.
     GIMBAL_DEVICE_CAP_FLAGS_HAS_RETRACT = 1,
     /// Gimbal device supports a horizontal, forward looking position, stabilized.

@@ -114,18 +114,20 @@ fn parseEnums(self: *Self, ast: *Ast.Dialect) !void {
 
 // Parse a single <enum name="...">...</enum>
 fn parseEnum(self: *Self) !Ast.Enum {
-    const name = try self.getAttr("name");
+    const name = self.getAttr("name") orelse @panic("name should be here");
     var enm = Ast.Enum.init(name, self.allocator);
-    if (self.reader.attributeIndex("bitmask")) |bm| {
-        if (std.mem.eql(u8, try self.reader.attributeValue(bm), "true")) {
+    if (self.getAttr("bitmask")) |bm| {
+        if (std.mem.eql(u8, bm, "true")) {
             enm.bitmask = true;
         }
     }
-    if (self.reader.attributeIndex("display")) |bm| {
-        if (std.mem.eql(u8, try self.reader.attributeValue(bm), "bitmask")) {
+
+    if (self.getAttr("display")) |bm| {
+        if (std.mem.eql(u8, bm, "bitmask")) {
             enm.bitmask = true;
         }
     }
+
     while (true) {
         const node = try self.reader.read();
         switch (node) {
@@ -162,8 +164,8 @@ fn parseEnum(self: *Self) !Ast.Enum {
 }
 // Parse a single <entry value="..." name="..."> with optional <description> and <param> children
 fn parseEnumEntry(self: *Self) !?Ast.EnumEntry {
-    const name = try self.getAttr("name");
-    const valueText = try self.getAttr("value");
+    const name = self.getAttr("name") orelse @panic("");
+    const valueText = self.getAttr("value") orelse @panic("");
 
     const value = try parseIntAuto(valueText);
 
@@ -230,9 +232,9 @@ fn parseMessages(self: *Self, ast: *Ast.Dialect) !void {
 
 // Parse a single <message id="..." name="..."> with multiple <field> children
 fn parseMessage(self: *Self) !?Ast.Message {
-    const idText = try self.getAttr("id");
+    const idText = self.getAttr("id") orelse @panic("");
     const id = try std.fmt.parseInt(u24, idText, 10);
-    const name = try self.getAttr("name");
+    const name = self.getAttr("name") orelse @panic("");
     var msg = Ast.Message.init(id, name, self.allocator);
     var in_extensions = false;
     while (true) {
@@ -276,10 +278,9 @@ fn parseMessage(self: *Self) !?Ast.Message {
 fn parseField(self: *Self) !Ast.Field {
     var theField = Ast.Field{
         .ctype = .{ .primitive = .uint8_t },
-        .description = "",
         .name = "",
     };
-    const typ_str = try getAttr(self, "type");
+    const typ_str = self.getAttr("type") orelse @panic("");
     const typeEnum: Ast.c_type = blk: {
         if (std.meta.stringToEnum(Ast.PrimitiveType, typ_str)) |val| {
             break :blk Ast.c_type{
@@ -302,26 +303,24 @@ fn parseField(self: *Self) !Ast.Field {
     };
 
     theField.ctype = typeEnum;
-    const name = try getAttr(self, "name");
+    theField.name = self.getAttr("name") orelse @panic("");
 
-    if (self.reader.attributeIndex("enum")) |idx| {
-        theField.enumname = try self.reader.attributeValue(idx);
+    if (self.getAttr("enum")) |enmname| {
+        theField.enumname = enmname;
     }
 
-    if (self.reader.attributeIndex("display")) |disp| {
-        theField.display = try self.reader.attributeValue(disp);
+    if (self.getAttr("display")) |disp| {
+        theField.display = disp;
     }
 
-    const description = try self.reader.readElementTextAlloc(self.allocator);
-    theField.description = description;
-    theField.name = name;
+    theField.description = try self.reader.readElementTextAlloc(self.allocator);
     return theField;
 }
 
 // Helper: get an attribute or fail
-fn getAttr(self: *Self, name: []const u8) ![]const u8 {
-    const idx = self.reader.attributeIndex(name) orelse return error.AttributeNotFound;
-    return self.reader.attributeValue(idx);
+fn getAttr(self: *Self, name: []const u8) ?[]const u8 {
+    const idx = self.reader.attributeIndex(name) orelse return null;
+    return self.reader.attributeValue(idx) catch @panic("read error");
 }
 
 fn parseIntAuto(s: []const u8) !usize {
