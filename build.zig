@@ -66,39 +66,39 @@ pub fn build(b: *std.Build) void {
         test_exe.root_module.addImport("mavlink", mavlink);
         test_step.dependOn(&b.addRunArtifact(test_exe).step);
     }
-    if (b.top_level_steps.entries.len == 0) {
-        { // The dialect zig generator
-            const genoptions = b.addOptions();
-            const mav_def_dir_opt = b.option([]const u8, "mavlink_xml_def_dir", "The output directory of the definitions") orelse b.path("mavlink/message_definitions/v1.0").getPath(b);
-            genoptions.addOption([]const u8, "dialect_to_use", blk: {
-                if (b.option([]const u8, "dialect_to_use", "The dialect to use or (all) for all of them")) |val| {
-                    if (!std.mem.eql(u8, val, "all") and !std.mem.endsWith(u8, val, ".xml")) {
-                        break :blk b.fmt("{s}.xml", .{val});
-                    } else {
-                        break :blk val;
-                    }
-                }
-                break :blk "all";
-            });
-            genoptions.addOption([]const u8, "dialect_out_dir", b.option([]const u8, "dialect_out_dir", "The output directory of the generated dialects") orelse b.path("src/dialects").getPath(b));
-            genoptions.addOption([]const u8, "mavlink_xml_def_dir", mav_def_dir_opt);
-            genoptions.addOption([]const [:0]const u8, "available_dialects", getDialects(b, mav_def_dir_opt));
-            const exe = b.addExecutable(.{
-                .name = "genv2",
-                .root_source_file = b.path("tools/genv2/main.zig"),
-                .target = target,
-                .optimize = optimize,
-            });
-            exe.root_module.addImport("mavlink", mavlink);
-            exe.root_module.addImport("xml", xml);
-            exe.root_module.addOptions("config", genoptions);
-            b.installArtifact(exe);
 
-            const run_cmd = b.addRunArtifact(exe);
-            const tool_step = b.step("genv2", "Generate MAVLink code from XML definitions");
-            tool_step.dependOn(&run_cmd.step);
-        }
+    { // The dialect zig generator
+        const genoptions = b.addOptions();
+        const mav_def_dir_opt = b.option([]const u8, "mavlink_xml_def_dir", "The output directory of the definitions") orelse b.path("mavlink/message_definitions/v1.0").getPath(b);
+        genoptions.addOption([]const u8, "dialect_to_use", blk: {
+            if (b.option([]const u8, "dialect_to_use", "The dialect to use or (all) for all of them")) |val| {
+                if (!std.mem.eql(u8, val, "all") and !std.mem.endsWith(u8, val, ".xml")) {
+                    break :blk b.fmt("{s}.xml", .{val});
+                } else {
+                    break :blk val;
+                }
+            }
+            break :blk "all";
+        });
+        genoptions.addOption([]const u8, "dialect_out_dir", b.option([]const u8, "dialect_out_dir", "The output directory of the generated dialects") orelse b.path("src/dialects").getPath(b));
+        genoptions.addOption([]const u8, "mavlink_xml_def_dir", mav_def_dir_opt);
+        genoptions.addOption([]const [:0]const u8, "available_dialects", getDialects(b, mav_def_dir_opt));
+        const exe = b.addExecutable(.{
+            .name = "genv2",
+            .root_source_file = b.path("tools/genv2/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        });
+        exe.root_module.addImport("mavlink", mavlink);
+        exe.root_module.addImport("xml", xml);
+        exe.root_module.addOptions("config", genoptions);
+        b.installArtifact(exe);
+
+        const run_cmd = b.addRunArtifact(exe);
+        const tool_step = b.step("genv2", "Generate MAVLink code from XML definitions");
+        tool_step.dependOn(&run_cmd.step);
     }
+
     // Examples configuration
     const examples = [_]struct {
         name: []const u8,
@@ -150,8 +150,8 @@ pub fn build(b: *std.Build) void {
 }
 
 fn getDialects(b: *std.Build, defPath: []const u8) []const [:0]const u8 {
-    var dir = b.build_root.handle.openDir(defPath, .{ .iterate = true }) catch |err| {
-        std.debug.print("Failed to open directory: {}\n", .{err});
+    var dir = b.build_root.handle.openDir(defPath, .{ .iterate = true }) catch {
+        //std.debug.print("Failed to open directory: {}\n", .{err});
         return &.{};
     };
     defer dir.close();
@@ -167,7 +167,7 @@ fn getDialects(b: *std.Build, defPath: []const u8) []const [:0]const u8 {
     }
 
     if (file_names.items.len == 0) {
-        std.debug.print("Warning: No XML files found in directory: {s}\n", .{defPath});
+        //std.debug.print("Warning: No XML files found in directory: {s}\n", .{defPath});
         // Create null-terminated fallback
         return &.{};
     }
