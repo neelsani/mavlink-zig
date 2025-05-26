@@ -6,6 +6,9 @@ const enums = @import("enums.zig");
 /// The heartbeat message shows that a system or component is present and responding. The type and autopilot fields (along with the message component id), allow the receiving system to treat further messages from this system appropriately (e.g. by laying out the user interface based on the autopilot). This microservice is documented at https://mavlink.io/en/services/heartbeat.html
 pub const HEARTBEAT = struct {
     pub const MSG_ID = 0;
+    /// A bitfield for use for autopilot-specific flags
+    custom_mode: u32,
+
     /// Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.
     type: enums.MAV_TYPE,
 
@@ -13,10 +16,7 @@ pub const HEARTBEAT = struct {
     autopilot: enums.MAV_AUTOPILOT,
 
     /// System mode bitmap.
-    base_mode: enums.MAV_MODE_FLAG,
-
-    /// A bitfield for use for autopilot-specific flags
-    custom_mode: u32,
+    base_mode: enums.MAV_MODE_FLAG.Type,
 
     /// System status flag.
     system_status: enums.MAV_STATE,
@@ -89,14 +89,14 @@ pub const LOWEHEISER_GOV_EFI = struct {
     /// Exhaust gas temperature.
     efi_exhaust_gas_temperature: f32,
 
-    /// EFI index.
-    efi_index: u8,
-
     /// Generator status.
     generator_status: u16,
 
     /// EFI status.
     efi_status: u16,
+
+    /// EFI index.
+    efi_index: u8,
 
 };
 

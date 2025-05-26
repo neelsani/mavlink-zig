@@ -64,6 +64,37 @@ pub const c_type = union(enum) {
             },
         };
     }
+
+    fn order_len(self: c_type) usize {
+        return switch (self) {
+            .primitive => |prim| switch (prim) {
+                .uint8_t, .char, .uint8_t_mavlink_version, .int8_t => 1,
+                .uint16_t, .int16_t => 2,
+                .uint32_t,
+                .int32_t,
+                .float,
+                => 4,
+                .uint64_t, .int64_t, .double => 8,
+            },
+            .array => |arr| arr.len,
+        };
+    }
+
+    pub fn compare(self: c_type, other: c_type) std.math.Order {
+        const self_len = self.order_len();
+        const other_len = other.order_len();
+        return std.math.order(self_len, other_len);
+    }
+
+    pub fn is_integer(self: c_type) bool {
+        return switch (self) {
+            .primitive => |p| switch (p) {
+                .float, .double => false,
+                else => true,
+            },
+            .array => false,
+        };
+    }
 };
 
 pub const Dialect = struct {
@@ -253,4 +284,9 @@ pub const Field = struct {
     description: ?[]const u8 = null,
     is_extension: bool = false,
     display: ?[]const u8 = null,
+
+    pub fn compareByCtype(context: void, a: @This(), b: @This()) bool {
+        _ = context;
+        return a.ctype.compare(b.ctype) == .gt;
+    }
 };

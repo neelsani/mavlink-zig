@@ -26,7 +26,7 @@ pub fn main() !void {
         .type = .MAV_TYPE_GCS,
         .system_status = .MAV_STATE_ACTIVE,
         .mavlink_version = 3,
-        .base_mode = .MAV_MODE_FLAG_AUTO_ENABLED,
+        .base_mode = 0,
         .custom_mode = 0,
     };
 
@@ -66,7 +66,8 @@ pub fn main() !void {
                                     std.debug.print("Failed to deserialize {s}: {any}\n{any}\n", .{ @typeName(T), e, msg.payload[0..msg.len] });
                                     break;
                                 };
-                                std.debug.print("Unhandled: {any}\n", .{msgde});
+                                _ = msgde;
+                                //std.debug.print("Unhandled: {any}\n", .{msgde});
                             }
                         }
                     },

@@ -2,17 +2,45 @@
 // DO NOT EDIT MANUALLY
 
 /// SERIAL_CONTROL flags (bitmask)
-pub const SERIAL_CONTROL_FLAG = enum(u8) {
+pub const SERIAL_CONTROL_FLAG = packed struct {
+    pub const is_bitmask = true;
+    bits: u8,
+
+    pub const Type = u8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Set if this is a reply
-    SERIAL_CONTROL_FLAG_REPLY = 1,
+    pub const SERIAL_CONTROL_FLAG_REPLY: @This() = .{ .bits = 1 };
     /// Set if the sender wants the receiver to send a response as another SERIAL_CONTROL message
-    SERIAL_CONTROL_FLAG_RESPOND = 2,
+    pub const SERIAL_CONTROL_FLAG_RESPOND: @This() = .{ .bits = 2 };
     /// Set if access to the serial port should be removed from whatever driver is currently using it, giving exclusive access to the SERIAL_CONTROL protocol. The port can be handed back by sending a request without this flag set
-    SERIAL_CONTROL_FLAG_EXCLUSIVE = 4,
+    pub const SERIAL_CONTROL_FLAG_EXCLUSIVE: @This() = .{ .bits = 4 };
     /// Block on writes to the serial port
-    SERIAL_CONTROL_FLAG_BLOCKING = 8,
+    pub const SERIAL_CONTROL_FLAG_BLOCKING: @This() = .{ .bits = 8 };
     /// Send multiple replies until port is drained
-    SERIAL_CONTROL_FLAG_MULTI = 16,
+    pub const SERIAL_CONTROL_FLAG_MULTI: @This() = .{ .bits = 16 };
 };
 
 /// List of possible units where failures can be injected.
@@ -35,34 +63,90 @@ pub const FAILURE_UNIT = enum(u32) {
 };
 
 /// These flags encode the MAV mode.
-pub const MAV_MODE_FLAG = enum(u8) {
+pub const MAV_MODE_FLAG = packed struct {
+    pub const is_bitmask = true;
+    bits: u8,
+
+    pub const Type = u8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// 0b10000000 MAV safety set to armed. Motors are enabled / running / can start. Ready to fly. Additional note: this flag is to be ignore when sent in the command MAV_CMD_DO_SET_MODE and MAV_CMD_COMPONENT_ARM_DISARM shall be used instead. The flag can still be used to report the armed state.
-    MAV_MODE_FLAG_SAFETY_ARMED = 128,
+    pub const MAV_MODE_FLAG_SAFETY_ARMED: @This() = .{ .bits = 128 };
     /// 0b01000000 remote control input is enabled.
-    MAV_MODE_FLAG_MANUAL_INPUT_ENABLED = 64,
+    pub const MAV_MODE_FLAG_MANUAL_INPUT_ENABLED: @This() = .{ .bits = 64 };
     /// 0b00100000 hardware in the loop simulation. All motors / actuators are blocked, but internal software is full operational.
-    MAV_MODE_FLAG_HIL_ENABLED = 32,
+    pub const MAV_MODE_FLAG_HIL_ENABLED: @This() = .{ .bits = 32 };
     /// 0b00010000 system stabilizes electronically its attitude (and optionally position). It needs however further control inputs to move around.
-    MAV_MODE_FLAG_STABILIZE_ENABLED = 16,
+    pub const MAV_MODE_FLAG_STABILIZE_ENABLED: @This() = .{ .bits = 16 };
     /// 0b00001000 guided mode enabled, system flies waypoints / mission items.
-    MAV_MODE_FLAG_GUIDED_ENABLED = 8,
+    pub const MAV_MODE_FLAG_GUIDED_ENABLED: @This() = .{ .bits = 8 };
     /// 0b00000100 autonomous mode enabled, system finds its own goal positions. Guided flag can be set or not, depends on the actual implementation.
-    MAV_MODE_FLAG_AUTO_ENABLED = 4,
+    pub const MAV_MODE_FLAG_AUTO_ENABLED: @This() = .{ .bits = 4 };
     /// 0b00000010 system has a test mode enabled. This flag is intended for temporary system tests and should not be used for stable implementations.
-    MAV_MODE_FLAG_TEST_ENABLED = 2,
+    pub const MAV_MODE_FLAG_TEST_ENABLED: @This() = .{ .bits = 2 };
     /// 0b00000001 Reserved for future use.
-    MAV_MODE_FLAG_CUSTOM_MODE_ENABLED = 1,
+    pub const MAV_MODE_FLAG_CUSTOM_MODE_ENABLED: @This() = .{ .bits = 1 };
 };
 
 /// Axes that will be autotuned by MAV_CMD_DO_AUTOTUNE_ENABLE.
 ///         Note that at least one flag must be set in MAV_CMD_DO_AUTOTUNE_ENABLE.param2: if none are set, the flight stack will tune its default set of axes.
-pub const AUTOTUNE_AXIS = enum(u32) {
+pub const AUTOTUNE_AXIS = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Autotune roll axis.
-    AUTOTUNE_AXIS_ROLL = 1,
+    pub const AUTOTUNE_AXIS_ROLL: @This() = .{ .bits = 1 };
     /// Autotune pitch axis.
-    AUTOTUNE_AXIS_PITCH = 2,
+    pub const AUTOTUNE_AXIS_PITCH: @This() = .{ .bits = 2 };
     /// Autotune yaw axis.
-    AUTOTUNE_AXIS_YAW = 4,
+    pub const AUTOTUNE_AXIS_YAW: @This() = .{ .bits = 4 };
 };
 
 /// Flags for CURRENT_EVENT_SEQUENCE.
@@ -96,39 +180,95 @@ pub const MAV_RESULT = enum(u8) {
 };
 
 /// Power supply status flags (bitmask)
-pub const MAV_POWER_STATUS = enum(u16) {
+pub const MAV_POWER_STATUS = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// main brick power supply valid
-    MAV_POWER_STATUS_BRICK_VALID = 1,
+    pub const MAV_POWER_STATUS_BRICK_VALID: @This() = .{ .bits = 1 };
     /// main servo power supply valid for FMU
-    MAV_POWER_STATUS_SERVO_VALID = 2,
+    pub const MAV_POWER_STATUS_SERVO_VALID: @This() = .{ .bits = 2 };
     /// USB power is connected
-    MAV_POWER_STATUS_USB_CONNECTED = 4,
+    pub const MAV_POWER_STATUS_USB_CONNECTED: @This() = .{ .bits = 4 };
     /// peripheral supply is in over-current state
-    MAV_POWER_STATUS_PERIPH_OVERCURRENT = 8,
+    pub const MAV_POWER_STATUS_PERIPH_OVERCURRENT: @This() = .{ .bits = 8 };
     /// hi-power peripheral supply is in over-current state
-    MAV_POWER_STATUS_PERIPH_HIPOWER_OVERCURRENT = 16,
+    pub const MAV_POWER_STATUS_PERIPH_HIPOWER_OVERCURRENT: @This() = .{ .bits = 16 };
     /// Power status has changed since boot
-    MAV_POWER_STATUS_CHANGED = 32,
+    pub const MAV_POWER_STATUS_CHANGED: @This() = .{ .bits = 32 };
 };
 
 /// These values encode the bit positions of the decode position. These values can be used to read the value of a flag bit by combining the base_mode variable with AND with the flag position value. The result will be either 0 or 1, depending on if the flag is set or not.
-pub const MAV_MODE_FLAG_DECODE_POSITION = enum(u32) {
+pub const MAV_MODE_FLAG_DECODE_POSITION = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// First bit:  10000000
-    MAV_MODE_FLAG_DECODE_POSITION_SAFETY = 128,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_SAFETY: @This() = .{ .bits = 128 };
     /// Second bit: 01000000
-    MAV_MODE_FLAG_DECODE_POSITION_MANUAL = 64,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_MANUAL: @This() = .{ .bits = 64 };
     /// Third bit:  00100000
-    MAV_MODE_FLAG_DECODE_POSITION_HIL = 32,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_HIL: @This() = .{ .bits = 32 };
     /// Fourth bit: 00010000
-    MAV_MODE_FLAG_DECODE_POSITION_STABILIZE = 16,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_STABILIZE: @This() = .{ .bits = 16 };
     /// Fifth bit:  00001000
-    MAV_MODE_FLAG_DECODE_POSITION_GUIDED = 8,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_GUIDED: @This() = .{ .bits = 8 };
     /// Sixth bit:   00000100
-    MAV_MODE_FLAG_DECODE_POSITION_AUTO = 4,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_AUTO: @This() = .{ .bits = 4 };
     /// Seventh bit: 00000010
-    MAV_MODE_FLAG_DECODE_POSITION_TEST = 2,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_TEST: @This() = .{ .bits = 2 };
     /// Eighth bit: 00000001
-    MAV_MODE_FLAG_DECODE_POSITION_CUSTOM_MODE = 1,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_CUSTOM_MODE: @This() = .{ .bits = 1 };
 };
 
 /// Enumeration of battery functions
@@ -168,35 +308,63 @@ pub const GPS_FIX_TYPE = enum(u8) {
 };
 
 /// Gimbal device (low level) capability flags (bitmap).
-pub const GIMBAL_DEVICE_CAP_FLAGS = enum(u16) {
+pub const GIMBAL_DEVICE_CAP_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Gimbal device supports a retracted position.
-    GIMBAL_DEVICE_CAP_FLAGS_HAS_RETRACT = 1,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_HAS_RETRACT: @This() = .{ .bits = 1 };
     /// Gimbal device supports a horizontal, forward looking position, stabilized.
-    GIMBAL_DEVICE_CAP_FLAGS_HAS_NEUTRAL = 2,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_HAS_NEUTRAL: @This() = .{ .bits = 2 };
     /// Gimbal device supports rotating around roll axis.
-    GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_AXIS = 4,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_AXIS: @This() = .{ .bits = 4 };
     /// Gimbal device supports to follow a roll angle relative to the vehicle.
-    GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_FOLLOW = 8,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_FOLLOW: @This() = .{ .bits = 8 };
     /// Gimbal device supports locking to a roll angle (generally that's the default with roll stabilized).
-    GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_LOCK = 16,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_LOCK: @This() = .{ .bits = 16 };
     /// Gimbal device supports rotating around pitch axis.
-    GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_AXIS = 32,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_AXIS: @This() = .{ .bits = 32 };
     /// Gimbal device supports to follow a pitch angle relative to the vehicle.
-    GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_FOLLOW = 64,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_FOLLOW: @This() = .{ .bits = 64 };
     /// Gimbal device supports locking to a pitch angle (generally that's the default with pitch stabilized).
-    GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_LOCK = 128,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_LOCK: @This() = .{ .bits = 128 };
     /// Gimbal device supports rotating around yaw axis.
-    GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_AXIS = 256,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_AXIS: @This() = .{ .bits = 256 };
     /// Gimbal device supports to follow a yaw angle relative to the vehicle (generally that's the default).
-    GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_FOLLOW = 512,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_FOLLOW: @This() = .{ .bits = 512 };
     /// Gimbal device supports locking to an absolute heading, i.e., yaw angle relative to North (earth frame, often this is an option available).
-    GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_LOCK = 1024,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_LOCK: @This() = .{ .bits = 1024 };
     /// Gimbal device supports yawing/panning infinitely (e.g. using slip disk).
-    GIMBAL_DEVICE_CAP_FLAGS_SUPPORTS_INFINITE_YAW = 2048,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_SUPPORTS_INFINITE_YAW: @This() = .{ .bits = 2048 };
     /// Gimbal device supports yaw angles and angular velocities relative to North (earth frame). This usually requires support by an autopilot via AUTOPILOT_STATE_FOR_GIMBAL_DEVICE. Support can go on and off during runtime, which is reported by the flag GIMBAL_DEVICE_FLAGS_CAN_ACCEPT_YAW_IN_EARTH_FRAME.
-    GIMBAL_DEVICE_CAP_FLAGS_SUPPORTS_YAW_IN_EARTH_FRAME = 4096,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_SUPPORTS_YAW_IN_EARTH_FRAME: @This() = .{ .bits = 4096 };
     /// Gimbal device supports radio control inputs as an alternative input for controlling the gimbal orientation.
-    GIMBAL_DEVICE_CAP_FLAGS_HAS_RC_INPUTS = 8192,
+    pub const GIMBAL_DEVICE_CAP_FLAGS_HAS_RC_INPUTS: @This() = .{ .bits = 8192 };
 };
 
 /// Type of mission items being requested/sent in mission protocol.
@@ -238,31 +406,59 @@ pub const AVSS_HORSEFLY_OPERATION_MODE = enum(u32) {
 };
 
 /// Flags in ESTIMATOR_STATUS message
-pub const ESTIMATOR_STATUS_FLAGS = enum(u16) {
+pub const ESTIMATOR_STATUS_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// True if the attitude estimate is good
-    ESTIMATOR_ATTITUDE = 1,
+    pub const ESTIMATOR_ATTITUDE: @This() = .{ .bits = 1 };
     /// True if the horizontal velocity estimate is good
-    ESTIMATOR_VELOCITY_HORIZ = 2,
+    pub const ESTIMATOR_VELOCITY_HORIZ: @This() = .{ .bits = 2 };
     /// True if the  vertical velocity estimate is good
-    ESTIMATOR_VELOCITY_VERT = 4,
+    pub const ESTIMATOR_VELOCITY_VERT: @This() = .{ .bits = 4 };
     /// True if the horizontal position (relative) estimate is good
-    ESTIMATOR_POS_HORIZ_REL = 8,
+    pub const ESTIMATOR_POS_HORIZ_REL: @This() = .{ .bits = 8 };
     /// True if the horizontal position (absolute) estimate is good
-    ESTIMATOR_POS_HORIZ_ABS = 16,
+    pub const ESTIMATOR_POS_HORIZ_ABS: @This() = .{ .bits = 16 };
     /// True if the vertical position (absolute) estimate is good
-    ESTIMATOR_POS_VERT_ABS = 32,
+    pub const ESTIMATOR_POS_VERT_ABS: @This() = .{ .bits = 32 };
     /// True if the vertical position (above ground) estimate is good
-    ESTIMATOR_POS_VERT_AGL = 64,
+    pub const ESTIMATOR_POS_VERT_AGL: @This() = .{ .bits = 64 };
     /// True if the EKF is in a constant position mode and is not using external measurements (eg GPS or optical flow)
-    ESTIMATOR_CONST_POS_MODE = 128,
+    pub const ESTIMATOR_CONST_POS_MODE: @This() = .{ .bits = 128 };
     /// True if the EKF has sufficient data to enter a mode that will provide a (relative) position estimate
-    ESTIMATOR_PRED_POS_HORIZ_REL = 256,
+    pub const ESTIMATOR_PRED_POS_HORIZ_REL: @This() = .{ .bits = 256 };
     /// True if the EKF has sufficient data to enter a mode that will provide a (absolute) position estimate
-    ESTIMATOR_PRED_POS_HORIZ_ABS = 512,
+    pub const ESTIMATOR_PRED_POS_HORIZ_ABS: @This() = .{ .bits = 512 };
     /// True if the EKF has detected a GPS glitch
-    ESTIMATOR_GPS_GLITCH = 1024,
+    pub const ESTIMATOR_GPS_GLITCH: @This() = .{ .bits = 1024 };
     /// True if the EKF has detected bad accelerometer data
-    ESTIMATOR_ACCEL_ERROR = 2048,
+    pub const ESTIMATOR_ACCEL_ERROR: @This() = .{ .bits = 2048 };
 };
 
 pub const MAV_ODID_OPERATOR_LOCATION_TYPE = enum(u8) {
@@ -447,15 +643,43 @@ pub const MAV_ODID_CLASS_EU = enum(u8) {
 /// Fence types to enable or disable when using MAV_CMD_DO_FENCE_ENABLE.
 ///         Note that at least one of these flags must be set in MAV_CMD_DO_FENCE_ENABLE.param2.
 ///         If none are set, the flight stack will ignore the field and enable/disable its default set of fences (usually all of them).
-pub const FENCE_TYPE = enum(u32) {
+pub const FENCE_TYPE = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Maximum altitude fence
-    FENCE_TYPE_ALT_MAX = 1,
+    pub const FENCE_TYPE_ALT_MAX: @This() = .{ .bits = 1 };
     /// Circle fence
-    FENCE_TYPE_CIRCLE = 2,
+    pub const FENCE_TYPE_CIRCLE: @This() = .{ .bits = 2 };
     /// Polygon fence
-    FENCE_TYPE_POLYGON = 4,
+    pub const FENCE_TYPE_POLYGON: @This() = .{ .bits = 4 };
     /// Minimum altitude fence
-    FENCE_TYPE_ALT_MIN = 8,
+    pub const FENCE_TYPE_ALT_MIN: @This() = .{ .bits = 8 };
 };
 
 /// Possible responses from a CELLULAR_CONFIG message.
@@ -500,59 +724,115 @@ pub const MAV_ARM_AUTH_DENIED_REASON = enum(u32) {
 };
 
 /// These flags are used in the AIS_VESSEL.fields bitmask to indicate validity of data in the other message fields. When set, the data is valid.
-pub const AIS_FLAGS = enum(u16) {
+pub const AIS_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// 1 = Position accuracy less than 10m, 0 = position accuracy greater than 10m.
-    AIS_FLAGS_POSITION_ACCURACY = 1,
-    AIS_FLAGS_VALID_COG = 2,
-    AIS_FLAGS_VALID_VELOCITY = 4,
+    pub const AIS_FLAGS_POSITION_ACCURACY: @This() = .{ .bits = 1 };
+    pub const AIS_FLAGS_VALID_COG: @This() = .{ .bits = 2 };
+    pub const AIS_FLAGS_VALID_VELOCITY: @This() = .{ .bits = 4 };
     /// 1 = Velocity over 52.5765m/s (102.2 knots)
-    AIS_FLAGS_HIGH_VELOCITY = 8,
-    AIS_FLAGS_VALID_TURN_RATE = 16,
+    pub const AIS_FLAGS_HIGH_VELOCITY: @This() = .{ .bits = 8 };
+    pub const AIS_FLAGS_VALID_TURN_RATE: @This() = .{ .bits = 16 };
     /// Only the sign of the returned turn rate value is valid, either greater than 5deg/30s or less than -5deg/30s
-    AIS_FLAGS_TURN_RATE_SIGN_ONLY = 32,
-    AIS_FLAGS_VALID_DIMENSIONS = 64,
+    pub const AIS_FLAGS_TURN_RATE_SIGN_ONLY: @This() = .{ .bits = 32 };
+    pub const AIS_FLAGS_VALID_DIMENSIONS: @This() = .{ .bits = 64 };
     /// Distance to bow is larger than 511m
-    AIS_FLAGS_LARGE_BOW_DIMENSION = 128,
+    pub const AIS_FLAGS_LARGE_BOW_DIMENSION: @This() = .{ .bits = 128 };
     /// Distance to stern is larger than 511m
-    AIS_FLAGS_LARGE_STERN_DIMENSION = 256,
+    pub const AIS_FLAGS_LARGE_STERN_DIMENSION: @This() = .{ .bits = 256 };
     /// Distance to port side is larger than 63m
-    AIS_FLAGS_LARGE_PORT_DIMENSION = 512,
+    pub const AIS_FLAGS_LARGE_PORT_DIMENSION: @This() = .{ .bits = 512 };
     /// Distance to starboard side is larger than 63m
-    AIS_FLAGS_LARGE_STARBOARD_DIMENSION = 1024,
-    AIS_FLAGS_VALID_CALLSIGN = 2048,
-    AIS_FLAGS_VALID_NAME = 4096,
+    pub const AIS_FLAGS_LARGE_STARBOARD_DIMENSION: @This() = .{ .bits = 1024 };
+    pub const AIS_FLAGS_VALID_CALLSIGN: @This() = .{ .bits = 2048 };
+    pub const AIS_FLAGS_VALID_NAME: @This() = .{ .bits = 4096 };
 };
 
 /// Winch status flags used in WINCH_STATUS
-pub const MAV_WINCH_STATUS_FLAG = enum(u32) {
+pub const MAV_WINCH_STATUS_FLAG = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Winch is healthy
-    MAV_WINCH_STATUS_HEALTHY = 1,
+    pub const MAV_WINCH_STATUS_HEALTHY: @This() = .{ .bits = 1 };
     /// Winch line is fully retracted
-    MAV_WINCH_STATUS_FULLY_RETRACTED = 2,
+    pub const MAV_WINCH_STATUS_FULLY_RETRACTED: @This() = .{ .bits = 2 };
     /// Winch motor is moving
-    MAV_WINCH_STATUS_MOVING = 4,
+    pub const MAV_WINCH_STATUS_MOVING: @This() = .{ .bits = 4 };
     /// Winch clutch is engaged allowing motor to move freely.
-    MAV_WINCH_STATUS_CLUTCH_ENGAGED = 8,
+    pub const MAV_WINCH_STATUS_CLUTCH_ENGAGED: @This() = .{ .bits = 8 };
     /// Winch is locked by locking mechanism.
-    MAV_WINCH_STATUS_LOCKED = 16,
+    pub const MAV_WINCH_STATUS_LOCKED: @This() = .{ .bits = 16 };
     /// Winch is gravity dropping payload.
-    MAV_WINCH_STATUS_DROPPING = 32,
+    pub const MAV_WINCH_STATUS_DROPPING: @This() = .{ .bits = 32 };
     /// Winch is arresting payload descent.
-    MAV_WINCH_STATUS_ARRESTING = 64,
+    pub const MAV_WINCH_STATUS_ARRESTING: @This() = .{ .bits = 64 };
     /// Winch is using torque measurements to sense the ground.
-    MAV_WINCH_STATUS_GROUND_SENSE = 128,
+    pub const MAV_WINCH_STATUS_GROUND_SENSE: @This() = .{ .bits = 128 };
     /// Winch is returning to the fully retracted position.
-    MAV_WINCH_STATUS_RETRACTING = 256,
+    pub const MAV_WINCH_STATUS_RETRACTING: @This() = .{ .bits = 256 };
     /// Winch is redelivering the payload. This is a failover state if the line tension goes above a threshold during RETRACTING.
-    MAV_WINCH_STATUS_REDELIVER = 512,
+    pub const MAV_WINCH_STATUS_REDELIVER: @This() = .{ .bits = 512 };
     /// Winch is abandoning the line and possibly payload. Winch unspools the entire calculated line length. This is a failover state from REDELIVER if the number of attempts exceeds a threshold.
-    MAV_WINCH_STATUS_ABANDON_LINE = 1024,
+    pub const MAV_WINCH_STATUS_ABANDON_LINE: @This() = .{ .bits = 1024 };
     /// Winch is engaging the locking mechanism.
-    MAV_WINCH_STATUS_LOCKING = 2048,
+    pub const MAV_WINCH_STATUS_LOCKING: @This() = .{ .bits = 2048 };
     /// Winch is spooling on line.
-    MAV_WINCH_STATUS_LOAD_LINE = 4096,
+    pub const MAV_WINCH_STATUS_LOAD_LINE: @This() = .{ .bits = 4096 };
     /// Winch is loading a payload.
-    MAV_WINCH_STATUS_LOAD_PAYLOAD = 8192,
+    pub const MAV_WINCH_STATUS_LOAD_PAYLOAD: @This() = .{ .bits = 8192 };
 };
 
 /// Actions that may be specified in MAV_CMD_OVERRIDE_GOTO to override mission execution.
@@ -774,55 +1054,111 @@ pub const MAV_ODID_HOR_ACC = enum(u8) {
 };
 
 /// Flags in the HIGHRES_IMU message indicate which fields have updated since the last message
-pub const HIGHRES_IMU_UPDATED_FLAGS = enum(u16) {
+pub const HIGHRES_IMU_UPDATED_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// The value in the xacc field has been updated
-    HIGHRES_IMU_UPDATED_XACC = 1,
+    pub const HIGHRES_IMU_UPDATED_XACC: @This() = .{ .bits = 1 };
     /// The value in the yacc field has been updated
-    HIGHRES_IMU_UPDATED_YACC = 2,
+    pub const HIGHRES_IMU_UPDATED_YACC: @This() = .{ .bits = 2 };
     /// The value in the zacc field has been updated since
-    HIGHRES_IMU_UPDATED_ZACC = 4,
+    pub const HIGHRES_IMU_UPDATED_ZACC: @This() = .{ .bits = 4 };
     /// The value in the xgyro field has been updated
-    HIGHRES_IMU_UPDATED_XGYRO = 8,
+    pub const HIGHRES_IMU_UPDATED_XGYRO: @This() = .{ .bits = 8 };
     /// The value in the ygyro field has been updated
-    HIGHRES_IMU_UPDATED_YGYRO = 16,
+    pub const HIGHRES_IMU_UPDATED_YGYRO: @This() = .{ .bits = 16 };
     /// The value in the zgyro field has been updated
-    HIGHRES_IMU_UPDATED_ZGYRO = 32,
+    pub const HIGHRES_IMU_UPDATED_ZGYRO: @This() = .{ .bits = 32 };
     /// The value in the xmag field has been updated
-    HIGHRES_IMU_UPDATED_XMAG = 64,
+    pub const HIGHRES_IMU_UPDATED_XMAG: @This() = .{ .bits = 64 };
     /// The value in the ymag field has been updated
-    HIGHRES_IMU_UPDATED_YMAG = 128,
+    pub const HIGHRES_IMU_UPDATED_YMAG: @This() = .{ .bits = 128 };
     /// The value in the zmag field has been updated
-    HIGHRES_IMU_UPDATED_ZMAG = 256,
+    pub const HIGHRES_IMU_UPDATED_ZMAG: @This() = .{ .bits = 256 };
     /// The value in the abs_pressure field has been updated
-    HIGHRES_IMU_UPDATED_ABS_PRESSURE = 512,
+    pub const HIGHRES_IMU_UPDATED_ABS_PRESSURE: @This() = .{ .bits = 512 };
     /// The value in the diff_pressure field has been updated
-    HIGHRES_IMU_UPDATED_DIFF_PRESSURE = 1024,
+    pub const HIGHRES_IMU_UPDATED_DIFF_PRESSURE: @This() = .{ .bits = 1024 };
     /// The value in the pressure_alt field has been updated
-    HIGHRES_IMU_UPDATED_PRESSURE_ALT = 2048,
+    pub const HIGHRES_IMU_UPDATED_PRESSURE_ALT: @This() = .{ .bits = 2048 };
     /// The value in the temperature field has been updated
-    HIGHRES_IMU_UPDATED_TEMPERATURE = 4096,
+    pub const HIGHRES_IMU_UPDATED_TEMPERATURE: @This() = .{ .bits = 4096 };
 };
 
 /// Smart battery supply status/fault flags (bitmask) for health indication. The battery must also report either MAV_BATTERY_CHARGE_STATE_FAILED or MAV_BATTERY_CHARGE_STATE_UNHEALTHY if any of these are set.
-pub const MAV_BATTERY_FAULT = enum(u32) {
+pub const MAV_BATTERY_FAULT = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Battery has deep discharged.
-    MAV_BATTERY_FAULT_DEEP_DISCHARGE = 1,
+    pub const MAV_BATTERY_FAULT_DEEP_DISCHARGE: @This() = .{ .bits = 1 };
     /// Voltage spikes.
-    MAV_BATTERY_FAULT_SPIKES = 2,
+    pub const MAV_BATTERY_FAULT_SPIKES: @This() = .{ .bits = 2 };
     /// One or more cells have failed. Battery should also report MAV_BATTERY_CHARGE_STATE_FAILE (and should not be used).
-    MAV_BATTERY_FAULT_CELL_FAIL = 4,
+    pub const MAV_BATTERY_FAULT_CELL_FAIL: @This() = .{ .bits = 4 };
     /// Over-current fault.
-    MAV_BATTERY_FAULT_OVER_CURRENT = 8,
+    pub const MAV_BATTERY_FAULT_OVER_CURRENT: @This() = .{ .bits = 8 };
     /// Over-temperature fault.
-    MAV_BATTERY_FAULT_OVER_TEMPERATURE = 16,
+    pub const MAV_BATTERY_FAULT_OVER_TEMPERATURE: @This() = .{ .bits = 16 };
     /// Under-temperature fault.
-    MAV_BATTERY_FAULT_UNDER_TEMPERATURE = 32,
+    pub const MAV_BATTERY_FAULT_UNDER_TEMPERATURE: @This() = .{ .bits = 32 };
     /// Vehicle voltage is not compatible with this battery (batteries on same power rail should have similar voltage).
-    MAV_BATTERY_FAULT_INCOMPATIBLE_VOLTAGE = 64,
+    pub const MAV_BATTERY_FAULT_INCOMPATIBLE_VOLTAGE: @This() = .{ .bits = 64 };
     /// Battery firmware is not compatible with current autopilot firmware.
-    MAV_BATTERY_FAULT_INCOMPATIBLE_FIRMWARE = 128,
+    pub const MAV_BATTERY_FAULT_INCOMPATIBLE_FIRMWARE: @This() = .{ .bits = 128 };
     /// Battery is not compatible due to cell configuration (e.g. 5s1p when vehicle requires 6s).
-    BATTERY_FAULT_INCOMPATIBLE_CELLS_CONFIGURATION = 256,
+    pub const BATTERY_FAULT_INCOMPATIBLE_CELLS_CONFIGURATION: @This() = .{ .bits = 256 };
 };
 
 pub const MAV_ODID_OPERATOR_ID_TYPE = enum(u8) {
@@ -848,23 +1184,51 @@ pub const RC_SUB_TYPE = enum(u32) {
 };
 
 /// Flags for the global position report.
-pub const UTM_DATA_AVAIL_FLAGS = enum(u8) {
+pub const UTM_DATA_AVAIL_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u8,
+
+    pub const Type = u8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// The field time contains valid data.
-    UTM_DATA_AVAIL_FLAGS_TIME_VALID = 1,
+    pub const UTM_DATA_AVAIL_FLAGS_TIME_VALID: @This() = .{ .bits = 1 };
     /// The field uas_id contains valid data.
-    UTM_DATA_AVAIL_FLAGS_UAS_ID_AVAILABLE = 2,
+    pub const UTM_DATA_AVAIL_FLAGS_UAS_ID_AVAILABLE: @This() = .{ .bits = 2 };
     /// The fields lat, lon and h_acc contain valid data.
-    UTM_DATA_AVAIL_FLAGS_POSITION_AVAILABLE = 4,
+    pub const UTM_DATA_AVAIL_FLAGS_POSITION_AVAILABLE: @This() = .{ .bits = 4 };
     /// The fields alt and v_acc contain valid data.
-    UTM_DATA_AVAIL_FLAGS_ALTITUDE_AVAILABLE = 8,
+    pub const UTM_DATA_AVAIL_FLAGS_ALTITUDE_AVAILABLE: @This() = .{ .bits = 8 };
     /// The field relative_alt contains valid data.
-    UTM_DATA_AVAIL_FLAGS_RELATIVE_ALTITUDE_AVAILABLE = 16,
+    pub const UTM_DATA_AVAIL_FLAGS_RELATIVE_ALTITUDE_AVAILABLE: @This() = .{ .bits = 16 };
     /// The fields vx and vy contain valid data.
-    UTM_DATA_AVAIL_FLAGS_HORIZONTAL_VELO_AVAILABLE = 32,
+    pub const UTM_DATA_AVAIL_FLAGS_HORIZONTAL_VELO_AVAILABLE: @This() = .{ .bits = 32 };
     /// The field vz contains valid data.
-    UTM_DATA_AVAIL_FLAGS_VERTICAL_VELO_AVAILABLE = 64,
+    pub const UTM_DATA_AVAIL_FLAGS_VERTICAL_VELO_AVAILABLE: @This() = .{ .bits = 64 };
     /// The fields next_lat, next_lon and next_alt contain valid data.
-    UTM_DATA_AVAIL_FLAGS_NEXT_WAYPOINT_AVAILABLE = 128,
+    pub const UTM_DATA_AVAIL_FLAGS_NEXT_WAYPOINT_AVAILABLE: @This() = .{ .bits = 128 };
 };
 
 /// Generalized UAVCAN node mode
@@ -1079,53 +1443,81 @@ pub const MAV_STATE = enum(u8) {
 };
 
 /// Flags to report status/failure cases for a power generator (used in GENERATOR_STATUS). Note that FAULTS are conditions that cause the generator to fail. Warnings are conditions that require attention before the next use (they indicate the system is not operating properly).
-pub const MAV_GENERATOR_STATUS_FLAG = enum(u64) {
+pub const MAV_GENERATOR_STATUS_FLAG = packed struct {
+    pub const is_bitmask = true;
+    bits: u64,
+
+    pub const Type = u64;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Generator is off.
-    MAV_GENERATOR_STATUS_FLAG_OFF = 1,
+    pub const MAV_GENERATOR_STATUS_FLAG_OFF: @This() = .{ .bits = 1 };
     /// Generator is ready to start generating power.
-    MAV_GENERATOR_STATUS_FLAG_READY = 2,
+    pub const MAV_GENERATOR_STATUS_FLAG_READY: @This() = .{ .bits = 2 };
     /// Generator is generating power.
-    MAV_GENERATOR_STATUS_FLAG_GENERATING = 4,
+    pub const MAV_GENERATOR_STATUS_FLAG_GENERATING: @This() = .{ .bits = 4 };
     /// Generator is charging the batteries (generating enough power to charge and provide the load).
-    MAV_GENERATOR_STATUS_FLAG_CHARGING = 8,
+    pub const MAV_GENERATOR_STATUS_FLAG_CHARGING: @This() = .{ .bits = 8 };
     /// Generator is operating at a reduced maximum power.
-    MAV_GENERATOR_STATUS_FLAG_REDUCED_POWER = 16,
+    pub const MAV_GENERATOR_STATUS_FLAG_REDUCED_POWER: @This() = .{ .bits = 16 };
     /// Generator is providing the maximum output.
-    MAV_GENERATOR_STATUS_FLAG_MAXPOWER = 32,
+    pub const MAV_GENERATOR_STATUS_FLAG_MAXPOWER: @This() = .{ .bits = 32 };
     /// Generator is near the maximum operating temperature, cooling is insufficient.
-    MAV_GENERATOR_STATUS_FLAG_OVERTEMP_WARNING = 64,
+    pub const MAV_GENERATOR_STATUS_FLAG_OVERTEMP_WARNING: @This() = .{ .bits = 64 };
     /// Generator hit the maximum operating temperature and shutdown.
-    MAV_GENERATOR_STATUS_FLAG_OVERTEMP_FAULT = 128,
+    pub const MAV_GENERATOR_STATUS_FLAG_OVERTEMP_FAULT: @This() = .{ .bits = 128 };
     /// Power electronics are near the maximum operating temperature, cooling is insufficient.
-    MAV_GENERATOR_STATUS_FLAG_ELECTRONICS_OVERTEMP_WARNING = 256,
+    pub const MAV_GENERATOR_STATUS_FLAG_ELECTRONICS_OVERTEMP_WARNING: @This() = .{ .bits = 256 };
     /// Power electronics hit the maximum operating temperature and shutdown.
-    MAV_GENERATOR_STATUS_FLAG_ELECTRONICS_OVERTEMP_FAULT = 512,
+    pub const MAV_GENERATOR_STATUS_FLAG_ELECTRONICS_OVERTEMP_FAULT: @This() = .{ .bits = 512 };
     /// Power electronics experienced a fault and shutdown.
-    MAV_GENERATOR_STATUS_FLAG_ELECTRONICS_FAULT = 1024,
+    pub const MAV_GENERATOR_STATUS_FLAG_ELECTRONICS_FAULT: @This() = .{ .bits = 1024 };
     /// The power source supplying the generator failed e.g. mechanical generator stopped, tether is no longer providing power, solar cell is in shade, hydrogen reaction no longer happening.
-    MAV_GENERATOR_STATUS_FLAG_POWERSOURCE_FAULT = 2048,
+    pub const MAV_GENERATOR_STATUS_FLAG_POWERSOURCE_FAULT: @This() = .{ .bits = 2048 };
     /// Generator controller having communication problems.
-    MAV_GENERATOR_STATUS_FLAG_COMMUNICATION_WARNING = 4096,
+    pub const MAV_GENERATOR_STATUS_FLAG_COMMUNICATION_WARNING: @This() = .{ .bits = 4096 };
     /// Power electronic or generator cooling system error.
-    MAV_GENERATOR_STATUS_FLAG_COOLING_WARNING = 8192,
+    pub const MAV_GENERATOR_STATUS_FLAG_COOLING_WARNING: @This() = .{ .bits = 8192 };
     /// Generator controller power rail experienced a fault.
-    MAV_GENERATOR_STATUS_FLAG_POWER_RAIL_FAULT = 16384,
+    pub const MAV_GENERATOR_STATUS_FLAG_POWER_RAIL_FAULT: @This() = .{ .bits = 16384 };
     /// Generator controller exceeded the overcurrent threshold and shutdown to prevent damage.
-    MAV_GENERATOR_STATUS_FLAG_OVERCURRENT_FAULT = 32768,
+    pub const MAV_GENERATOR_STATUS_FLAG_OVERCURRENT_FAULT: @This() = .{ .bits = 32768 };
     /// Generator controller detected a high current going into the batteries and shutdown to prevent battery damage.
-    MAV_GENERATOR_STATUS_FLAG_BATTERY_OVERCHARGE_CURRENT_FAULT = 65536,
+    pub const MAV_GENERATOR_STATUS_FLAG_BATTERY_OVERCHARGE_CURRENT_FAULT: @This() = .{ .bits = 65536 };
     /// Generator controller exceeded it's overvoltage threshold and shutdown to prevent it exceeding the voltage rating.
-    MAV_GENERATOR_STATUS_FLAG_OVERVOLTAGE_FAULT = 131072,
+    pub const MAV_GENERATOR_STATUS_FLAG_OVERVOLTAGE_FAULT: @This() = .{ .bits = 131072 };
     /// Batteries are under voltage (generator will not start).
-    MAV_GENERATOR_STATUS_FLAG_BATTERY_UNDERVOLT_FAULT = 262144,
+    pub const MAV_GENERATOR_STATUS_FLAG_BATTERY_UNDERVOLT_FAULT: @This() = .{ .bits = 262144 };
     /// Generator start is inhibited by e.g. a safety switch.
-    MAV_GENERATOR_STATUS_FLAG_START_INHIBITED = 524288,
+    pub const MAV_GENERATOR_STATUS_FLAG_START_INHIBITED: @This() = .{ .bits = 524288 };
     /// Generator requires maintenance.
-    MAV_GENERATOR_STATUS_FLAG_MAINTENANCE_REQUIRED = 1048576,
+    pub const MAV_GENERATOR_STATUS_FLAG_MAINTENANCE_REQUIRED: @This() = .{ .bits = 1048576 };
     /// Generator is not ready to generate yet.
-    MAV_GENERATOR_STATUS_FLAG_WARMING_UP = 2097152,
+    pub const MAV_GENERATOR_STATUS_FLAG_WARMING_UP: @This() = .{ .bits = 2097152 };
     /// Generator is idle.
-    MAV_GENERATOR_STATUS_FLAG_IDLE = 4194304,
+    pub const MAV_GENERATOR_STATUS_FLAG_IDLE: @This() = .{ .bits = 4194304 };
 };
 
 /// Specifies the datatype of a MAVLink extended parameter.
@@ -1154,33 +1546,89 @@ pub const MAV_PARAM_EXT_TYPE = enum(u8) {
     MAV_PARAM_EXT_TYPE_CUSTOM = 11,
 };
 
-pub const GPS_INPUT_IGNORE_FLAGS = enum(u16) {
+pub const GPS_INPUT_IGNORE_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// ignore altitude field
-    GPS_INPUT_IGNORE_FLAG_ALT = 1,
+    pub const GPS_INPUT_IGNORE_FLAG_ALT: @This() = .{ .bits = 1 };
     /// ignore hdop field
-    GPS_INPUT_IGNORE_FLAG_HDOP = 2,
+    pub const GPS_INPUT_IGNORE_FLAG_HDOP: @This() = .{ .bits = 2 };
     /// ignore vdop field
-    GPS_INPUT_IGNORE_FLAG_VDOP = 4,
+    pub const GPS_INPUT_IGNORE_FLAG_VDOP: @This() = .{ .bits = 4 };
     /// ignore horizontal velocity field (vn and ve)
-    GPS_INPUT_IGNORE_FLAG_VEL_HORIZ = 8,
+    pub const GPS_INPUT_IGNORE_FLAG_VEL_HORIZ: @This() = .{ .bits = 8 };
     /// ignore vertical velocity field (vd)
-    GPS_INPUT_IGNORE_FLAG_VEL_VERT = 16,
+    pub const GPS_INPUT_IGNORE_FLAG_VEL_VERT: @This() = .{ .bits = 16 };
     /// ignore speed accuracy field
-    GPS_INPUT_IGNORE_FLAG_SPEED_ACCURACY = 32,
+    pub const GPS_INPUT_IGNORE_FLAG_SPEED_ACCURACY: @This() = .{ .bits = 32 };
     /// ignore horizontal accuracy field
-    GPS_INPUT_IGNORE_FLAG_HORIZONTAL_ACCURACY = 64,
+    pub const GPS_INPUT_IGNORE_FLAG_HORIZONTAL_ACCURACY: @This() = .{ .bits = 64 };
     /// ignore vertical accuracy field
-    GPS_INPUT_IGNORE_FLAG_VERTICAL_ACCURACY = 128,
+    pub const GPS_INPUT_IGNORE_FLAG_VERTICAL_ACCURACY: @This() = .{ .bits = 128 };
 };
 
 /// Stream status flags (Bitmap)
-pub const VIDEO_STREAM_STATUS_FLAGS = enum(u16) {
+pub const VIDEO_STREAM_STATUS_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Stream is active (running)
-    VIDEO_STREAM_STATUS_FLAGS_RUNNING = 1,
+    pub const VIDEO_STREAM_STATUS_FLAGS_RUNNING: @This() = .{ .bits = 1 };
     /// Stream is thermal imaging
-    VIDEO_STREAM_STATUS_FLAGS_THERMAL = 2,
+    pub const VIDEO_STREAM_STATUS_FLAGS_THERMAL: @This() = .{ .bits = 2 };
     /// Stream can report absolute thermal range (see CAMERA_THERMAL_RANGE).
-    VIDEO_STREAM_STATUS_FLAGS_THERMAL_RANGE_ENABLED = 4,
+    pub const VIDEO_STREAM_STATUS_FLAGS_THERMAL_RANGE_ENABLED: @This() = .{ .bits = 4 };
 };
 
 pub const MAV_ODID_CATEGORY_EU = enum(u8) {
@@ -1333,103 +1781,159 @@ pub const MAV_BATTERY_MODE = enum(u8) {
 };
 
 /// These encode the sensors whose status is sent as part of the SYS_STATUS message.
-pub const MAV_SYS_STATUS_SENSOR = enum(u32) {
+pub const MAV_SYS_STATUS_SENSOR = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// 0x01 3D gyro
-    MAV_SYS_STATUS_SENSOR_3D_GYRO = 1,
+    pub const MAV_SYS_STATUS_SENSOR_3D_GYRO: @This() = .{ .bits = 1 };
     /// 0x02 3D accelerometer
-    MAV_SYS_STATUS_SENSOR_3D_ACCEL = 2,
+    pub const MAV_SYS_STATUS_SENSOR_3D_ACCEL: @This() = .{ .bits = 2 };
     /// 0x04 3D magnetometer
-    MAV_SYS_STATUS_SENSOR_3D_MAG = 4,
+    pub const MAV_SYS_STATUS_SENSOR_3D_MAG: @This() = .{ .bits = 4 };
     /// 0x08 absolute pressure
-    MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE = 8,
+    pub const MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE: @This() = .{ .bits = 8 };
     /// 0x10 differential pressure
-    MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE = 16,
+    pub const MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE: @This() = .{ .bits = 16 };
     /// 0x20 GPS
-    MAV_SYS_STATUS_SENSOR_GPS = 32,
+    pub const MAV_SYS_STATUS_SENSOR_GPS: @This() = .{ .bits = 32 };
     /// 0x40 optical flow
-    MAV_SYS_STATUS_SENSOR_OPTICAL_FLOW = 64,
+    pub const MAV_SYS_STATUS_SENSOR_OPTICAL_FLOW: @This() = .{ .bits = 64 };
     /// 0x80 computer vision position
-    MAV_SYS_STATUS_SENSOR_VISION_POSITION = 128,
+    pub const MAV_SYS_STATUS_SENSOR_VISION_POSITION: @This() = .{ .bits = 128 };
     /// 0x100 laser based position
-    MAV_SYS_STATUS_SENSOR_LASER_POSITION = 256,
+    pub const MAV_SYS_STATUS_SENSOR_LASER_POSITION: @This() = .{ .bits = 256 };
     /// 0x200 external ground truth (Vicon or Leica)
-    MAV_SYS_STATUS_SENSOR_EXTERNAL_GROUND_TRUTH = 512,
+    pub const MAV_SYS_STATUS_SENSOR_EXTERNAL_GROUND_TRUTH: @This() = .{ .bits = 512 };
     /// 0x400 3D angular rate control
-    MAV_SYS_STATUS_SENSOR_ANGULAR_RATE_CONTROL = 1024,
+    pub const MAV_SYS_STATUS_SENSOR_ANGULAR_RATE_CONTROL: @This() = .{ .bits = 1024 };
     /// 0x800 attitude stabilization
-    MAV_SYS_STATUS_SENSOR_ATTITUDE_STABILIZATION = 2048,
+    pub const MAV_SYS_STATUS_SENSOR_ATTITUDE_STABILIZATION: @This() = .{ .bits = 2048 };
     /// 0x1000 yaw position
-    MAV_SYS_STATUS_SENSOR_YAW_POSITION = 4096,
+    pub const MAV_SYS_STATUS_SENSOR_YAW_POSITION: @This() = .{ .bits = 4096 };
     /// 0x2000 z/altitude control
-    MAV_SYS_STATUS_SENSOR_Z_ALTITUDE_CONTROL = 8192,
+    pub const MAV_SYS_STATUS_SENSOR_Z_ALTITUDE_CONTROL: @This() = .{ .bits = 8192 };
     /// 0x4000 x/y position control
-    MAV_SYS_STATUS_SENSOR_XY_POSITION_CONTROL = 16384,
+    pub const MAV_SYS_STATUS_SENSOR_XY_POSITION_CONTROL: @This() = .{ .bits = 16384 };
     /// 0x8000 motor outputs / control
-    MAV_SYS_STATUS_SENSOR_MOTOR_OUTPUTS = 32768,
+    pub const MAV_SYS_STATUS_SENSOR_MOTOR_OUTPUTS: @This() = .{ .bits = 32768 };
     /// 0x10000 RC receiver
-    MAV_SYS_STATUS_SENSOR_RC_RECEIVER = 65536,
+    pub const MAV_SYS_STATUS_SENSOR_RC_RECEIVER: @This() = .{ .bits = 65536 };
     /// 0x20000 2nd 3D gyro
-    MAV_SYS_STATUS_SENSOR_3D_GYRO2 = 131072,
+    pub const MAV_SYS_STATUS_SENSOR_3D_GYRO2: @This() = .{ .bits = 131072 };
     /// 0x40000 2nd 3D accelerometer
-    MAV_SYS_STATUS_SENSOR_3D_ACCEL2 = 262144,
+    pub const MAV_SYS_STATUS_SENSOR_3D_ACCEL2: @This() = .{ .bits = 262144 };
     /// 0x80000 2nd 3D magnetometer
-    MAV_SYS_STATUS_SENSOR_3D_MAG2 = 524288,
+    pub const MAV_SYS_STATUS_SENSOR_3D_MAG2: @This() = .{ .bits = 524288 };
     /// 0x100000 geofence
-    MAV_SYS_STATUS_GEOFENCE = 1048576,
+    pub const MAV_SYS_STATUS_GEOFENCE: @This() = .{ .bits = 1048576 };
     /// 0x200000 AHRS subsystem health
-    MAV_SYS_STATUS_AHRS = 2097152,
+    pub const MAV_SYS_STATUS_AHRS: @This() = .{ .bits = 2097152 };
     /// 0x400000 Terrain subsystem health
-    MAV_SYS_STATUS_TERRAIN = 4194304,
+    pub const MAV_SYS_STATUS_TERRAIN: @This() = .{ .bits = 4194304 };
     /// 0x800000 Motors are reversed
-    MAV_SYS_STATUS_REVERSE_MOTOR = 8388608,
+    pub const MAV_SYS_STATUS_REVERSE_MOTOR: @This() = .{ .bits = 8388608 };
     /// 0x1000000 Logging
-    MAV_SYS_STATUS_LOGGING = 16777216,
+    pub const MAV_SYS_STATUS_LOGGING: @This() = .{ .bits = 16777216 };
     /// 0x2000000 Battery
-    MAV_SYS_STATUS_SENSOR_BATTERY = 33554432,
+    pub const MAV_SYS_STATUS_SENSOR_BATTERY: @This() = .{ .bits = 33554432 };
     /// 0x4000000 Proximity
-    MAV_SYS_STATUS_SENSOR_PROXIMITY = 67108864,
+    pub const MAV_SYS_STATUS_SENSOR_PROXIMITY: @This() = .{ .bits = 67108864 };
     /// 0x8000000 Satellite Communication
-    MAV_SYS_STATUS_SENSOR_SATCOM = 134217728,
+    pub const MAV_SYS_STATUS_SENSOR_SATCOM: @This() = .{ .bits = 134217728 };
     /// 0x10000000 pre-arm check status. Always healthy when armed
-    MAV_SYS_STATUS_PREARM_CHECK = 268435456,
+    pub const MAV_SYS_STATUS_PREARM_CHECK: @This() = .{ .bits = 268435456 };
     /// 0x20000000 Avoidance/collision prevention
-    MAV_SYS_STATUS_OBSTACLE_AVOIDANCE = 536870912,
+    pub const MAV_SYS_STATUS_OBSTACLE_AVOIDANCE: @This() = .{ .bits = 536870912 };
     /// 0x40000000 propulsion (actuator, esc, motor or propellor)
-    MAV_SYS_STATUS_SENSOR_PROPULSION = 1073741824,
+    pub const MAV_SYS_STATUS_SENSOR_PROPULSION: @This() = .{ .bits = 1073741824 };
     /// 0x80000000 Extended bit-field are used for further sensor status bits (needs to be set in onboard_control_sensors_present only)
-    MAV_SYS_STATUS_EXTENSION_USED = 2147483648,
+    pub const MAV_SYS_STATUS_EXTENSION_USED: @This() = .{ .bits = 2147483648 };
 };
 
 /// Flags to report failure cases over the high latency telemetry.
-pub const HL_FAILURE_FLAG = enum(u16) {
+pub const HL_FAILURE_FLAG = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// GPS failure.
-    HL_FAILURE_FLAG_GPS = 1,
+    pub const HL_FAILURE_FLAG_GPS: @This() = .{ .bits = 1 };
     /// Differential pressure sensor failure.
-    HL_FAILURE_FLAG_DIFFERENTIAL_PRESSURE = 2,
+    pub const HL_FAILURE_FLAG_DIFFERENTIAL_PRESSURE: @This() = .{ .bits = 2 };
     /// Absolute pressure sensor failure.
-    HL_FAILURE_FLAG_ABSOLUTE_PRESSURE = 4,
+    pub const HL_FAILURE_FLAG_ABSOLUTE_PRESSURE: @This() = .{ .bits = 4 };
     /// Accelerometer sensor failure.
-    HL_FAILURE_FLAG_3D_ACCEL = 8,
+    pub const HL_FAILURE_FLAG_3D_ACCEL: @This() = .{ .bits = 8 };
     /// Gyroscope sensor failure.
-    HL_FAILURE_FLAG_3D_GYRO = 16,
+    pub const HL_FAILURE_FLAG_3D_GYRO: @This() = .{ .bits = 16 };
     /// Magnetometer sensor failure.
-    HL_FAILURE_FLAG_3D_MAG = 32,
+    pub const HL_FAILURE_FLAG_3D_MAG: @This() = .{ .bits = 32 };
     /// Terrain subsystem failure.
-    HL_FAILURE_FLAG_TERRAIN = 64,
+    pub const HL_FAILURE_FLAG_TERRAIN: @This() = .{ .bits = 64 };
     /// Battery failure/critical low battery.
-    HL_FAILURE_FLAG_BATTERY = 128,
+    pub const HL_FAILURE_FLAG_BATTERY: @This() = .{ .bits = 128 };
     /// RC receiver failure/no RC connection.
-    HL_FAILURE_FLAG_RC_RECEIVER = 256,
+    pub const HL_FAILURE_FLAG_RC_RECEIVER: @This() = .{ .bits = 256 };
     /// Offboard link failure.
-    HL_FAILURE_FLAG_OFFBOARD_LINK = 512,
+    pub const HL_FAILURE_FLAG_OFFBOARD_LINK: @This() = .{ .bits = 512 };
     /// Engine failure.
-    HL_FAILURE_FLAG_ENGINE = 1024,
+    pub const HL_FAILURE_FLAG_ENGINE: @This() = .{ .bits = 1024 };
     /// Geofence violation.
-    HL_FAILURE_FLAG_GEOFENCE = 2048,
+    pub const HL_FAILURE_FLAG_GEOFENCE: @This() = .{ .bits = 2048 };
     /// Estimator failure, for example measurement rejection or large variances.
-    HL_FAILURE_FLAG_ESTIMATOR = 4096,
+    pub const HL_FAILURE_FLAG_ESTIMATOR: @This() = .{ .bits = 4096 };
     /// Mission failure.
-    HL_FAILURE_FLAG_MISSION = 8192,
+    pub const HL_FAILURE_FLAG_MISSION: @This() = .{ .bits = 8192 };
 };
 
 /// Camera Modes.
@@ -1555,21 +2059,49 @@ pub const AIS_TYPE = enum(u8) {
 };
 
 /// Flags to report ESC failures.
-pub const ESC_FAILURE_FLAGS = enum(u32) {
+pub const ESC_FAILURE_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Over current failure.
-    ESC_FAILURE_OVER_CURRENT = 1,
+    pub const ESC_FAILURE_OVER_CURRENT: @This() = .{ .bits = 1 };
     /// Over voltage failure.
-    ESC_FAILURE_OVER_VOLTAGE = 2,
+    pub const ESC_FAILURE_OVER_VOLTAGE: @This() = .{ .bits = 2 };
     /// Over temperature failure.
-    ESC_FAILURE_OVER_TEMPERATURE = 4,
+    pub const ESC_FAILURE_OVER_TEMPERATURE: @This() = .{ .bits = 4 };
     /// Over RPM failure.
-    ESC_FAILURE_OVER_RPM = 8,
+    pub const ESC_FAILURE_OVER_RPM: @This() = .{ .bits = 8 };
     /// Inconsistent command failure i.e. out of bounds.
-    ESC_FAILURE_INCONSISTENT_CMD = 16,
+    pub const ESC_FAILURE_INCONSISTENT_CMD: @This() = .{ .bits = 16 };
     /// Motor stuck failure.
-    ESC_FAILURE_MOTOR_STUCK = 32,
+    pub const ESC_FAILURE_MOTOR_STUCK: @This() = .{ .bits = 32 };
     /// Generic ESC failure.
-    ESC_FAILURE_GENERIC = 64,
+    pub const ESC_FAILURE_GENERIC: @This() = .{ .bits = 64 };
 };
 
 /// These flags are used to diagnose the failure state of CELLULAR_STATUS
@@ -2092,9 +2624,37 @@ pub const MAV_ODID_STATUS = enum(u8) {
 };
 
 /// These encode the sensors whose status is sent as part of the SYS_STATUS message in the extended fields.
-pub const MAV_SYS_STATUS_SENSOR_EXTENDED = enum(u32) {
+pub const MAV_SYS_STATUS_SENSOR_EXTENDED = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// 0x01 Recovery system (parachute, balloon, retracts etc)
-    MAV_SYS_STATUS_RECOVERY_SYSTEM = 1,
+    pub const MAV_SYS_STATUS_RECOVERY_SYSTEM: @This() = .{ .bits = 1 };
 };
 
 /// These flags encode the cellular network status
@@ -2151,13 +2711,41 @@ pub const CAN_FILTER_OP = enum(u8) {
 };
 
 /// Camera tracking target data (shows where tracked target is within image)
-pub const CAMERA_TRACKING_TARGET_DATA = enum(u8) {
+pub const CAMERA_TRACKING_TARGET_DATA = packed struct {
+    pub const is_bitmask = true;
+    bits: u8,
+
+    pub const Type = u8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Target data embedded in image data (proprietary)
-    CAMERA_TRACKING_TARGET_DATA_EMBEDDED = 1,
+    pub const CAMERA_TRACKING_TARGET_DATA_EMBEDDED: @This() = .{ .bits = 1 };
     /// Target data rendered in image
-    CAMERA_TRACKING_TARGET_DATA_RENDERED = 2,
+    pub const CAMERA_TRACKING_TARGET_DATA_RENDERED: @This() = .{ .bits = 2 };
     /// Target data within status message (Point or Rectangle)
-    CAMERA_TRACKING_TARGET_DATA_IN_STATUS = 4,
+    pub const CAMERA_TRACKING_TARGET_DATA_IN_STATUS: @This() = .{ .bits = 4 };
 };
 
 /// Speed setpoint types used in MAV_CMD_DO_CHANGE_SPEED
@@ -2173,27 +2761,55 @@ pub const SPEED_TYPE = enum(u32) {
 };
 
 /// Flags for high level gimbal manager operation The first 16 bits are identical to the GIMBAL_DEVICE_FLAGS.
-pub const GIMBAL_MANAGER_FLAGS = enum(u32) {
+pub const GIMBAL_MANAGER_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Based on GIMBAL_DEVICE_FLAGS_RETRACT.
-    GIMBAL_MANAGER_FLAGS_RETRACT = 1,
+    pub const GIMBAL_MANAGER_FLAGS_RETRACT: @This() = .{ .bits = 1 };
     /// Based on GIMBAL_DEVICE_FLAGS_NEUTRAL.
-    GIMBAL_MANAGER_FLAGS_NEUTRAL = 2,
+    pub const GIMBAL_MANAGER_FLAGS_NEUTRAL: @This() = .{ .bits = 2 };
     /// Based on GIMBAL_DEVICE_FLAGS_ROLL_LOCK.
-    GIMBAL_MANAGER_FLAGS_ROLL_LOCK = 4,
+    pub const GIMBAL_MANAGER_FLAGS_ROLL_LOCK: @This() = .{ .bits = 4 };
     /// Based on GIMBAL_DEVICE_FLAGS_PITCH_LOCK.
-    GIMBAL_MANAGER_FLAGS_PITCH_LOCK = 8,
+    pub const GIMBAL_MANAGER_FLAGS_PITCH_LOCK: @This() = .{ .bits = 8 };
     /// Based on GIMBAL_DEVICE_FLAGS_YAW_LOCK.
-    GIMBAL_MANAGER_FLAGS_YAW_LOCK = 16,
+    pub const GIMBAL_MANAGER_FLAGS_YAW_LOCK: @This() = .{ .bits = 16 };
     /// Based on GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME.
-    GIMBAL_MANAGER_FLAGS_YAW_IN_VEHICLE_FRAME = 32,
+    pub const GIMBAL_MANAGER_FLAGS_YAW_IN_VEHICLE_FRAME: @This() = .{ .bits = 32 };
     /// Based on GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME.
-    GIMBAL_MANAGER_FLAGS_YAW_IN_EARTH_FRAME = 64,
+    pub const GIMBAL_MANAGER_FLAGS_YAW_IN_EARTH_FRAME: @This() = .{ .bits = 64 };
     /// Based on GIMBAL_DEVICE_FLAGS_ACCEPTS_YAW_IN_EARTH_FRAME.
-    GIMBAL_MANAGER_FLAGS_ACCEPTS_YAW_IN_EARTH_FRAME = 128,
+    pub const GIMBAL_MANAGER_FLAGS_ACCEPTS_YAW_IN_EARTH_FRAME: @This() = .{ .bits = 128 };
     /// Based on GIMBAL_DEVICE_FLAGS_RC_EXCLUSIVE.
-    GIMBAL_MANAGER_FLAGS_RC_EXCLUSIVE = 256,
+    pub const GIMBAL_MANAGER_FLAGS_RC_EXCLUSIVE: @This() = .{ .bits = 256 };
     /// Based on GIMBAL_DEVICE_FLAGS_RC_MIXED.
-    GIMBAL_MANAGER_FLAGS_RC_MIXED = 512,
+    pub const GIMBAL_MANAGER_FLAGS_RC_MIXED: @This() = .{ .bits = 512 };
 };
 
 /// Defines how throttle value is represented in MAV_CMD_DO_MOTOR_TEST.
@@ -2231,27 +2847,55 @@ pub const PARAM_ACK = enum(u8) {
 };
 
 /// Gimbal device (low level) error flags (bitmap, 0 means no error)
-pub const GIMBAL_DEVICE_ERROR_FLAGS = enum(u32) {
+pub const GIMBAL_DEVICE_ERROR_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Gimbal device is limited by hardware roll limit.
-    GIMBAL_DEVICE_ERROR_FLAGS_AT_ROLL_LIMIT = 1,
+    pub const GIMBAL_DEVICE_ERROR_FLAGS_AT_ROLL_LIMIT: @This() = .{ .bits = 1 };
     /// Gimbal device is limited by hardware pitch limit.
-    GIMBAL_DEVICE_ERROR_FLAGS_AT_PITCH_LIMIT = 2,
+    pub const GIMBAL_DEVICE_ERROR_FLAGS_AT_PITCH_LIMIT: @This() = .{ .bits = 2 };
     /// Gimbal device is limited by hardware yaw limit.
-    GIMBAL_DEVICE_ERROR_FLAGS_AT_YAW_LIMIT = 4,
+    pub const GIMBAL_DEVICE_ERROR_FLAGS_AT_YAW_LIMIT: @This() = .{ .bits = 4 };
     /// There is an error with the gimbal encoders.
-    GIMBAL_DEVICE_ERROR_FLAGS_ENCODER_ERROR = 8,
+    pub const GIMBAL_DEVICE_ERROR_FLAGS_ENCODER_ERROR: @This() = .{ .bits = 8 };
     /// There is an error with the gimbal power source.
-    GIMBAL_DEVICE_ERROR_FLAGS_POWER_ERROR = 16,
+    pub const GIMBAL_DEVICE_ERROR_FLAGS_POWER_ERROR: @This() = .{ .bits = 16 };
     /// There is an error with the gimbal motors.
-    GIMBAL_DEVICE_ERROR_FLAGS_MOTOR_ERROR = 32,
+    pub const GIMBAL_DEVICE_ERROR_FLAGS_MOTOR_ERROR: @This() = .{ .bits = 32 };
     /// There is an error with the gimbal's software.
-    GIMBAL_DEVICE_ERROR_FLAGS_SOFTWARE_ERROR = 64,
+    pub const GIMBAL_DEVICE_ERROR_FLAGS_SOFTWARE_ERROR: @This() = .{ .bits = 64 };
     /// There is an error with the gimbal's communication.
-    GIMBAL_DEVICE_ERROR_FLAGS_COMMS_ERROR = 128,
+    pub const GIMBAL_DEVICE_ERROR_FLAGS_COMMS_ERROR: @This() = .{ .bits = 128 };
     /// Gimbal device is currently calibrating.
-    GIMBAL_DEVICE_ERROR_FLAGS_CALIBRATION_RUNNING = 256,
+    pub const GIMBAL_DEVICE_ERROR_FLAGS_CALIBRATION_RUNNING: @This() = .{ .bits = 256 };
     /// Gimbal device is not assigned to a gimbal manager.
-    GIMBAL_DEVICE_ERROR_FLAGS_NO_MANAGER = 512,
+    pub const GIMBAL_DEVICE_ERROR_FLAGS_NO_MANAGER: @This() = .{ .bits = 512 };
 };
 
 /// Possible responses from a WIFI_CONFIG_AP message.
@@ -2690,25 +3334,81 @@ pub const MAV_COMPONENT = enum(u32) {
 };
 
 /// Flags used in HIL_ACTUATOR_CONTROLS message.
-pub const HIL_ACTUATOR_CONTROLS_FLAGS = enum(u64) {
+pub const HIL_ACTUATOR_CONTROLS_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u64,
+
+    pub const Type = u64;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Simulation is using lockstep
-    HIL_ACTUATOR_CONTROLS_FLAGS_LOCKSTEP = 1,
+    pub const HIL_ACTUATOR_CONTROLS_FLAGS_LOCKSTEP: @This() = .{ .bits = 1 };
 };
 
 /// Bitmap to indicate which dimensions should be ignored by the vehicle: a value of 0b00000000 indicates that none of the setpoint dimensions should be ignored.
-pub const ATTITUDE_TARGET_TYPEMASK = enum(u8) {
+pub const ATTITUDE_TARGET_TYPEMASK = packed struct {
+    pub const is_bitmask = true;
+    bits: u8,
+
+    pub const Type = u8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Ignore body roll rate
-    ATTITUDE_TARGET_TYPEMASK_BODY_ROLL_RATE_IGNORE = 1,
+    pub const ATTITUDE_TARGET_TYPEMASK_BODY_ROLL_RATE_IGNORE: @This() = .{ .bits = 1 };
     /// Ignore body pitch rate
-    ATTITUDE_TARGET_TYPEMASK_BODY_PITCH_RATE_IGNORE = 2,
+    pub const ATTITUDE_TARGET_TYPEMASK_BODY_PITCH_RATE_IGNORE: @This() = .{ .bits = 2 };
     /// Ignore body yaw rate
-    ATTITUDE_TARGET_TYPEMASK_BODY_YAW_RATE_IGNORE = 4,
+    pub const ATTITUDE_TARGET_TYPEMASK_BODY_YAW_RATE_IGNORE: @This() = .{ .bits = 4 };
     /// Use 3D body thrust setpoint instead of throttle
-    ATTITUDE_TARGET_TYPEMASK_THRUST_BODY_SET = 32,
+    pub const ATTITUDE_TARGET_TYPEMASK_THRUST_BODY_SET: @This() = .{ .bits = 32 };
     /// Ignore throttle
-    ATTITUDE_TARGET_TYPEMASK_THROTTLE_IGNORE = 64,
+    pub const ATTITUDE_TARGET_TYPEMASK_THROTTLE_IGNORE: @This() = .{ .bits = 64 };
     /// Ignore attitude
-    ATTITUDE_TARGET_TYPEMASK_ATTITUDE_IGNORE = 128,
+    pub const ATTITUDE_TARGET_TYPEMASK_ATTITUDE_IGNORE: @This() = .{ .bits = 128 };
 };
 
 /// Enumeration of VTOL states
@@ -2878,27 +3578,55 @@ pub const FAILURE_TYPE = enum(u32) {
 };
 
 /// Flags for gimbal device (lower level) operation.
-pub const GIMBAL_DEVICE_FLAGS = enum(u16) {
+pub const GIMBAL_DEVICE_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Set to retracted safe position (no stabilization), takes precedence over all other flags.
-    GIMBAL_DEVICE_FLAGS_RETRACT = 1,
+    pub const GIMBAL_DEVICE_FLAGS_RETRACT: @This() = .{ .bits = 1 };
     /// Set to neutral/default position, taking precedence over all other flags except RETRACT. Neutral is commonly forward-facing and horizontal (roll=pitch=yaw=0) but may be any orientation.
-    GIMBAL_DEVICE_FLAGS_NEUTRAL = 2,
+    pub const GIMBAL_DEVICE_FLAGS_NEUTRAL: @This() = .{ .bits = 2 };
     /// Lock roll angle to absolute angle relative to horizon (not relative to vehicle). This is generally the default with a stabilizing gimbal.
-    GIMBAL_DEVICE_FLAGS_ROLL_LOCK = 4,
+    pub const GIMBAL_DEVICE_FLAGS_ROLL_LOCK: @This() = .{ .bits = 4 };
     /// Lock pitch angle to absolute angle relative to horizon (not relative to vehicle). This is generally the default with a stabilizing gimbal.
-    GIMBAL_DEVICE_FLAGS_PITCH_LOCK = 8,
+    pub const GIMBAL_DEVICE_FLAGS_PITCH_LOCK: @This() = .{ .bits = 8 };
     /// Lock yaw angle to absolute angle relative to North (not relative to vehicle). If this flag is set, the yaw angle and z component of angular velocity are relative to North (earth frame, x-axis pointing North), else they are relative to the vehicle heading (vehicle frame, earth frame rotated so that the x-axis is pointing forward).
-    GIMBAL_DEVICE_FLAGS_YAW_LOCK = 16,
+    pub const GIMBAL_DEVICE_FLAGS_YAW_LOCK: @This() = .{ .bits = 16 };
     /// Yaw angle and z component of angular velocity are relative to the vehicle heading (vehicle frame, earth frame rotated such that the x-axis is pointing forward).
-    GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME = 32,
+    pub const GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME: @This() = .{ .bits = 32 };
     /// Yaw angle and z component of angular velocity are relative to North (earth frame, x-axis is pointing North).
-    GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME = 64,
+    pub const GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME: @This() = .{ .bits = 64 };
     /// Gimbal device can accept yaw angle inputs relative to North (earth frame). This flag is only for reporting (attempts to set this flag are ignored).
-    GIMBAL_DEVICE_FLAGS_ACCEPTS_YAW_IN_EARTH_FRAME = 128,
+    pub const GIMBAL_DEVICE_FLAGS_ACCEPTS_YAW_IN_EARTH_FRAME: @This() = .{ .bits = 128 };
     /// The gimbal orientation is set exclusively by the RC signals feed to the gimbal's radio control inputs. MAVLink messages for setting the gimbal orientation (GIMBAL_DEVICE_SET_ATTITUDE) are ignored.
-    GIMBAL_DEVICE_FLAGS_RC_EXCLUSIVE = 256,
+    pub const GIMBAL_DEVICE_FLAGS_RC_EXCLUSIVE: @This() = .{ .bits = 256 };
     /// The gimbal orientation is determined by combining/mixing the RC signals feed to the gimbal's radio control inputs and the MAVLink messages for setting the gimbal orientation (GIMBAL_DEVICE_SET_ATTITUDE). How these two controls are combined or mixed is not defined by the protocol but is up to the implementation.
-    GIMBAL_DEVICE_FLAGS_RC_MIXED = 512,
+    pub const GIMBAL_DEVICE_FLAGS_RC_MIXED: @This() = .{ .bits = 512 };
 };
 
 /// Specifies the datatype of a MAVLink parameter.
@@ -3012,49 +3740,77 @@ pub const ORBIT_YAW_BEHAVIOUR = enum(u32) {
 };
 
 /// Component supports locking control to a particular GCS independent of its system (via MAV_CMD_REQUEST_OPERATOR_CONTROL).
-pub const MAV_PROTOCOL_CAPABILITY = enum(u64) {
+pub const MAV_PROTOCOL_CAPABILITY = packed struct {
+    pub const is_bitmask = true;
+    bits: u64,
+
+    pub const Type = u64;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Autopilot supports the MISSION_ITEM float message type.
     ///           Note that MISSION_ITEM is deprecated, and autopilots should use MISSION_INT instead.
-    MAV_PROTOCOL_CAPABILITY_MISSION_FLOAT = 1,
+    pub const MAV_PROTOCOL_CAPABILITY_MISSION_FLOAT: @This() = .{ .bits = 1 };
     /// Autopilot supports the new param float message type.
-    MAV_PROTOCOL_CAPABILITY_PARAM_FLOAT = 2,
+    pub const MAV_PROTOCOL_CAPABILITY_PARAM_FLOAT: @This() = .{ .bits = 2 };
     /// Autopilot supports MISSION_ITEM_INT scaled integer message type.
     ///           Note that this flag must always be set if missions are supported, because missions must always use MISSION_ITEM_INT (rather than MISSION_ITEM, which is deprecated).
-    MAV_PROTOCOL_CAPABILITY_MISSION_INT = 4,
+    pub const MAV_PROTOCOL_CAPABILITY_MISSION_INT: @This() = .{ .bits = 4 };
     /// Autopilot supports COMMAND_INT scaled integer message type.
-    MAV_PROTOCOL_CAPABILITY_COMMAND_INT = 8,
+    pub const MAV_PROTOCOL_CAPABILITY_COMMAND_INT: @This() = .{ .bits = 8 };
     /// Parameter protocol uses byte-wise encoding of parameter values into param_value (float) fields: https://mavlink.io/en/services/parameter.html#parameter-encoding.
     ///           Note that either this flag or MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_C_CAST should be set if the parameter protocol is supported.
-    MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_BYTEWISE = 16,
+    pub const MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_BYTEWISE: @This() = .{ .bits = 16 };
     /// Autopilot supports the File Transfer Protocol v1: https://mavlink.io/en/services/ftp.html.
-    MAV_PROTOCOL_CAPABILITY_FTP = 32,
+    pub const MAV_PROTOCOL_CAPABILITY_FTP: @This() = .{ .bits = 32 };
     /// Autopilot supports commanding attitude offboard.
-    MAV_PROTOCOL_CAPABILITY_SET_ATTITUDE_TARGET = 64,
+    pub const MAV_PROTOCOL_CAPABILITY_SET_ATTITUDE_TARGET: @This() = .{ .bits = 64 };
     /// Autopilot supports commanding position and velocity targets in local NED frame.
-    MAV_PROTOCOL_CAPABILITY_SET_POSITION_TARGET_LOCAL_NED = 128,
+    pub const MAV_PROTOCOL_CAPABILITY_SET_POSITION_TARGET_LOCAL_NED: @This() = .{ .bits = 128 };
     /// Autopilot supports commanding position and velocity targets in global scaled integers.
-    MAV_PROTOCOL_CAPABILITY_SET_POSITION_TARGET_GLOBAL_INT = 256,
+    pub const MAV_PROTOCOL_CAPABILITY_SET_POSITION_TARGET_GLOBAL_INT: @This() = .{ .bits = 256 };
     /// Autopilot supports terrain protocol / data handling.
-    MAV_PROTOCOL_CAPABILITY_TERRAIN = 512,
+    pub const MAV_PROTOCOL_CAPABILITY_TERRAIN: @This() = .{ .bits = 512 };
     /// Reserved for future use.
-    MAV_PROTOCOL_CAPABILITY_RESERVED3 = 1024,
+    pub const MAV_PROTOCOL_CAPABILITY_RESERVED3: @This() = .{ .bits = 1024 };
     /// Autopilot supports the MAV_CMD_DO_FLIGHTTERMINATION command (flight termination).
-    MAV_PROTOCOL_CAPABILITY_FLIGHT_TERMINATION = 2048,
+    pub const MAV_PROTOCOL_CAPABILITY_FLIGHT_TERMINATION: @This() = .{ .bits = 2048 };
     /// Autopilot supports onboard compass calibration.
-    MAV_PROTOCOL_CAPABILITY_COMPASS_CALIBRATION = 4096,
+    pub const MAV_PROTOCOL_CAPABILITY_COMPASS_CALIBRATION: @This() = .{ .bits = 4096 };
     /// Autopilot supports MAVLink version 2.
-    MAV_PROTOCOL_CAPABILITY_MAVLINK2 = 8192,
+    pub const MAV_PROTOCOL_CAPABILITY_MAVLINK2: @This() = .{ .bits = 8192 };
     /// Autopilot supports mission fence protocol.
-    MAV_PROTOCOL_CAPABILITY_MISSION_FENCE = 16384,
+    pub const MAV_PROTOCOL_CAPABILITY_MISSION_FENCE: @This() = .{ .bits = 16384 };
     /// Autopilot supports mission rally point protocol.
-    MAV_PROTOCOL_CAPABILITY_MISSION_RALLY = 32768,
+    pub const MAV_PROTOCOL_CAPABILITY_MISSION_RALLY: @This() = .{ .bits = 32768 };
     /// Reserved for future use.
-    MAV_PROTOCOL_CAPABILITY_RESERVED2 = 65536,
+    pub const MAV_PROTOCOL_CAPABILITY_RESERVED2: @This() = .{ .bits = 65536 };
     /// Parameter protocol uses C-cast of parameter values to set the param_value (float) fields: https://mavlink.io/en/services/parameter.html#parameter-encoding.
     ///           Note that either this flag or MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_BYTEWISE should be set if the parameter protocol is supported.
-    MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_C_CAST = 131072,
+    pub const MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_C_CAST: @This() = .{ .bits = 131072 };
     /// This component implements/is a gimbal manager. This means the GIMBAL_MANAGER_INFORMATION, and other messages can be requested.
-    MAV_PROTOCOL_CAPABILITY_COMPONENT_IMPLEMENTS_GIMBAL_MANAGER = 262144,
+    pub const MAV_PROTOCOL_CAPABILITY_COMPONENT_IMPLEMENTS_GIMBAL_MANAGER: @This() = .{ .bits = 262144 };
 };
 
 /// Enumeration of the ADSB altimeter types
@@ -3066,17 +3822,45 @@ pub const ADSB_ALTITUDE_TYPE = enum(u8) {
 };
 
 /// These flags indicate status such as data validity of each data source. Set = data valid
-pub const ADSB_FLAGS = enum(u16) {
-    ADSB_FLAGS_VALID_COORDS = 1,
-    ADSB_FLAGS_VALID_ALTITUDE = 2,
-    ADSB_FLAGS_VALID_HEADING = 4,
-    ADSB_FLAGS_VALID_VELOCITY = 8,
-    ADSB_FLAGS_VALID_CALLSIGN = 16,
-    ADSB_FLAGS_VALID_SQUAWK = 32,
-    ADSB_FLAGS_SIMULATED = 64,
-    ADSB_FLAGS_VERTICAL_VELOCITY_VALID = 128,
-    ADSB_FLAGS_BARO_VALID = 256,
-    ADSB_FLAGS_SOURCE_UAT = 32768,
+pub const ADSB_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
+    pub const ADSB_FLAGS_VALID_COORDS: @This() = .{ .bits = 1 };
+    pub const ADSB_FLAGS_VALID_ALTITUDE: @This() = .{ .bits = 2 };
+    pub const ADSB_FLAGS_VALID_HEADING: @This() = .{ .bits = 4 };
+    pub const ADSB_FLAGS_VALID_VELOCITY: @This() = .{ .bits = 8 };
+    pub const ADSB_FLAGS_VALID_CALLSIGN: @This() = .{ .bits = 16 };
+    pub const ADSB_FLAGS_VALID_SQUAWK: @This() = .{ .bits = 32 };
+    pub const ADSB_FLAGS_SIMULATED: @This() = .{ .bits = 64 };
+    pub const ADSB_FLAGS_VERTICAL_VELOCITY_VALID: @This() = .{ .bits = 128 };
+    pub const ADSB_FLAGS_BARO_VALID: @This() = .{ .bits = 256 };
+    pub const ADSB_FLAGS_SOURCE_UAT: @This() = .{ .bits = 32768 };
 };
 
 /// Camera tracking status flags
@@ -3175,39 +3959,123 @@ pub const STORAGE_STATUS = enum(u8) {
 };
 
 /// Mode properties.
-pub const MAV_MODE_PROPERTY = enum(u32) {
+pub const MAV_MODE_PROPERTY = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// If set, this mode is an advanced mode.
     ///           For example a rate-controlled manual mode might be advanced, whereas a position-controlled manual mode is not.
     ///           A GCS can optionally use this flag to configure the UI for its intended users.
-    MAV_MODE_PROPERTY_ADVANCED = 1,
+    pub const MAV_MODE_PROPERTY_ADVANCED: @This() = .{ .bits = 1 };
     /// If set, this mode should not be added to the list of selectable modes.
     ///           The mode might still be selected by the FC directly (for example as part of a failsafe).
-    MAV_MODE_PROPERTY_NOT_USER_SELECTABLE = 2,
+    pub const MAV_MODE_PROPERTY_NOT_USER_SELECTABLE: @This() = .{ .bits = 2 };
     /// If set, this mode is automatically controlled (it may use but does not require a manual controller).
     ///           If unset the mode is a assumed to require user input (be a manual mode).
-    MAV_MODE_PROPERTY_AUTO_MODE = 4,
+    pub const MAV_MODE_PROPERTY_AUTO_MODE: @This() = .{ .bits = 4 };
 };
 
 /// Flags to indicate usage for a particular storage (see STORAGE_INFORMATION.storage_usage and MAV_CMD_SET_STORAGE_USAGE).
-pub const STORAGE_USAGE_FLAG = enum(u8) {
+pub const STORAGE_USAGE_FLAG = packed struct {
+    pub const is_bitmask = true;
+    bits: u8,
+
+    pub const Type = u8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Always set to 1 (indicates STORAGE_INFORMATION.storage_usage is supported).
-    STORAGE_USAGE_FLAG_SET = 1,
+    pub const STORAGE_USAGE_FLAG_SET: @This() = .{ .bits = 1 };
     /// Storage for saving photos.
-    STORAGE_USAGE_FLAG_PHOTO = 2,
+    pub const STORAGE_USAGE_FLAG_PHOTO: @This() = .{ .bits = 2 };
     /// Storage for saving videos.
-    STORAGE_USAGE_FLAG_VIDEO = 4,
+    pub const STORAGE_USAGE_FLAG_VIDEO: @This() = .{ .bits = 4 };
     /// Storage for saving logs.
-    STORAGE_USAGE_FLAG_LOGS = 8,
+    pub const STORAGE_USAGE_FLAG_LOGS: @This() = .{ .bits = 8 };
 };
 
 /// Illuminator module error flags (bitmap, 0 means no error)
-pub const ILLUMINATOR_ERROR_FLAGS = enum(u32) {
+pub const ILLUMINATOR_ERROR_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Illuminator thermal throttling error.
-    ILLUMINATOR_ERROR_FLAGS_THERMAL_THROTTLING = 1,
+    pub const ILLUMINATOR_ERROR_FLAGS_THERMAL_THROTTLING: @This() = .{ .bits = 1 };
     /// Illuminator over temperature shutdown error.
-    ILLUMINATOR_ERROR_FLAGS_OVER_TEMPERATURE_SHUTDOWN = 2,
+    pub const ILLUMINATOR_ERROR_FLAGS_OVER_TEMPERATURE_SHUTDOWN: @This() = .{ .bits = 2 };
     /// Illuminator thermistor failure.
-    ILLUMINATOR_ERROR_FLAGS_THERMISTOR_FAILURE = 4,
+    pub const ILLUMINATOR_ERROR_FLAGS_THERMISTOR_FAILURE: @This() = .{ .bits = 4 };
 };
 
 /// Direction of VTOL transition
@@ -3245,31 +4113,59 @@ pub const MAV_SEVERITY = enum(u8) {
 };
 
 /// Bitmap to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 9 is set the floats afx afy afz should be interpreted as force instead of acceleration.
-pub const POSITION_TARGET_TYPEMASK = enum(u16) {
+pub const POSITION_TARGET_TYPEMASK = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Ignore position x
-    POSITION_TARGET_TYPEMASK_X_IGNORE = 1,
+    pub const POSITION_TARGET_TYPEMASK_X_IGNORE: @This() = .{ .bits = 1 };
     /// Ignore position y
-    POSITION_TARGET_TYPEMASK_Y_IGNORE = 2,
+    pub const POSITION_TARGET_TYPEMASK_Y_IGNORE: @This() = .{ .bits = 2 };
     /// Ignore position z
-    POSITION_TARGET_TYPEMASK_Z_IGNORE = 4,
+    pub const POSITION_TARGET_TYPEMASK_Z_IGNORE: @This() = .{ .bits = 4 };
     /// Ignore velocity x
-    POSITION_TARGET_TYPEMASK_VX_IGNORE = 8,
+    pub const POSITION_TARGET_TYPEMASK_VX_IGNORE: @This() = .{ .bits = 8 };
     /// Ignore velocity y
-    POSITION_TARGET_TYPEMASK_VY_IGNORE = 16,
+    pub const POSITION_TARGET_TYPEMASK_VY_IGNORE: @This() = .{ .bits = 16 };
     /// Ignore velocity z
-    POSITION_TARGET_TYPEMASK_VZ_IGNORE = 32,
+    pub const POSITION_TARGET_TYPEMASK_VZ_IGNORE: @This() = .{ .bits = 32 };
     /// Ignore acceleration x
-    POSITION_TARGET_TYPEMASK_AX_IGNORE = 64,
+    pub const POSITION_TARGET_TYPEMASK_AX_IGNORE: @This() = .{ .bits = 64 };
     /// Ignore acceleration y
-    POSITION_TARGET_TYPEMASK_AY_IGNORE = 128,
+    pub const POSITION_TARGET_TYPEMASK_AY_IGNORE: @This() = .{ .bits = 128 };
     /// Ignore acceleration z
-    POSITION_TARGET_TYPEMASK_AZ_IGNORE = 256,
+    pub const POSITION_TARGET_TYPEMASK_AZ_IGNORE: @This() = .{ .bits = 256 };
     /// Use force instead of acceleration
-    POSITION_TARGET_TYPEMASK_FORCE_SET = 512,
+    pub const POSITION_TARGET_TYPEMASK_FORCE_SET: @This() = .{ .bits = 512 };
     /// Ignore yaw
-    POSITION_TARGET_TYPEMASK_YAW_IGNORE = 1024,
+    pub const POSITION_TARGET_TYPEMASK_YAW_IGNORE: @This() = .{ .bits = 1024 };
     /// Ignore yaw rate
-    POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE = 2048,
+    pub const POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE: @This() = .{ .bits = 2048 };
 };
 
 /// These values define the type of firmware release.  These values indicate the first version or release of this type.  For example the first alpha release would be 64, the second would be 65.
@@ -3376,33 +4272,61 @@ pub const FENCE_MITIGATE = enum(u8) {
 };
 
 /// Camera capability flags (Bitmap)
-pub const CAMERA_CAP_FLAGS = enum(u32) {
+pub const CAMERA_CAP_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Camera is able to record video
-    CAMERA_CAP_FLAGS_CAPTURE_VIDEO = 1,
+    pub const CAMERA_CAP_FLAGS_CAPTURE_VIDEO: @This() = .{ .bits = 1 };
     /// Camera is able to capture images
-    CAMERA_CAP_FLAGS_CAPTURE_IMAGE = 2,
+    pub const CAMERA_CAP_FLAGS_CAPTURE_IMAGE: @This() = .{ .bits = 2 };
     /// Camera has separate Video and Image/Photo modes (MAV_CMD_SET_CAMERA_MODE)
-    CAMERA_CAP_FLAGS_HAS_MODES = 4,
+    pub const CAMERA_CAP_FLAGS_HAS_MODES: @This() = .{ .bits = 4 };
     /// Camera can capture images while in video mode
-    CAMERA_CAP_FLAGS_CAN_CAPTURE_IMAGE_IN_VIDEO_MODE = 8,
+    pub const CAMERA_CAP_FLAGS_CAN_CAPTURE_IMAGE_IN_VIDEO_MODE: @This() = .{ .bits = 8 };
     /// Camera can capture videos while in Photo/Image mode
-    CAMERA_CAP_FLAGS_CAN_CAPTURE_VIDEO_IN_IMAGE_MODE = 16,
+    pub const CAMERA_CAP_FLAGS_CAN_CAPTURE_VIDEO_IN_IMAGE_MODE: @This() = .{ .bits = 16 };
     /// Camera has image survey mode (MAV_CMD_SET_CAMERA_MODE)
-    CAMERA_CAP_FLAGS_HAS_IMAGE_SURVEY_MODE = 32,
+    pub const CAMERA_CAP_FLAGS_HAS_IMAGE_SURVEY_MODE: @This() = .{ .bits = 32 };
     /// Camera has basic zoom control (MAV_CMD_SET_CAMERA_ZOOM)
-    CAMERA_CAP_FLAGS_HAS_BASIC_ZOOM = 64,
+    pub const CAMERA_CAP_FLAGS_HAS_BASIC_ZOOM: @This() = .{ .bits = 64 };
     /// Camera has basic focus control (MAV_CMD_SET_CAMERA_FOCUS)
-    CAMERA_CAP_FLAGS_HAS_BASIC_FOCUS = 128,
+    pub const CAMERA_CAP_FLAGS_HAS_BASIC_FOCUS: @This() = .{ .bits = 128 };
     /// Camera has video streaming capabilities (request VIDEO_STREAM_INFORMATION with MAV_CMD_REQUEST_MESSAGE for video streaming info)
-    CAMERA_CAP_FLAGS_HAS_VIDEO_STREAM = 256,
+    pub const CAMERA_CAP_FLAGS_HAS_VIDEO_STREAM: @This() = .{ .bits = 256 };
     /// Camera supports tracking of a point on the camera view.
-    CAMERA_CAP_FLAGS_HAS_TRACKING_POINT = 512,
+    pub const CAMERA_CAP_FLAGS_HAS_TRACKING_POINT: @This() = .{ .bits = 512 };
     /// Camera supports tracking of a selection rectangle on the camera view.
-    CAMERA_CAP_FLAGS_HAS_TRACKING_RECTANGLE = 1024,
+    pub const CAMERA_CAP_FLAGS_HAS_TRACKING_RECTANGLE: @This() = .{ .bits = 1024 };
     /// Camera supports tracking geo status (CAMERA_TRACKING_GEO_STATUS).
-    CAMERA_CAP_FLAGS_HAS_TRACKING_GEO_STATUS = 2048,
+    pub const CAMERA_CAP_FLAGS_HAS_TRACKING_GEO_STATUS: @This() = .{ .bits = 2048 };
     /// Camera supports absolute thermal range (request CAMERA_THERMAL_RANGE with MAV_CMD_REQUEST_MESSAGE).
-    CAMERA_CAP_FLAGS_HAS_THERMAL_RANGE = 4096,
+    pub const CAMERA_CAP_FLAGS_HAS_THERMAL_RANGE: @This() = .{ .bits = 4096 };
 };
 
 /// RTK GPS baseline coordinate system, used for RTK corrections
@@ -3463,35 +4387,63 @@ pub const WIFI_CONFIG_AP_MODE = enum(i8) {
 };
 
 /// Flags in the HIL_SENSOR message indicate which fields have updated since the last message
-pub const HIL_SENSOR_UPDATED_FLAGS = enum(u32) {
+pub const HIL_SENSOR_UPDATED_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// The value in the xacc field has been updated
-    HIL_SENSOR_UPDATED_XACC = 1,
+    pub const HIL_SENSOR_UPDATED_XACC: @This() = .{ .bits = 1 };
     /// The value in the yacc field has been updated
-    HIL_SENSOR_UPDATED_YACC = 2,
+    pub const HIL_SENSOR_UPDATED_YACC: @This() = .{ .bits = 2 };
     /// The value in the zacc field has been updated
-    HIL_SENSOR_UPDATED_ZACC = 4,
+    pub const HIL_SENSOR_UPDATED_ZACC: @This() = .{ .bits = 4 };
     /// The value in the xgyro field has been updated
-    HIL_SENSOR_UPDATED_XGYRO = 8,
+    pub const HIL_SENSOR_UPDATED_XGYRO: @This() = .{ .bits = 8 };
     /// The value in the ygyro field has been updated
-    HIL_SENSOR_UPDATED_YGYRO = 16,
+    pub const HIL_SENSOR_UPDATED_YGYRO: @This() = .{ .bits = 16 };
     /// The value in the zgyro field has been updated
-    HIL_SENSOR_UPDATED_ZGYRO = 32,
+    pub const HIL_SENSOR_UPDATED_ZGYRO: @This() = .{ .bits = 32 };
     /// The value in the xmag field has been updated
-    HIL_SENSOR_UPDATED_XMAG = 64,
+    pub const HIL_SENSOR_UPDATED_XMAG: @This() = .{ .bits = 64 };
     /// The value in the ymag field has been updated
-    HIL_SENSOR_UPDATED_YMAG = 128,
+    pub const HIL_SENSOR_UPDATED_YMAG: @This() = .{ .bits = 128 };
     /// The value in the zmag field has been updated
-    HIL_SENSOR_UPDATED_ZMAG = 256,
+    pub const HIL_SENSOR_UPDATED_ZMAG: @This() = .{ .bits = 256 };
     /// The value in the abs_pressure field has been updated
-    HIL_SENSOR_UPDATED_ABS_PRESSURE = 512,
+    pub const HIL_SENSOR_UPDATED_ABS_PRESSURE: @This() = .{ .bits = 512 };
     /// The value in the diff_pressure field has been updated
-    HIL_SENSOR_UPDATED_DIFF_PRESSURE = 1024,
+    pub const HIL_SENSOR_UPDATED_DIFF_PRESSURE: @This() = .{ .bits = 1024 };
     /// The value in the pressure_alt field has been updated
-    HIL_SENSOR_UPDATED_PRESSURE_ALT = 2048,
+    pub const HIL_SENSOR_UPDATED_PRESSURE_ALT: @This() = .{ .bits = 2048 };
     /// The value in the temperature field has been updated
-    HIL_SENSOR_UPDATED_TEMPERATURE = 4096,
+    pub const HIL_SENSOR_UPDATED_TEMPERATURE: @This() = .{ .bits = 4096 };
     /// Full reset of attitude/position/velocities/etc was performed in sim (Bit 31).
-    HIL_SENSOR_UPDATED_RESET = 2147483648,
+    pub const HIL_SENSOR_UPDATED_RESET: @This() = .{ .bits = 2147483648 };
 };
 
 /// A data stream is not a fixed set of messages, but rather a
@@ -3617,9 +4569,37 @@ pub const MAV_ODID_AUTH_TYPE = enum(u8) {
 };
 
 /// Bitmap of options for the MAV_CMD_DO_REPOSITION
-pub const MAV_DO_REPOSITION_FLAGS = enum(u32) {
+pub const MAV_DO_REPOSITION_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// The aircraft should immediately transition into guided. This should not be set for follow me applications
-    MAV_DO_REPOSITION_FLAGS_CHANGE_MODE = 1,
+    pub const MAV_DO_REPOSITION_FLAGS_CHANGE_MODE: @This() = .{ .bits = 1 };
 };
 
 pub const MAVLINK_DATA_STREAM_TYPE = enum(u8) {
@@ -3632,39 +4612,67 @@ pub const MAVLINK_DATA_STREAM_TYPE = enum(u8) {
 };
 
 /// Gimbal manager high level capability flags (bitmap). The first 16 bits are identical to the GIMBAL_DEVICE_CAP_FLAGS. However, the gimbal manager does not need to copy the flags from the gimbal but can also enhance the capabilities and thus add flags.
-pub const GIMBAL_MANAGER_CAP_FLAGS = enum(u32) {
+pub const GIMBAL_MANAGER_CAP_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_RETRACT.
-    GIMBAL_MANAGER_CAP_FLAGS_HAS_RETRACT = 1,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_RETRACT: @This() = .{ .bits = 1 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_NEUTRAL.
-    GIMBAL_MANAGER_CAP_FLAGS_HAS_NEUTRAL = 2,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_NEUTRAL: @This() = .{ .bits = 2 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_AXIS.
-    GIMBAL_MANAGER_CAP_FLAGS_HAS_ROLL_AXIS = 4,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_ROLL_AXIS: @This() = .{ .bits = 4 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_FOLLOW.
-    GIMBAL_MANAGER_CAP_FLAGS_HAS_ROLL_FOLLOW = 8,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_ROLL_FOLLOW: @This() = .{ .bits = 8 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_LOCK.
-    GIMBAL_MANAGER_CAP_FLAGS_HAS_ROLL_LOCK = 16,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_ROLL_LOCK: @This() = .{ .bits = 16 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_AXIS.
-    GIMBAL_MANAGER_CAP_FLAGS_HAS_PITCH_AXIS = 32,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_PITCH_AXIS: @This() = .{ .bits = 32 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_FOLLOW.
-    GIMBAL_MANAGER_CAP_FLAGS_HAS_PITCH_FOLLOW = 64,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_PITCH_FOLLOW: @This() = .{ .bits = 64 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_LOCK.
-    GIMBAL_MANAGER_CAP_FLAGS_HAS_PITCH_LOCK = 128,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_PITCH_LOCK: @This() = .{ .bits = 128 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_AXIS.
-    GIMBAL_MANAGER_CAP_FLAGS_HAS_YAW_AXIS = 256,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_YAW_AXIS: @This() = .{ .bits = 256 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_FOLLOW.
-    GIMBAL_MANAGER_CAP_FLAGS_HAS_YAW_FOLLOW = 512,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_YAW_FOLLOW: @This() = .{ .bits = 512 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_LOCK.
-    GIMBAL_MANAGER_CAP_FLAGS_HAS_YAW_LOCK = 1024,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_YAW_LOCK: @This() = .{ .bits = 1024 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_SUPPORTS_INFINITE_YAW.
-    GIMBAL_MANAGER_CAP_FLAGS_SUPPORTS_INFINITE_YAW = 2048,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_SUPPORTS_INFINITE_YAW: @This() = .{ .bits = 2048 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_SUPPORTS_YAW_IN_EARTH_FRAME.
-    GIMBAL_MANAGER_CAP_FLAGS_SUPPORTS_YAW_IN_EARTH_FRAME = 4096,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_SUPPORTS_YAW_IN_EARTH_FRAME: @This() = .{ .bits = 4096 };
     /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_RC_INPUTS.
-    GIMBAL_MANAGER_CAP_FLAGS_HAS_RC_INPUTS = 8192,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_RC_INPUTS: @This() = .{ .bits = 8192 };
     /// Gimbal manager supports to point to a local position.
-    GIMBAL_MANAGER_CAP_FLAGS_CAN_POINT_LOCATION_LOCAL = 65536,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_CAN_POINT_LOCATION_LOCAL: @This() = .{ .bits = 65536 };
     /// Gimbal manager supports to point to a global latitude, longitude, altitude position.
-    GIMBAL_MANAGER_CAP_FLAGS_CAN_POINT_LOCATION_GLOBAL = 131072,
+    pub const GIMBAL_MANAGER_CAP_FLAGS_CAN_POINT_LOCATION_GLOBAL: @This() = .{ .bits = 131072 };
 };
 
 pub const MAV_ODID_DESC_TYPE = enum(u8) {

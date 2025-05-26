@@ -83,27 +83,24 @@ fn recursiveDeserialize(
             }
         },
         .pointer => @compileError("Pointers/slices not supported in allocation-free deserializer"),
+        // In your deserializer, add this case to the switch statement:
         .@"enum" => |enumInfo| {
             const IntType = enumInfo.tag_type;
             const raw = try reader.readInt(IntType, .little);
 
+            // Special handling for bitmask enums
+            if (@hasDecl(T, "is_bitmask") and T.is_bitmask) {
+                target.* = @bitCast(raw);
+                return;
+            }
+
+            // Regular enum handling
             inline for (std.meta.tags(T)) |tag| {
                 if (@intFromEnum(tag) == raw) {
                     target.* = tag;
                     return;
                 }
             }
-
-            // Debug print before returning error
-            std.debug.print("Invalid enum value for {s}: got {d} (valid values: ", .{ @typeName(T), raw });
-
-            // Print all valid values
-            inline for (std.meta.tags(T), 0..) |tag, i| {
-                if (i > 0) std.debug.print(", ", .{});
-                std.debug.print("{s}={d}", .{ @tagName(tag), @intFromEnum(tag) });
-            }
-            std.debug.print(")\n", .{});
-
             return error.InvalidEnumValue;
         },
         else => @compileError("Type not supported: " ++ @typeName(T)),
@@ -210,7 +207,7 @@ test "serialize then deserialize equality" {
         .current_battery = 2,
         .current_consumed = 2,
         .energy_consumed = 3,
-        .fault_bitmask = .BATTERY_FAULT_INCOMPATIBLE_CELLS_CONFIGURATION,
+        .fault_bitmask = dialect.enums.MAV_BATTERY_FAULT.fromInt(1).bits,
         .id = 4,
         .mode = .MAV_BATTERY_MODE_AUTO_DISCHARGING,
         .temperature = 3,

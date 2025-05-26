@@ -53,25 +53,83 @@ pub fn generateEnums(allocator: std.mem.Allocator, ir: *const IR, writer: anytyp
     var enum_iter = ir.enums.iterator();
     while (enum_iter.next()) |entry| {
         const enm = entry.value_ptr;
+
         if (enm.description) |desc| {
             try writeComment(writer, desc, false);
         }
-        try writer.print("pub const {s} = enum({s}) {{\n", .{
-            enm.name,
-            enm.c_type.to_zig_primitive(allocator),
-        });
-        //do sum bitmask shi
 
-        for (enm.entries) |enum_entry| {
-            if (enum_entry.description) |desc| {
-                try writeComment(writer, desc, true);
-            }
-            try writer.print("    {s} = {d},\n", .{
-                enum_entry.name,
-                enum_entry.value,
+        if (enm.bitmask) {
+            // Generate bitmask enum with helper functions
+            try writer.print(
+                \\pub const {s} = packed struct {{
+                \\    pub const is_bitmask = true;
+                \\    bits: {s},
+                \\
+                \\    pub const Type = {s};
+                \\
+                \\    pub inline fn toInt(self: @This()) Type {{
+                \\        return self.bits;
+                \\    }}
+                \\
+                \\    pub inline fn fromInt(bits: Type) @This() {{
+                \\        return @This(){{ .bits = bits }};
+                \\    }}
+                \\
+                \\    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {{
+                \\        return (self.bits & flag.bits) != 0;
+                \\    }}
+                \\
+                \\    pub inline fn set(self: *@This(), comptime flag: @This()) void {{
+                \\        self.bits |= flag.bits;
+                \\    }}
+                \\
+                \\    pub inline fn unset(self: *@This(), comptime flag: @This()) void {{
+                \\        self.bits &= ~flag.bits;
+                \\    }}
+                \\
+                \\    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {{
+                \\        self.bits ^= flag.bits;
+                \\    }}
+                \\
+            , .{
+                enm.name,
+                enm.c_type.to_zig_primitive(allocator),
+                enm.c_type.to_zig_primitive(allocator),
             });
+
+            // Generate flag constants
+            for (enm.entries) |enum_entry| {
+                if (enum_entry.description) |desc| {
+                    try writeComment(writer, desc, true);
+                }
+                try writer.print(
+                    \\    pub const {s}: @This() = .{{ .bits = {d} }};
+                    \\
+                , .{
+                    enum_entry.name,
+                    enum_entry.value,
+                });
+            }
+
+            try writer.writeAll("};\n\n");
+        } else {
+            // Regular enum generation
+            try writer.print("pub const {s} = enum({s}) {{\n", .{
+                enm.name,
+                enm.c_type.to_zig_primitive(allocator),
+            });
+
+            for (enm.entries) |enum_entry| {
+                if (enum_entry.description) |desc| {
+                    try writeComment(writer, desc, true);
+                }
+                try writer.print("    {s} = {d},\n", .{
+                    enum_entry.name,
+                    enum_entry.value,
+                });
+            }
+            try writer.writeAll("};\n\n");
         }
-        try writer.writeAll("};\n\n");
     }
 }
 
@@ -96,10 +154,17 @@ pub fn generateMessages(allocator: std.mem.Allocator, ir: *const IR, writer: any
             }
 
             if (field.enum_ref) |enm| {
-                try writer.print("    {s}: enums.{s},\n\n", .{
-                    field.name,
-                    enm.name,
-                });
+                if (enm.bitmask) {
+                    try writer.print("    {s}: enums.{s}.Type,\n\n", .{
+                        field.name,
+                        enm.name,
+                    });
+                } else {
+                    try writer.print("    {s}: enums.{s},\n\n", .{
+                        field.name,
+                        enm.name,
+                    });
+                }
             } else {
                 try writer.print("    {s}: {s},\n\n", .{
                     field.name,

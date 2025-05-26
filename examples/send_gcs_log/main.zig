@@ -15,7 +15,7 @@ pub fn main() !void {
     const hb = D.messages.HEARTBEAT{
         .type = .MAV_TYPE_GCS, // Identify as GCS
         .autopilot = .MAV_AUTOPILOT_INVALID, // Not a flight controller
-        .base_mode = .MAV_MODE_FLAG_AUTO_ENABLED,
+        .base_mode = @intFromEnum(D.enums.MAV_MODE.MAV_MODE_AUTO_ARMED),
         // Armed in AUTO mode
         .custom_mode = 0, // No custom mode flags
         .system_status = .MAV_STATE_STANDBY, // Standby state
@@ -45,11 +45,11 @@ pub fn main() !void {
         for (readBuf[0..n]) |b| { // Iterate each received byte
             if (parser.parseChar(b)) |msg| { // If a full MAVLink message is parsed
                 // Check if it’s a ATTITUDE response
-                if (msg.msgid == D.messages.ATTITUDE.MSG_ID) {
+                if (msg.msgid == D.messages.HEARTBEAT.MSG_ID) {
                     // Deserialize the payload into a HEARTBEAT struct
-                    const reply = try mavlink.serde.deserialize(D.messages.ATTITUDE, msg.payload[0..msg.len]);
+                    const reply = try mavlink.serde.deserialize(D.messages.HEARTBEAT, msg.payload[0..msg.len]);
                     // Print the received heartbeat in debug output
-                    std.debug.print("GCS got ATTITUDE: {any}\n", .{reply});
+                    std.debug.print("GCS got HEARTBEAT: {any}\n", .{reply});
                 }
             }
         }

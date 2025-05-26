@@ -23,43 +23,99 @@ pub const MAV_STATE = enum(u8) {
 };
 
 /// These flags encode the MAV mode.
-pub const MAV_MODE_FLAG = enum(u8) {
+pub const MAV_MODE_FLAG = packed struct {
+    pub const is_bitmask = true;
+    bits: u8,
+
+    pub const Type = u8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// 0b10000000 MAV safety set to armed. Motors are enabled / running / can start. Ready to fly. Additional note: this flag is to be ignore when sent in the command MAV_CMD_DO_SET_MODE and MAV_CMD_COMPONENT_ARM_DISARM shall be used instead. The flag can still be used to report the armed state.
-    MAV_MODE_FLAG_SAFETY_ARMED = 128,
+    pub const MAV_MODE_FLAG_SAFETY_ARMED: @This() = .{ .bits = 128 };
     /// 0b01000000 remote control input is enabled.
-    MAV_MODE_FLAG_MANUAL_INPUT_ENABLED = 64,
+    pub const MAV_MODE_FLAG_MANUAL_INPUT_ENABLED: @This() = .{ .bits = 64 };
     /// 0b00100000 hardware in the loop simulation. All motors / actuators are blocked, but internal software is full operational.
-    MAV_MODE_FLAG_HIL_ENABLED = 32,
+    pub const MAV_MODE_FLAG_HIL_ENABLED: @This() = .{ .bits = 32 };
     /// 0b00010000 system stabilizes electronically its attitude (and optionally position). It needs however further control inputs to move around.
-    MAV_MODE_FLAG_STABILIZE_ENABLED = 16,
+    pub const MAV_MODE_FLAG_STABILIZE_ENABLED: @This() = .{ .bits = 16 };
     /// 0b00001000 guided mode enabled, system flies waypoints / mission items.
-    MAV_MODE_FLAG_GUIDED_ENABLED = 8,
+    pub const MAV_MODE_FLAG_GUIDED_ENABLED: @This() = .{ .bits = 8 };
     /// 0b00000100 autonomous mode enabled, system finds its own goal positions. Guided flag can be set or not, depends on the actual implementation.
-    MAV_MODE_FLAG_AUTO_ENABLED = 4,
+    pub const MAV_MODE_FLAG_AUTO_ENABLED: @This() = .{ .bits = 4 };
     /// 0b00000010 system has a test mode enabled. This flag is intended for temporary system tests and should not be used for stable implementations.
-    MAV_MODE_FLAG_TEST_ENABLED = 2,
+    pub const MAV_MODE_FLAG_TEST_ENABLED: @This() = .{ .bits = 2 };
     /// 0b00000001 Reserved for future use.
-    MAV_MODE_FLAG_CUSTOM_MODE_ENABLED = 1,
+    pub const MAV_MODE_FLAG_CUSTOM_MODE_ENABLED: @This() = .{ .bits = 1 };
 };
 
 /// These values encode the bit positions of the decode position. These values can be used to read the value of a flag bit by combining the base_mode variable with AND with the flag position value. The result will be either 0 or 1, depending on if the flag is set or not.
-pub const MAV_MODE_FLAG_DECODE_POSITION = enum(u32) {
+pub const MAV_MODE_FLAG_DECODE_POSITION = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// First bit:  10000000
-    MAV_MODE_FLAG_DECODE_POSITION_SAFETY = 128,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_SAFETY: @This() = .{ .bits = 128 };
     /// Second bit: 01000000
-    MAV_MODE_FLAG_DECODE_POSITION_MANUAL = 64,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_MANUAL: @This() = .{ .bits = 64 };
     /// Third bit:  00100000
-    MAV_MODE_FLAG_DECODE_POSITION_HIL = 32,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_HIL: @This() = .{ .bits = 32 };
     /// Fourth bit: 00010000
-    MAV_MODE_FLAG_DECODE_POSITION_STABILIZE = 16,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_STABILIZE: @This() = .{ .bits = 16 };
     /// Fifth bit:  00001000
-    MAV_MODE_FLAG_DECODE_POSITION_GUIDED = 8,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_GUIDED: @This() = .{ .bits = 8 };
     /// Sixth bit:   00000100
-    MAV_MODE_FLAG_DECODE_POSITION_AUTO = 4,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_AUTO: @This() = .{ .bits = 4 };
     /// Seventh bit: 00000010
-    MAV_MODE_FLAG_DECODE_POSITION_TEST = 2,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_TEST: @This() = .{ .bits = 2 };
     /// Eighth bit: 00000001
-    MAV_MODE_FLAG_DECODE_POSITION_CUSTOM_MODE = 1,
+    pub const MAV_MODE_FLAG_DECODE_POSITION_CUSTOM_MODE: @This() = .{ .bits = 1 };
 };
 
 /// Micro air vehicle / autopilot classes. This identifies the individual model.

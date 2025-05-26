@@ -1,14 +1,14 @@
 const std = @import("std");
 const mavlink = @import("mavlink");
 
-const dialect = mavlink.dialects.common;
+const dialect = mavlink.dialects.all;
 
 pub fn main() !void {
     // Prepare a HEARTBEAT indicating this is a GCS
     const hb = dialect.messages.HEARTBEAT{
         .type = .MAV_TYPE_GCS,
         .autopilot = .MAV_AUTOPILOT_INVALID,
-        .base_mode = .MAV_MODE_FLAG_AUTO_ENABLED,
+        .base_mode = @intFromEnum(dialect.enums.MAV_MODE.MAV_MODE_AUTO_ARMED),
         .custom_mode = 0,
         .system_status = .MAV_STATE_STANDBY,
         .mavlink_version = 3,

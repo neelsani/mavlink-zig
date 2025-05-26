@@ -6,41 +6,26 @@ const enums = @import("enums.zig");
 /// Test all field types
 pub const TEST_TYPES = struct {
     pub const MSG_ID = 17000;
-    /// char
-    c: u8,
-
     /// string
     s: [10]u8,
-
-    /// uint8_t
-    u8: u8,
-
-    /// uint16_t
-    u16: u16,
-
-    /// uint32_t
-    u32: u32,
 
     /// uint64_t
     u64: u64,
 
-    /// int8_t
-    s8: i8,
+    /// int64_t
+    s64: i64,
 
-    /// int16_t
-    s16: i16,
+    /// double
+    d: f64,
+
+    /// uint32_t
+    u32: u32,
 
     /// int32_t
     s32: i32,
 
-    /// int64_t
-    s64: i64,
-
     /// float
     f: f32,
-
-    /// double
-    d: f64,
 
     /// uint8_t_array
     u8_array: [3]u8,
@@ -71,6 +56,21 @@ pub const TEST_TYPES = struct {
 
     /// double_array
     d_array: [3]f64,
+
+    /// uint16_t
+    u16: u16,
+
+    /// int16_t
+    s16: i16,
+
+    /// char
+    c: u8,
+
+    /// uint8_t
+    u8: u8,
+
+    /// int8_t
+    s8: i8,
 
 };
 

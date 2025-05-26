@@ -271,6 +271,21 @@ fn parseMessage(self: *Self) !?Ast.Message {
             else => {},
         }
     }
+    var basefields = std.ArrayList(Ast.Field).init(self.allocator);
+    var extfields = std.ArrayList(Ast.Field).init(self.allocator);
+
+    for (msg.fields.items) |fld| {
+        if (fld.is_extension) {
+            try extfields.append(fld);
+        } else {
+            try basefields.append(fld);
+        }
+    }
+    const baseslice = try basefields.toOwnedSlice();
+    msg.fields.clearRetainingCapacity();
+    std.mem.sort(Ast.Field, baseslice, {}, Ast.Field.compareByCtype);
+    try msg.fields.appendSlice(baseslice);
+    try msg.fields.appendSlice(try extfields.toOwnedSlice());
     return msg;
 }
 
