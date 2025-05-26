@@ -1,15 +1,3 @@
-pub const ASLUAV = struct {
-    pub const enums    = @import("ASLUAV/enums.zig");
-    pub const messages = @import("ASLUAV/messages.zig");
-};
-
-
-pub const AVSSUAS = struct {
-    pub const enums    = @import("AVSSUAS/enums.zig");
-    pub const messages = @import("AVSSUAS/messages.zig");
-};
-
-
 pub const all = struct {
     pub const enums    = @import("all/enums.zig");
     pub const messages = @import("all/messages.zig");
@@ -19,6 +7,18 @@ pub const all = struct {
 pub const ardupilotmega = struct {
     pub const enums    = @import("ardupilotmega/enums.zig");
     pub const messages = @import("ardupilotmega/messages.zig");
+};
+
+
+pub const ASLUAV = struct {
+    pub const enums    = @import("ASLUAV/enums.zig");
+    pub const messages = @import("ASLUAV/messages.zig");
+};
+
+
+pub const AVSSUAS = struct {
+    pub const enums    = @import("AVSSUAS/enums.zig");
+    pub const messages = @import("AVSSUAS/messages.zig");
 };
 
 
@@ -100,15 +100,15 @@ pub const Test = struct {
 };
 
 
-pub const uAvionix = struct {
-    pub const enums    = @import("uAvionix/enums.zig");
-    pub const messages = @import("uAvionix/messages.zig");
-};
-
-
 pub const ualberta = struct {
     pub const enums    = @import("ualberta/enums.zig");
     pub const messages = @import("ualberta/messages.zig");
+};
+
+
+pub const uAvionix = struct {
+    pub const enums    = @import("uAvionix/enums.zig");
+    pub const messages = @import("uAvionix/messages.zig");
 };
 
 

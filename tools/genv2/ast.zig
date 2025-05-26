@@ -1,25 +1,30 @@
 const std = @import("std");
+const config = @import("config");
 
-pub const DialectEnum = enum {
-    @"ASLUAV.xml",
-    @"AVSSUAS.xml",
-    @"all.xml",
-    @"ardupilotmega.xml",
-    @"common.xml",
-    @"csAirLink.xml",
-    @"cubepilot.xml",
-    @"development.xml",
-    @"icarous.xml",
-    @"loweheiser.xml",
-    @"matrixpilot.xml",
-    @"minimal.xml",
-    @"paparazzi.xml",
-    @"python_array_test.xml",
-    @"standard.xml",
-    @"storm32.xml",
-    @"test.xml",
-    @"uAvionix.xml",
-    @"ualberta.xml",
+pub const DialectEnum = blk: {
+    {
+        const fields = config.available_dialects;
+        if (fields.len == 0) @compileError("no dialects available");
+
+        const EnumField = std.builtin.Type.EnumField;
+        var enumFields: [fields.len]EnumField = undefined;
+
+        for (fields, 0..) |name, i| {
+            enumFields[i] = .{
+                .name = name, // name is already [:0]const u8
+                .value = i,
+            };
+        }
+
+        break :blk @Type(.{
+            .@"enum" = .{ // Corrected to .Enum (not .@"enum")
+                .tag_type = u32,
+                .fields = &enumFields,
+                .decls = &.{},
+                .is_exhaustive = true,
+            },
+        });
+    }
 };
 pub const PrimitiveType = enum {
     uint8_t,

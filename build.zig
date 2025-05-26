@@ -87,12 +87,12 @@ pub fn build(b: *std.Build) void {
     }
 
     { // The dialect zig generator
-
         const genoptions = b.addOptions();
+        const mav_def_dir_opt = b.option([]const u8, "mavlink_xml_def_dir", "The output directory of the definitions") orelse b.path("mavlink/message_definitions/v1.0").getPath(b);
         genoptions.addOption([]const u8, "dialect_to_use", b.option([]const u8, "dialect_to_use", "The dialect to use or (all) for all of them") orelse "all");
         genoptions.addOption([]const u8, "dialect_out_dir", b.option([]const u8, "dialect_out_dir", "The output directory of the generated dialects") orelse b.path("src/dialects").getPath(b));
-        genoptions.addOption([]const u8, "mavlink_xml_def_dir", b.option([]const u8, "mavlink_xml_def_dir", "The output directory of the definitions") orelse b.path("mavlink/message_definitions/v1.0").getPath(b));
-
+        genoptions.addOption([]const u8, "mavlink_xml_def_dir", mav_def_dir_opt);
+        genoptions.addOption([]const [:0]const u8, "available_dialects", getDialects(b, mav_def_dir_opt));
         const exe = b.addExecutable(.{
             .name = "genv2",
             .root_source_file = b.path("tools/genv2/main.zig"),
@@ -157,4 +157,30 @@ pub fn build(b: *std.Build) void {
             example_step.dependOn(&run_cmd.step);
         }
     }
+}
+
+fn getDialects(b: *std.Build, defPath: []const u8) []const [:0]const u8 {
+    var dir = b.build_root.handle.openDir(defPath, .{ .iterate = true }) catch |err| {
+        std.debug.print("Failed to open directory: {}\n", .{err});
+        return &.{};
+    };
+    defer dir.close();
+
+    var file_names = std.ArrayList([:0]const u8).init(b.allocator);
+    var it = dir.iterate();
+    while (it.next() catch null) |entry| {
+        if (!std.mem.endsWith(u8, entry.name, ".xml")) continue;
+
+        // Create null-terminated copy
+        const name = b.allocator.dupeZ(u8, entry.name) catch @panic("Allocation failed");
+        file_names.append(name) catch @panic("Allocation failed");
+    }
+
+    if (file_names.items.len == 0) {
+        std.debug.print("Warning: No XML files found in directory: {s}\n", .{defPath});
+        // Create null-terminated fallback
+        return &.{};
+    }
+
+    return file_names.toOwnedSlice() catch @panic("Allocation failed");
 }
