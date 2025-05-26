@@ -68,28 +68,18 @@ pub fn build(b: *std.Build) void {
     }
 
     { // The dialect zig generator
-        const exe = b.addExecutable(.{
-            .name = "generate",
-            .root_source_file = b.path("tools/generator/main.zig"),
-            .target = target,
-            .optimize = optimize,
-        });
-        exe.root_module.addImport("mavlink", mavlink);
-        exe.root_module.addImport("xml", xml);
-        b.installArtifact(exe);
-
-        const run_cmd = b.addRunArtifact(exe);
-        run_cmd.addArg(b.option([]const u8, "xml", "XML file to process (default: 'ardupilotmega.xml')") orelse "all");
-        run_cmd.addArg(b.option([]const u8, "out", "Output directory (default: 'src/dialects')") orelse "src/dialects");
-
-        const tool_step = b.step("generate", "Generate MAVLink code from XML definitions (deprecated)");
-        tool_step.dependOn(&run_cmd.step);
-    }
-
-    { // The dialect zig generator
         const genoptions = b.addOptions();
         const mav_def_dir_opt = b.option([]const u8, "mavlink_xml_def_dir", "The output directory of the definitions") orelse b.path("mavlink/message_definitions/v1.0").getPath(b);
-        genoptions.addOption([]const u8, "dialect_to_use", b.option([]const u8, "dialect_to_use", "The dialect to use or (all) for all of them") orelse "all");
+        genoptions.addOption([]const u8, "dialect_to_use", blk: {
+            if (b.option([]const u8, "dialect_to_use", "The dialect to use or (all) for all of them")) |val| {
+                if (!std.mem.eql(u8, val, "all") and !std.mem.endsWith(u8, val, ".xml")) {
+                    break :blk b.fmt("{s}.xml", .{val});
+                } else {
+                    break :blk val;
+                }
+            }
+            break :blk "all";
+        });
         genoptions.addOption([]const u8, "dialect_out_dir", b.option([]const u8, "dialect_out_dir", "The output directory of the generated dialects") orelse b.path("src/dialects").getPath(b));
         genoptions.addOption([]const u8, "mavlink_xml_def_dir", mav_def_dir_opt);
         genoptions.addOption([]const [:0]const u8, "available_dialects", getDialects(b, mav_def_dir_opt));
