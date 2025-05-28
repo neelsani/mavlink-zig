@@ -21,7 +21,7 @@ pub fn load(self: *Self, path: []const u8) !?*Ast.Dialect {
     // Return cached if already parsed
     if (self.parsed.get(path) != null) {
         std.debug.print("[loader] Using cached AST for '{s}'\n", .{path});
-        return null;
+        return null; //no need to return dep if already exists
     }
     try self.depTree.appendSlice(try std.fmt.allocPrint(self.allocator, "{s}->", .{path}));
     std.debug.print("[loader] Opening file: {s}\n", .{path});
@@ -44,7 +44,8 @@ pub fn load(self: *Self, path: []const u8) !?*Ast.Dialect {
 
     // Parse into raw AST
     std.debug.print("[loader] Parsing XML for '{s}'\n", .{path});
-    var parser: *Parser = try Parser.init(xmlData, self.allocator);
+    var parser: Parser = undefined;
+    parser.init(xmlData, self.allocator);
     const dialect = try parser.parse();
 
     // Allocate storage for this dialect

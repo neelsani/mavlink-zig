@@ -4,7 +4,7 @@ const net = std.net;
 const mavlink = @import("mavlink");
 
 // ArduPilot‐Mega dialect
-const dialect = mavlink.dialects.all;
+const dialect = mavlink.dialects.ardupilotmega;
 
 pub fn main() !void {
     const addr = try net.Address.parseIp4("127.0.0.1", 8888);
@@ -32,9 +32,11 @@ pub fn main() !void {
 
     var outBuf: [mavlink.v2.MAVLINK_MAX_PACKET_SIZE]u8 = undefined;
     const reqLen = try mavlink.v2.writeMessageToSlice(outBuf[0..], req);
-    const hbLen = try mavlink.v2.writeMessageToSlice(outBuf[0..], hb);
 
     try conn.writer().writeAll(outBuf[0..reqLen]);
+    const hbLen = try mavlink.v2.writeMessageToSlice(outBuf[0..], hb);
+
+    try conn.writer().writeAll(outBuf[0..hbLen]);
 
     // Initialize a byte‐wise parser
     var parser = mavlink.v2.init();
@@ -66,8 +68,7 @@ pub fn main() !void {
                                     std.debug.print("Failed to deserialize {s}: {any}\n{any}\n", .{ @typeName(T), e, msg.payload[0..msg.len] });
                                     break;
                                 };
-                                _ = msgde;
-                                //std.debug.print("Unhandled: {any}\n", .{msgde});
+                                std.debug.print("Unhandled: {any}\n", .{msgde});
                             }
                         }
                     },

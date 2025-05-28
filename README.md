@@ -98,7 +98,7 @@ pub fn main() !void {
     const hb = D.messages.HEARTBEAT{
         .type = .MAV_TYPE_GCS, // Identify as GCS
         .autopilot = .MAV_AUTOPILOT_INVALID, // Not a flight controller
-        .base_mode = .MAV_MODE_FLAG_AUTO_ENABLED,
+        .base_mode = D.enums.MAV_MODE_FLAG.toInt(.MAV_MODE_FLAG_AUTO_ENABLED),
         // Armed in AUTO mode
         .custom_mode = 0, // No custom mode flags
         .system_status = .MAV_STATE_STANDBY, // Standby state

@@ -8,6 +8,8 @@ on:
 jobs:
   update-dialects:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write  # Allow the workflow to push
 
     steps:
     - name: Install Zig
@@ -20,6 +22,7 @@ jobs:
       with:
         submodules: 'true'
         fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}  # Explicitly use default token
 
     - name: Update top-level submodules only
       id: update-subs

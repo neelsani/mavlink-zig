@@ -24,10 +24,7 @@ const MavTag = enum {
     wip,
 };
 
-pub fn init(xml_bytes: []const u8, allocator: std.mem.Allocator) !*Self {
-    // Allocate memory for Self
-    var self = try allocator.create(Self);
-
+pub fn init(self: *Self, xml_bytes: []const u8, allocator: std.mem.Allocator) void {
     // Initialize the document (owns the XML data)
     self.doc = xml.StaticDocument.init(xml_bytes);
 
@@ -35,7 +32,6 @@ pub fn init(xml_bytes: []const u8, allocator: std.mem.Allocator) !*Self {
     self.reader = self.doc.reader(allocator, .{});
 
     self.allocator = allocator;
-    return self;
 }
 
 pub fn parse(self: *Self) !Ast.Dialect {
