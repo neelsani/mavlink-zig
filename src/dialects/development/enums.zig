@@ -1499,6 +1499,8 @@ pub const MAV_TYPE = enum(u8) {
     MAV_TYPE_SPACECRAFT_ORBITER = 45,
     /// A generic four-legged ground vehicle (e.g., a robot dog).
     MAV_TYPE_GROUND_QUADRUPED = 46,
+    /// VTOL hybrid of helicopter and autogyro. It has a main rotor for lift and separate propellers for forward flight. The rotor must be powered for hover but can autorotate in cruise flight. See: https://en.wikipedia.org/wiki/Gyrodyne
+    MAV_TYPE_VTOL_GYRODYNE = 47,
 };
 
 /// Airborne status of UAS.
