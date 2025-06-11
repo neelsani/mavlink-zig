@@ -62,7 +62,7 @@ pub const FAILURE_UNIT = enum(u32) {
     FAILURE_UNIT_SYSTEM_MAVLINK_SIGNAL = 105,
 };
 
-/// These flags encode the MAV mode.
+/// These flags encode the MAV mode, see MAV_MODE enum for useful combinations.
 pub const MAV_MODE_FLAG = packed struct {
     pub const is_bitmask = true;
     bits: u8,
@@ -106,7 +106,7 @@ pub const MAV_MODE_FLAG = packed struct {
     pub const MAV_MODE_FLAG_AUTO_ENABLED: @This() = .{ .bits = 4 };
     /// 0b00000010 system has a test mode enabled. This flag is intended for temporary system tests and should not be used for stable implementations.
     pub const MAV_MODE_FLAG_TEST_ENABLED: @This() = .{ .bits = 2 };
-    /// 0b00000001 Reserved for future use.
+    /// 0b00000001 system-specific custom mode is enabled. When using this flag to enable a custom mode all other flags should be ignored.
     pub const MAV_MODE_FLAG_CUSTOM_MODE_ENABLED: @This() = .{ .bits = 1 };
 };
 
@@ -853,30 +853,29 @@ pub const COMP_METADATA_TYPE = enum(u32) {
     COMP_METADATA_TYPE_ACTUATORS = 5,
 };
 
-/// These defines are predefined OR-combined mode flags. There is no need to use values from this enum, but it
-///                simplifies the use of the mode flags. Note that manual input is enabled in all modes as a safety override.
+/// Predefined OR-combined MAV_MODE_FLAG values. These can simplify using the flags when setting modes. Note that manual input is enabled in all modes as a safety override.
 pub const MAV_MODE = enum(u8) {
     /// System is not ready to fly, booting, calibrating, etc. No flag is set.
     MAV_MODE_PREFLIGHT = 0,
-    /// System is allowed to be active, under assisted RC control.
+    /// System is allowed to be active, under assisted RC control (MAV_MODE_FLAG_SAFETY_ARMED, MAV_MODE_FLAG_STABILIZE_ENABLED)
     MAV_MODE_STABILIZE_DISARMED = 80,
-    /// System is allowed to be active, under assisted RC control.
+    /// System is allowed to be active, under assisted RC control (MAV_MODE_FLAG_SAFETY_ARMED, MAV_MODE_FLAG_MANUAL_INPUT_ENABLED, MAV_MODE_FLAG_STABILIZE_ENABLED)
     MAV_MODE_STABILIZE_ARMED = 208,
-    /// System is allowed to be active, under manual (RC) control, no stabilization
+    /// System is allowed to be active, under manual (RC) control, no stabilization (MAV_MODE_FLAG_MANUAL_INPUT_ENABLED)
     MAV_MODE_MANUAL_DISARMED = 64,
-    /// System is allowed to be active, under manual (RC) control, no stabilization
+    /// System is allowed to be active, under manual (RC) control, no stabilization (MAV_MODE_FLAG_SAFETY_ARMED, MAV_MODE_FLAG_MANUAL_INPUT_ENABLED)
     MAV_MODE_MANUAL_ARMED = 192,
-    /// System is allowed to be active, under autonomous control, manual setpoint
+    /// System is allowed to be active, under autonomous control, manual setpoint (MAV_MODE_FLAG_SAFETY_ARMED, MAV_MODE_FLAG_STABILIZE_ENABLED, MAV_MODE_FLAG_GUIDED_ENABLED)
     MAV_MODE_GUIDED_DISARMED = 88,
-    /// System is allowed to be active, under autonomous control, manual setpoint
+    /// System is allowed to be active, under autonomous control, manual setpoint (MAV_MODE_FLAG_SAFETY_ARMED, MAV_MODE_FLAG_MANUAL_INPUT_ENABLED, MAV_MODE_FLAG_STABILIZE_ENABLED, MAV_MODE_FLAG_GUIDED_ENABLED)
     MAV_MODE_GUIDED_ARMED = 216,
-    /// System is allowed to be active, under autonomous control and navigation (the trajectory is decided onboard and not pre-programmed by waypoints)
+    /// System is allowed to be active, under autonomous control and navigation (the trajectory is decided onboard and not pre-programmed by waypoints). (MAV_MODE_FLAG_SAFETY_ARMED, MAV_MODE_FLAG_STABILIZE_ENABLED, MAV_MODE_FLAG_GUIDED_ENABLED, MAV_MODE_FLAG_AUTO_ENABLED).
     MAV_MODE_AUTO_DISARMED = 92,
-    /// System is allowed to be active, under autonomous control and navigation (the trajectory is decided onboard and not pre-programmed by waypoints)
+    /// System is allowed to be active, under autonomous control and navigation (the trajectory is decided onboard and not pre-programmed by waypoints). (MAV_MODE_FLAG_SAFETY_ARMED, MAV_MODE_FLAG_MANUAL_INPUT_ENABLED, MAV_MODE_FLAG_STABILIZE_ENABLED, MAV_MODE_FLAG_GUIDED_ENABLED,MAV_MODE_FLAG_AUTO_ENABLED).
     MAV_MODE_AUTO_ARMED = 220,
-    /// UNDEFINED mode. This solely depends on the autopilot - use with caution, intended for developers only.
+    /// UNDEFINED mode. This solely depends on the autopilot - use with caution, intended for developers only. (MAV_MODE_FLAG_MANUAL_INPUT_ENABLED, MAV_MODE_FLAG_TEST_ENABLED).
     MAV_MODE_TEST_DISARMED = 66,
-    /// UNDEFINED mode. This solely depends on the autopilot - use with caution, intended for developers only.
+    /// UNDEFINED mode. This solely depends on the autopilot - use with caution, intended for developers only (MAV_MODE_FLAG_SAFETY_ARMED, MAV_MODE_FLAG_MANUAL_INPUT_ENABLED, MAV_MODE_FLAG_TEST_ENABLED)
     MAV_MODE_TEST_ARMED = 194,
 };
 
