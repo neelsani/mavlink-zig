@@ -4562,6 +4562,8 @@ pub const MAV_DO_REPOSITION_FLAGS = packed struct {
     }
     /// The aircraft should immediately transition into guided. This should not be set for follow me applications
     pub const MAV_DO_REPOSITION_FLAGS_CHANGE_MODE: @This() = .{ .bits = 1 };
+    /// Yaw relative to the vehicle current heading (if not set, relative to North).
+    pub const MAV_DO_REPOSITION_FLAGS_RELATIVE_YAW: @This() = .{ .bits = 2 };
 };
 
 pub const MAVLINK_DATA_STREAM_TYPE = enum(u8) {
