@@ -1456,6 +1456,8 @@ pub const MAV_TYPE = enum(u8) {
     MAV_TYPE_GROUND_QUADRUPED = 46,
     /// VTOL hybrid of helicopter and autogyro. It has a main rotor for lift and separate propellers for forward flight. The rotor must be powered for hover but can autorotate in cruise flight. See: https://en.wikipedia.org/wiki/Gyrodyne
     MAV_TYPE_VTOL_GYRODYNE = 47,
+    /// Gripper
+    MAV_TYPE_GRIPPER = 48,
 };
 
 /// Airborne status of UAS.
@@ -3914,7 +3916,7 @@ pub const ORBIT_YAW_BEHAVIOUR = enum(u32) {
     ORBIT_YAW_BEHAVIOUR_UNCHANGED = 5,
 };
 
-/// Component supports locking control to a particular GCS independent of its system (via MAV_CMD_REQUEST_OPERATOR_CONTROL).
+/// Autopilot has a connected gripper. MAVLink Grippers would set MAV_TYPE_GRIPPER instead.
 pub const MAV_PROTOCOL_CAPABILITY = packed struct {
     pub const is_bitmask = true;
     bits: u64,

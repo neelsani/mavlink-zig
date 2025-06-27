@@ -198,6 +198,8 @@ pub const MAV_TYPE = enum(u8) {
     MAV_TYPE_GROUND_QUADRUPED = 46,
     /// VTOL hybrid of helicopter and autogyro. It has a main rotor for lift and separate propellers for forward flight. The rotor must be powered for hover but can autorotate in cruise flight. See: https://en.wikipedia.org/wiki/Gyrodyne
     MAV_TYPE_VTOL_GYRODYNE = 47,
+    /// Gripper
+    MAV_TYPE_GRIPPER = 48,
 };
 
 pub const MAV_STATE = enum(u8) {
