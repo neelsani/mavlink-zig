@@ -2156,7 +2156,7 @@ pub const MAV_CMD = enum(u16) {
     MAV_CMD_NAV_VTOL_TAKEOFF = 84,
     /// Land using VTOL mode
     MAV_CMD_NAV_VTOL_LAND = 85,
-    /// hand control over to an external controller
+    /// Hand control over to an external controller
     MAV_CMD_NAV_GUIDED_ENABLE = 92,
     /// Delay the next navigation command a number of seconds or until a specified time
     MAV_CMD_NAV_DELAY = 93,
@@ -2820,6 +2820,42 @@ pub const PARAM_ACK = enum(u8) {
     PARAM_ACK_FAILED = 2,
     /// Parameter value received but not yet set/accepted. A subsequent PARAM_EXT_ACK with the final result will follow once operation is completed. This is returned immediately for parameters that take longer to set, indicating that the the parameter was received and does not need to be resent.
     PARAM_ACK_IN_PROGRESS = 3,
+};
+
+/// Enum used to indicate true or false (also: success or failure, enabled or disabled, active or inactive).
+pub const BOOL = packed struct {
+    pub const is_bitmask = true;
+    bits: i8,
+
+    pub const Type = i8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
+    /// False.
+    pub const BOOL_FALSE: @This() = .{ .bits = 0 };
+    /// True.
+    pub const BOOL_TRUE: @This() = .{ .bits = 1 };
 };
 
 /// Gimbal device (low level) error flags (bitmap, 0 means no error)
