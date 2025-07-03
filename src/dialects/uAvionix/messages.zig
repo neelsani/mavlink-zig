@@ -1133,7 +1133,7 @@ pub const OPEN_DRONE_ID_LOCATION = struct {
     /// Current longitude of the unmanned aircraft. If unknown: 0 (both Lat/Lon).
     longitude: i32,
 
-    /// The altitude calculated from the barometric pressue. Reference is against 29.92inHg or 1013.2mb. If unknown: -1000 m.
+    /// The altitude calculated from the barometric pressure. Reference is against 29.92inHg or 1013.2mb. If unknown: -1000 m.
     altitude_barometric: f32,
 
     /// The geodetic altitude as defined by WGS84. If unknown: -1000 m.
@@ -3239,7 +3239,7 @@ pub const RESOURCE_REQUEST = struct {
     /// The storage path the autopilot wants the URI to be stored in. Will only be valid if the transfer_type has a storage associated (e.g. MAVLink FTP).
     storage: [120]u8,
 
-    /// Request ID. This ID should be re-used when sending back URI contents
+    /// Request ID. This ID should be reused when sending back URI contents
     request_id: u8,
 
     /// The type of requested URI. 0 = a file via URL. 1 = a UAVCAN binary
@@ -4131,7 +4131,7 @@ pub const SAFETY_SET_ALLOWED_AREA = struct {
 ///         The request is sent with `ts1=syncing component timestamp` and `tc1=0`, and may be broadcast or targeted to a specific system/component.
 ///         The response is sent with `ts1=syncing component timestamp` (mirror back unchanged), and `tc1=responding component timestamp`, with the `target_system` and `target_component` set to ids of the original request.
 ///         Systems can determine if they are receiving a request or response based on the value of `tc`.
-///         If the response has `target_system==target_component==0` the remote system has not been updated to use the component IDs and cannot reliably timesync; the requestor may report an error.
+///         If the response has `target_system==target_component==0` the remote system has not been updated to use the component IDs and cannot reliably timesync; the requester may report an error.
 ///         Timestamps are UNIX Epoch time or time since system boot in nanoseconds (the timestamp format can be inferred by checking for the magnitude of the number; generally it doesn't matter as only the offset is used).
 ///         The message sequence is repeated numerous times with results being filtered/averaged to estimate the offset.
 ///         See also: https://mavlink.io/en/services/timesync.html.
@@ -4304,10 +4304,10 @@ pub const GIMBAL_DEVICE_INFORMATION = struct {
     /// Timestamp (time since system boot).
     time_boot_ms: u32,
 
-    /// Version of the gimbal firmware, encoded as: (Dev & 0xff) << 24 | (Patch & 0xff) << 16 | (Minor & 0xff) << 8 | (Major & 0xff).
+    /// Version of the gimbal firmware, encoded as: `(Dev & 0xff) << 24 \| (Patch & 0xff) << 16 \| (Minor & 0xff) << 8 \| (Major & 0xff)`.
     firmware_version: u32,
 
-    /// Version of the gimbal hardware, encoded as: (Dev & 0xff) << 24 | (Patch & 0xff) << 16 | (Minor & 0xff) << 8 | (Major & 0xff).
+    /// Version of the gimbal hardware, encoded as: `(Dev & 0xff) << 24 \| (Patch & 0xff) << 16 \| (Minor & 0xff) << 8 \| (Major & 0xff)`.
     hardware_version: u32,
 
     /// Minimum hardware roll angle (positive: rolling to the right, negative: rolling to the left). NAN if unknown.

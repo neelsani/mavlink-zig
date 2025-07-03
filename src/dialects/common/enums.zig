@@ -1361,7 +1361,7 @@ pub const MAV_TYPE = enum(u8) {
     MAV_TYPE_WINCH = 42,
     /// Generic multirotor that does not fit into a specific type or whose type is unknown
     MAV_TYPE_GENERIC_MULTIROTOR = 43,
-    /// Illuminator. An illuminator is a light source that is used for lighting up dark areas external to the sytstem: e.g. a torch or searchlight (as opposed to a light source for illuminating the system itself, e.g. an indicator light).
+    /// Illuminator. An illuminator is a light source that is used for lighting up dark areas external to the system: e.g. a torch or searchlight (as opposed to a light source for illuminating the system itself, e.g. an indicator light).
     MAV_TYPE_ILLUMINATOR = 44,
     /// Orbiter spacecraft. Includes satellites orbiting terrestrial and extra-terrestrial bodies. Follows NASA Spacecraft Classification.
     MAV_TYPE_SPACECRAFT_ORBITER = 45,

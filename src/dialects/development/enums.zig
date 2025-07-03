@@ -1492,7 +1492,7 @@ pub const MAV_TYPE = enum(u8) {
     MAV_TYPE_WINCH = 42,
     /// Generic multirotor that does not fit into a specific type or whose type is unknown
     MAV_TYPE_GENERIC_MULTIROTOR = 43,
-    /// Illuminator. An illuminator is a light source that is used for lighting up dark areas external to the sytstem: e.g. a torch or searchlight (as opposed to a light source for illuminating the system itself, e.g. an indicator light).
+    /// Illuminator. An illuminator is a light source that is used for lighting up dark areas external to the system: e.g. a torch or searchlight (as opposed to a light source for illuminating the system itself, e.g. an indicator light).
     MAV_TYPE_ILLUMINATOR = 44,
     /// Orbiter spacecraft. Includes satellites orbiting terrestrial and extra-terrestrial bodies. Follows NASA Spacecraft Classification.
     MAV_TYPE_SPACECRAFT_ORBITER = 45,
@@ -2308,8 +2308,8 @@ pub const MAV_CMD = enum(u16) {
     ///           If the system manager component cannot grant control (because takeover requires permission), the request should be rejected with MAV_RESULT_FAILED.
     ///           The system manager component should then send this same command to the current owning GCS in order to notify of the request.
     ///           The owning GCS would ACK with MAV_RESULT_ACCEPTED, and might choose to release control of the vehicle, or re-request control with the takeover bit set to allow permission.
-    ///           In case it choses to re-request control with takeover bit set to allow permission, requestor GCS will only have 10 seconds to get control, otherwise owning GCS will re-request control with takeover bit set to disallow permission, and requestor GCS will need repeat the request if still interested in getting control.
-    ///           Note that the pilots of both GCS should co-ordinate safe handover offline.
+    ///           In case it choses to re-request control with takeover bit set to allow permission, requester GCS will only have 10 seconds to get control, otherwise owning GCS will re-request control with takeover bit set to disallow permission, and requester GCS will need repeat the request if still interested in getting control.
+    ///           Note that the pilots of both GCS should coordinate safe handover offline.
     /// 
     ///           Note that in most systems the only controlled component will be the "system manager component", and that will be the autopilot.
     ///           However separate GCS control of a particular component is also permitted, if supported by the component.
