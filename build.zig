@@ -10,6 +10,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     }).module("xml");
+    const mavlink_defs = b.dependency("mavlink_defs", .{});
     const buildExamples: bool = b.option(bool, "examples", "Build examples?") orelse true;
 
     // Main module
@@ -69,7 +70,7 @@ pub fn build(b: *std.Build) void {
 
     { // The dialect zig generator
         const genoptions = b.addOptions();
-        const mav_def_dir_opt = b.option([]const u8, "mavlink_xml_def_dir", "The output directory of the definitions") orelse b.path("mavlink/message_definitions/v1.0").getPath(b);
+        const mav_def_dir_opt = b.option([]const u8, "mavlink_xml_def_dir", "The directory of the xml definitions") orelse mavlink_defs.path("message_definitions/v1.0").getPath(b);
         genoptions.addOption([]const u8, "dialect_to_use", blk: {
             if (b.option([]const u8, "dialect_to_use", "The dialect to use or (all) for all of them")) |val| {
                 if (!std.mem.eql(u8, val, "all") and !std.mem.endsWith(u8, val, ".xml")) {

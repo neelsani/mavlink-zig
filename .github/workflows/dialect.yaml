@@ -2,74 +2,45 @@ name: Update MAVLink Dialects
 
 on:
   schedule:
-    - cron: '4 5 * * *'
+    - cron: "4 5 * * *"
   workflow_dispatch:
 
 jobs:
   update-dialects:
     runs-on: ubuntu-22.04
     permissions:
-      contents: write  # Allow the workflow to push
+      contents: write
 
     steps:
-    - name: Install Zig
-      uses: mlugg/setup-zig@v2
-      with:
-        version: 0.14.0
+      - name: Install Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.0
 
-    - name: Checkout repository (with submodules)
-      uses: actions/checkout@v4
-      with:
-        submodules: 'true'
-        fetch-depth: 0
-        token: ${{ secrets.GITHUB_TOKEN }}  # Explicitly use default token
+      - name: Checkout repository (with submodules)
+        uses: actions/checkout@v4
 
-    - name: Update top-level submodules only
-      id: update-subs
-      run: |
-        # Initialize variables
-        changed=false
-        submodule_updates=""
-        
-        # Get list of top-level submodules
-        submodules=$(git config --file .gitmodules --get-regexp path | awk '{ print $2 }')
-        
-        for submodule in $submodules; do
-          echo "Checking submodule: $submodule"
-          
-          # Get current and remote commit hashes
-          cd $submodule
-          current_commit=$(git rev-parse HEAD)
-          git fetch origin
-          remote_commit=$(git rev-parse origin/HEAD)
-          cd ..
-          
-          if [ "$current_commit" != "$remote_commit" ]; then
-            echo "Updating $submodule from $current_commit to $remote_commit"
-            git submodule update --remote --checkout $submodule
-            changed=true
-            submodule_updates+="$submodule: $remote_commit, "
-          else
-            echo "$submodule is already up to date"
-          fi
-        done
-        
-        # Remove trailing comma and space
-        submodule_updates=${submodule_updates%, }
-        
-        # Set outputs
-        echo "changed=$changed" >> $GITHUB_OUTPUT
-        echo "submodule_updates=${submodule_updates}" >> $GITHUB_OUTPUT
+      - name: Update mavlink xml commit
+        id: update-mavlink-hash
+        run: |
+          OUTPUT=$(zig fetch --save=mavlink_defs git+https://github.com/mavlink/mavlink 2>&1)
+          echo "$OUTPUT"
+          HASH=$(echo "$OUTPUT" | grep -oE '[0-9a-f]{40}')
+          echo "commit_hash=$HASH" >> "$GITHUB_OUTPUT"
 
-    - name: Generate Dialects
-      if: steps.update-subs.outputs.changed == 'true'
-      run: zig build genv2
+      - name: Generate Dialects
+        run: zig build genv2
 
-    - name: Commit and Push Changes
-      if: steps.update-subs.outputs.changed == 'true'
-      run: |
-        git config user.name mavlink-zig-bot
-        git config user.email bot@mavlink-zig.neels.dev
-        git add .
-        git commit -m "(automatic) update dialects and submodules to: ${{ steps.update-subs.outputs.submodule_updates }}"
-        git push
+      - name: Run tests
+        run: zig build test --summary all
+
+      - name: Build all
+        run: zig build --summary all
+
+      - name: Commit and Push Changes
+        run: |
+          git config user.name mavlink-zig-bot
+          git config user.email bot@mavlink-zig.neels.dev
+          git add .
+          git commit -m "(automatic) Update MAVLink XML Dialects to commit: ${{ steps.update-mavlink-hash.outputs.commit_hash }}"
+          git push

@@ -39,25 +39,36 @@ zig fetch --save https://github.com/neelsani/mavlink-zig/archive/refs/tags/vX.Y.
 # For Zig master branch compatibility:
 zig fetch --save git+https://github.com/neelsani/mavlink-zig
 ```
+
 Then add the following to `build.zig`:
 
 ```zig
 const mavlink = b.dependency("mavlink", .{});
 exe.root_module.addImport("mavlink", mavlink.module("mavlink"));
 ```
+
 ## Build
-### Build and Test 
+
+### Build and Test
+
 ```sh
-zig build test --summary all
-zig build -Dexamples=false --summary all
+#build lib and examples
 zig build -Dexamples=true --summary all
+
+#run tests
+zig build test --summary all
 ```
+
 ### Generate Definitions
+
 ```sh
+#use ardupilot from fetched dialects
 zig build genv2 -Ddialect_to_use=ardupilotmega.xml --summary all
-or
+
+#use all of the dialects from fetched dialects
 zig build genv2 -Ddialect_to_use=all --summary all
 
+#use ardupilot from the specified xml defintions dir and store the generated zig files in the out dir
 zig build genv2 -Ddialect_to_use=ardupilotmega.xml -Dmavlink_xml_def_dir=<path/to/mavlink/xml/dir> -Ddialect_out_dir=<path/to/output> --summary all
 ```
 
@@ -151,8 +162,9 @@ For detailed documentation and the full API reference, visit:
 ---
 
 ## Acknowledgements
+
 - [mavlink](https://mavlink.io/en/) — Protocol specification
-- [zig-xml](https://github.com/ianprime0509/zig-xml) — the XML parsing library used by the code generator to transform MAVLink XML definitions into Zig code.  
+- [zig-xml](https://github.com/ianprime0509/zig-xml) — the XML parsing library used by the code generator to transform MAVLink XML definitions into Zig code.
 - [rust-mavlink](https://github.com/mavlink/rust-mavlink) - mavlink in rust
 
 ## Support

@@ -40,11 +40,16 @@
             .url = "git+https://github.com/ianprime0509/zig-xml#c0bda4f35ea61cfb7845337adfa255c86c67fd13",
             .hash = "xml-0.1.0-ZTbP35VkAgAp2cDlvsPuL7SWVZWwPg-V99LmVRSHbCtL",
         },
+        .mavlink_defs = .{
+            .url = "git+https://github.com/mavlink/mavlink#0f70d319487354dd4eb807c2f4d1663146ea2cd8",
+            .hash = "N-V-__8AAI9nFADHwCupBNK_tvlj-RQq09b4fGbDOaZ-VAeV",
+        },
     },
     .paths = .{
         "build.zig",
         "build.zig.zon",
         "src",
+        "tools",
         // For example...
         //"LICENSE",
         //"README.md",

@@ -2,13 +2,13 @@ name: build mavlink-zig
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
     paths-ignore:
       - "README.md"
       - "**.md"
       - "LICENSE**"
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
     paths-ignore:
       - "README.md"
       - "**.md"
@@ -21,30 +21,27 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Checkout repository (with submodules)
+        uses: actions/checkout@v4
 
-    - name: Checkout repository (with submodules)
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
+      - name: Install Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.0
 
-    - name: Install Zig
-      uses: mlugg/setup-zig@v2
-      with:
-        version: 0.14.0
+      - name: Run tests
+        run: zig build test --summary all
 
-    - name: Run tests
-      run: zig build test --summary all
+      - name: Build all
+        run: zig build --summary all
 
-    - name: Build all
-      run: zig build --summary all
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-artifacts-${{ matrix.os }}
-        path: |
-          zig-out/bin
-          zig-out/lib 
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-${{ matrix.os }}
+          path: |
+            zig-out/bin
+            zig-out/lib
   build-docs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
@@ -54,7 +51,7 @@ jobs:
       - name: Set up Zig
         uses: mlugg/setup-zig@v2
         with:
-            version: 0.14.0
+          version: 0.14.0
       - name: Build docs
         if: github.ref == 'refs/heads/master'
         run: zig build docs
