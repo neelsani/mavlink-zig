@@ -43,9 +43,8 @@ pub const SERIAL_CONTROL_FLAG = packed struct {
     pub const SERIAL_CONTROL_FLAG_MULTI: @This() = .{ .bits = 16 };
 };
 
-/// Axes that will be autotuned by MAV_CMD_DO_AUTOTUNE_ENABLE.
-///         Note that at least one flag must be set in MAV_CMD_DO_AUTOTUNE_ENABLE.param2: if none are set, the flight stack will tune its default set of axes.
-pub const AUTOTUNE_AXIS = packed struct {
+/// Gimbal manager high level capability flags (bitmap). The first 16 bits are identical to the GIMBAL_DEVICE_CAP_FLAGS. However, the gimbal manager does not need to copy the flags from the gimbal but can also enhance the capabilities and thus add flags.
+pub const GIMBAL_MANAGER_CAP_FLAGS = packed struct {
     pub const is_bitmask = true;
     bits: u32,
 
@@ -74,12 +73,38 @@ pub const AUTOTUNE_AXIS = packed struct {
     pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
         self.bits ^= flag.bits;
     }
-    /// Autotune roll axis.
-    pub const AUTOTUNE_AXIS_ROLL: @This() = .{ .bits = 1 };
-    /// Autotune pitch axis.
-    pub const AUTOTUNE_AXIS_PITCH: @This() = .{ .bits = 2 };
-    /// Autotune yaw axis.
-    pub const AUTOTUNE_AXIS_YAW: @This() = .{ .bits = 4 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_RETRACT.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_RETRACT: @This() = .{ .bits = 1 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_NEUTRAL.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_NEUTRAL: @This() = .{ .bits = 2 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_AXIS.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_ROLL_AXIS: @This() = .{ .bits = 4 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_FOLLOW.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_ROLL_FOLLOW: @This() = .{ .bits = 8 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_LOCK.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_ROLL_LOCK: @This() = .{ .bits = 16 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_AXIS.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_PITCH_AXIS: @This() = .{ .bits = 32 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_FOLLOW.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_PITCH_FOLLOW: @This() = .{ .bits = 64 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_LOCK.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_PITCH_LOCK: @This() = .{ .bits = 128 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_AXIS.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_YAW_AXIS: @This() = .{ .bits = 256 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_FOLLOW.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_YAW_FOLLOW: @This() = .{ .bits = 512 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_LOCK.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_YAW_LOCK: @This() = .{ .bits = 1024 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_SUPPORTS_INFINITE_YAW.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_SUPPORTS_INFINITE_YAW: @This() = .{ .bits = 2048 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_SUPPORTS_YAW_IN_EARTH_FRAME.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_SUPPORTS_YAW_IN_EARTH_FRAME: @This() = .{ .bits = 4096 };
+    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_RC_INPUTS.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_RC_INPUTS: @This() = .{ .bits = 8192 };
+    /// Gimbal manager supports to point to a local position.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_CAN_POINT_LOCATION_LOCAL: @This() = .{ .bits = 65536 };
+    /// Gimbal manager supports to point to a global latitude, longitude, altitude position.
+    pub const GIMBAL_MANAGER_CAP_FLAGS_CAN_POINT_LOCATION_GLOBAL: @This() = .{ .bits = 131072 };
 };
 
 /// These flags encode the MAV mode, see MAV_MODE enum for useful combinations.
@@ -130,6 +155,45 @@ pub const MAV_MODE_FLAG = packed struct {
     pub const MAV_MODE_FLAG_CUSTOM_MODE_ENABLED: @This() = .{ .bits = 1 };
 };
 
+/// Axes that will be autotuned by MAV_CMD_DO_AUTOTUNE_ENABLE.
+///         Note that at least one flag must be set in MAV_CMD_DO_AUTOTUNE_ENABLE.param2: if none are set, the flight stack will tune its default set of axes.
+pub const AUTOTUNE_AXIS = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
+    /// Autotune roll axis.
+    pub const AUTOTUNE_AXIS_ROLL: @This() = .{ .bits = 1 };
+    /// Autotune pitch axis.
+    pub const AUTOTUNE_AXIS_PITCH: @This() = .{ .bits = 2 };
+    /// Autotune yaw axis.
+    pub const AUTOTUNE_AXIS_YAW: @This() = .{ .bits = 4 };
+};
+
 /// Flags for CURRENT_EVENT_SEQUENCE.
 pub const MAV_EVENT_CURRENT_SEQUENCE_FLAGS = enum(u32) {
     /// A sequence reset has happened (e.g. vehicle reboot).
@@ -168,6 +232,19 @@ pub const MAV_REMOTE_LOG_DATA_BLOCK_COMMANDS = enum(u32) {
     MAV_REMOTE_LOG_DATA_BLOCK_START = 2147483646,
 };
 
+pub const GSM_LINK_TYPE = enum(u8) {
+    /// no service
+    GSM_LINK_TYPE_NONE = 0,
+    /// link type unknown
+    GSM_LINK_TYPE_UNKNOWN = 1,
+    /// 2G (GSM/GRPS/EDGE) link
+    GSM_LINK_TYPE_2G = 2,
+    /// 3G link (WCDMA/HSDPA/HSPA)
+    GSM_LINK_TYPE_3G = 3,
+    /// 4G link (LTE)
+    GSM_LINK_TYPE_4G = 4,
+};
+
 /// Enumeration of battery functions
 pub const MAV_BATTERY_FUNCTION = enum(u8) {
     /// Battery function is unknown
@@ -180,19 +257,6 @@ pub const MAV_BATTERY_FUNCTION = enum(u8) {
     MAV_BATTERY_FUNCTION_AVIONICS = 3,
     /// Payload battery
     MAV_BATTERY_FUNCTION_PAYLOAD = 4,
-};
-
-pub const GSM_LINK_TYPE = enum(u8) {
-    /// no service
-    GSM_LINK_TYPE_NONE = 0,
-    /// link type unknown
-    GSM_LINK_TYPE_UNKNOWN = 1,
-    /// 2G (GSM/GRPS/EDGE) link
-    GSM_LINK_TYPE_2G = 2,
-    /// 3G link (WCDMA/HSDPA/HSPA)
-    GSM_LINK_TYPE_3G = 3,
-    /// 4G link (LTE)
-    GSM_LINK_TYPE_4G = 4,
 };
 
 /// Type of GPS fix
@@ -519,17 +583,6 @@ pub const GOPRO_PROTUNE_WHITE_BALANCE = enum(u32) {
     GOPRO_PROTUNE_WHITE_BALANCE_RAW = 4,
 };
 
-pub const MAG_CAL_STATUS = enum(u8) {
-    MAG_CAL_NOT_STARTED = 0,
-    MAG_CAL_WAITING_TO_START = 1,
-    MAG_CAL_RUNNING_STEP_ONE = 2,
-    MAG_CAL_RUNNING_STEP_TWO = 3,
-    MAG_CAL_SUCCESS = 4,
-    MAG_CAL_FAILED = 5,
-    MAG_CAL_BAD_ORIENTATION = 6,
-    MAG_CAL_BAD_RADIUS = 7,
-};
-
 pub const GOPRO_CAPTURE_MODE = enum(u8) {
     /// Video mode.
     GOPRO_CAPTURE_MODE_VIDEO = 0,
@@ -547,6 +600,17 @@ pub const GOPRO_CAPTURE_MODE = enum(u8) {
     GOPRO_CAPTURE_MODE_SETUP = 6,
     /// Mode not yet known.
     GOPRO_CAPTURE_MODE_UNKNOWN = 255,
+};
+
+pub const MAG_CAL_STATUS = enum(u8) {
+    MAG_CAL_NOT_STARTED = 0,
+    MAG_CAL_WAITING_TO_START = 1,
+    MAG_CAL_RUNNING_STEP_ONE = 2,
+    MAG_CAL_RUNNING_STEP_TWO = 3,
+    MAG_CAL_SUCCESS = 4,
+    MAG_CAL_FAILED = 5,
+    MAG_CAL_BAD_ORIENTATION = 6,
+    MAG_CAL_BAD_RADIUS = 7,
 };
 
 pub const MAV_ODID_CLASS_EU = enum(u8) {
@@ -1586,6 +1650,18 @@ pub const GOPRO_REQUEST_STATUS = enum(u8) {
     GOPRO_REQUEST_FAILED = 1,
 };
 
+/// Specific axis of pilot control inputs, with order corresponding to x, y, z, r fields in MANUAL_CONTROL message.
+pub const CONTROL_AXIS = enum(u32) {
+    /// Roll axis, with positive values corresponding to stick right movement, causing the vehicle to roll right. For helicopters this is lateral cyclic.
+    CONTROL_AXIS_ROLL = 0,
+    /// Pitch axis, with positive values corresponding to stick forward movement, causing the vehicle to move nose down. For helicopters this is longitudinal cyclic.
+    CONTROL_AXIS_PITCH = 1,
+    /// Main thrust, with positive values corresponding to going faster and higher. For helicopters this is collective.
+    CONTROL_AXIS_THRUST = 2,
+    /// Yaw axis, with positive values corresponding to pushing right pedal, causing the vehicle to face right direction. For helicopters this is tail collective.
+    CONTROL_AXIS_YAW = 3,
+};
+
 pub const MAV_ODID_STATUS = enum(u8) {
     /// The status of the (UA) Unmanned Aircraft is undefined.
     MAV_ODID_STATUS_UNDECLARED = 0,
@@ -1597,6 +1673,36 @@ pub const MAV_ODID_STATUS = enum(u8) {
     MAV_ODID_STATUS_EMERGENCY = 3,
     /// The remote ID system is failing or unreliable in some way.
     MAV_ODID_STATUS_REMOTE_ID_SYSTEM_FAILURE = 4,
+};
+
+/// These flags encode the cellular network status
+pub const CELLULAR_STATUS_FLAG = enum(u8) {
+    /// State unknown or not reportable.
+    CELLULAR_STATUS_FLAG_UNKNOWN = 0,
+    /// Modem is unusable
+    CELLULAR_STATUS_FLAG_FAILED = 1,
+    /// Modem is being initialized
+    CELLULAR_STATUS_FLAG_INITIALIZING = 2,
+    /// Modem is locked
+    CELLULAR_STATUS_FLAG_LOCKED = 3,
+    /// Modem is not enabled and is powered down
+    CELLULAR_STATUS_FLAG_DISABLED = 4,
+    /// Modem is currently transitioning to the CELLULAR_STATUS_FLAG_DISABLED state
+    CELLULAR_STATUS_FLAG_DISABLING = 5,
+    /// Modem is currently transitioning to the CELLULAR_STATUS_FLAG_ENABLED state
+    CELLULAR_STATUS_FLAG_ENABLING = 6,
+    /// Modem is enabled and powered on but not registered with a network provider and not available for data connections
+    CELLULAR_STATUS_FLAG_ENABLED = 7,
+    /// Modem is searching for a network provider to register
+    CELLULAR_STATUS_FLAG_SEARCHING = 8,
+    /// Modem is registered with a network provider, and data connections and messaging may be available for use
+    CELLULAR_STATUS_FLAG_REGISTERED = 9,
+    /// Modem is disconnecting and deactivating the last active packet data bearer. This state will not be entered if more than one packet data bearer is active and one of the active bearers is deactivated
+    CELLULAR_STATUS_FLAG_DISCONNECTING = 10,
+    /// Modem is activating and connecting the first packet data bearer. Subsequent bearer activations when another bearer is already active do not cause this state to be entered
+    CELLULAR_STATUS_FLAG_CONNECTING = 11,
+    /// One or more packet data bearers is active and connected
+    CELLULAR_STATUS_FLAG_CONNECTED = 12,
 };
 
 /// These encode the sensors whose status is sent as part of the SYS_STATUS message in the extended fields.
@@ -1669,36 +1775,6 @@ pub const CAMERA_TRACKING_TARGET_DATA = packed struct {
     pub const CAMERA_TRACKING_TARGET_DATA_RENDERED: @This() = .{ .bits = 2 };
     /// Target data within status message (Point or Rectangle)
     pub const CAMERA_TRACKING_TARGET_DATA_IN_STATUS: @This() = .{ .bits = 4 };
-};
-
-/// These flags encode the cellular network status
-pub const CELLULAR_STATUS_FLAG = enum(u8) {
-    /// State unknown or not reportable.
-    CELLULAR_STATUS_FLAG_UNKNOWN = 0,
-    /// Modem is unusable
-    CELLULAR_STATUS_FLAG_FAILED = 1,
-    /// Modem is being initialized
-    CELLULAR_STATUS_FLAG_INITIALIZING = 2,
-    /// Modem is locked
-    CELLULAR_STATUS_FLAG_LOCKED = 3,
-    /// Modem is not enabled and is powered down
-    CELLULAR_STATUS_FLAG_DISABLED = 4,
-    /// Modem is currently transitioning to the CELLULAR_STATUS_FLAG_DISABLED state
-    CELLULAR_STATUS_FLAG_DISABLING = 5,
-    /// Modem is currently transitioning to the CELLULAR_STATUS_FLAG_ENABLED state
-    CELLULAR_STATUS_FLAG_ENABLING = 6,
-    /// Modem is enabled and powered on but not registered with a network provider and not available for data connections
-    CELLULAR_STATUS_FLAG_ENABLED = 7,
-    /// Modem is searching for a network provider to register
-    CELLULAR_STATUS_FLAG_SEARCHING = 8,
-    /// Modem is registered with a network provider, and data connections and messaging may be available for use
-    CELLULAR_STATUS_FLAG_REGISTERED = 9,
-    /// Modem is disconnecting and deactivating the last active packet data bearer. This state will not be entered if more than one packet data bearer is active and one of the active bearers is deactivated
-    CELLULAR_STATUS_FLAG_DISCONNECTING = 10,
-    /// Modem is activating and connecting the first packet data bearer. Subsequent bearer activations when another bearer is already active do not cause this state to be entered
-    CELLULAR_STATUS_FLAG_CONNECTING = 11,
-    /// One or more packet data bearers is active and connected
-    CELLULAR_STATUS_FLAG_CONNECTED = 12,
 };
 
 pub const CAN_FILTER_OP = enum(u8) {
@@ -1902,6 +1978,32 @@ pub const UAVIONIX_ADSB_OUT_CFG_AIRCRAFT_SIZE = enum(u8) {
     UAVIONIX_ADSB_OUT_CFG_AIRCRAFT_SIZE_L75_W80M = 13,
     UAVIONIX_ADSB_OUT_CFG_AIRCRAFT_SIZE_L85_W80M = 14,
     UAVIONIX_ADSB_OUT_CFG_AIRCRAFT_SIZE_L85_W90M = 15,
+};
+
+/// Usage of MANUAL_SETPOINT message, sent in mode_switch field.
+pub const MARSH_MANUAL_SETPOINT_MODE = enum(u32) {
+    /// Values for target inceptors positions that the pilot should follow.
+    MARSH_MANUAL_SETPOINT_MODE_TARGET = 0,
+    /// Values for inceptors trim positions, the exact meaning depends on the flight model.
+    MARSH_MANUAL_SETPOINT_MODE_TRIM = 1,
+};
+
+/// Mode of a motion platform system.
+pub const MOTION_PLATFORM_MODE = enum(u32) {
+    /// Mode information is unsupported on this device.
+    MOTION_PLATFORM_MODE_UNKNOWN = 0,
+    /// Mode is currently not available, but may be in different condition.
+    MOTION_PLATFORM_MODE_UNINITIALIZED = 1,
+    /// Platform actuators are turned off, but control system is responsive.
+    MOTION_PLATFORM_MODE_OFF = 2,
+    /// Platform is in the lowest position and/or locked, appropriate for personnel entry.
+    MOTION_PLATFORM_MODE_SETTLED = 3,
+    /// Platform is in a neutral reference position, not accepting movement commands.
+    MOTION_PLATFORM_MODE_NEUTRAL = 4,
+    /// Platform is stopped in any position, not accepting movement commands.
+    MOTION_PLATFORM_MODE_FROZEN = 5,
+    /// Platform is in any position, accepting movement commands.
+    MOTION_PLATFORM_MODE_ENGAGED = 6,
 };
 
 /// Flags to indicate the type of storage.
@@ -2765,6 +2867,18 @@ pub const UAVIONIX_ADSB_OUT_DYNAMIC_STATE = packed struct {
     pub const UAVIONIX_ADSB_OUT_DYNAMIC_STATE_IDENT: @This() = .{ .bits = 16 };
 };
 
+/// General error state of a motion platform system.
+pub const MOTION_PLATFORM_HEALTH = enum(u32) {
+    /// System is operating correctly.
+    MOTION_PLATFORM_HEALTH_OK = 0,
+    /// There is at least one warning present, but operation can be continued.
+    MOTION_PLATFORM_HEALTH_WARNING = 1,
+    /// There is a failure or misconfiguration that requires operator's attention for correct operation.
+    MOTION_PLATFORM_HEALTH_ERROR = 2,
+    /// There is a major failure that requires immediate operator action to maintain safety.
+    MOTION_PLATFORM_HEALTH_CRITICAL = 3,
+};
+
 /// These values define the type of firmware release.  These values indicate the first version or release of this type.  For example the first alpha release would be 64, the second would be 65.
 pub const FIRMWARE_VERSION_TYPE = enum(u32) {
     /// development release
@@ -3237,6 +3351,16 @@ pub const FAILURE_UNIT = enum(u32) {
     FAILURE_UNIT_SYSTEM_AVOIDANCE = 103,
     FAILURE_UNIT_SYSTEM_RC_SIGNAL = 104,
     FAILURE_UNIT_SYSTEM_MAVLINK_SIGNAL = 105,
+};
+
+/// These values are MARSH-specific modes intended to be sent in custom_mode field of HEARTBEAT message.
+///         Prefer defining values in the most significant byte (between 2^24 and 2^31) to leave the lower three bytes to contain a message id
+pub const MARSH_MODE_FLAGS = enum(u32) {
+    /// Request Manager to only send one specific message, advised for very resource limited nodes or with control flow limitations like Simulink.
+    ///           That message id should be in the lower three bytes of the mode, which can be done by adding it to the flags.
+    MARSH_MODE_SINGLE_MESSAGE = 16777216,
+    /// Request Manager to send every message going out to any of the clients.
+    MARSH_MODE_ALL_MESSAGES = 33554432,
 };
 
 pub const GOPRO_CHARGING = enum(u32) {
@@ -6623,13 +6747,32 @@ pub const AIRLINK_AUTH_RESPONSE_TYPE = enum(u8) {
     AIRLINK_AUTH_OK = 1,
 };
 
-pub const MAVLINK_DATA_STREAM_TYPE = enum(u8) {
-    MAVLINK_DATA_STREAM_IMG_JPEG = 0,
-    MAVLINK_DATA_STREAM_IMG_BMP = 1,
-    MAVLINK_DATA_STREAM_IMG_RAW8U = 2,
-    MAVLINK_DATA_STREAM_IMG_RAW32U = 3,
-    MAVLINK_DATA_STREAM_IMG_PGM = 4,
-    MAVLINK_DATA_STREAM_IMG_PNG = 5,
+/// Component types for different nodes of the simulator network (flight model, controls, visualisation etc.). Components will always receive messages from the Manager relevant for their type. Only the first component in a network with a given system ID and type will have its messages forwarded by the Manager, all other ones will only be treated as output (will be shadowed). This enum is an extension of MAV_TYPE documented at https://mavlink.io/en/messages/minimal.html#MAV_TYPE
+pub const MARSH_TYPE = enum(u32) {
+    /// The simulation manager responsible for routing packets between different nodes. Typically MARSH Manager, see https://marsh-sim.github.io/manager.html
+    MARSH_TYPE_MANAGER = 100,
+    /// Component simulating flight dynamics of the aircraft.
+    MARSH_TYPE_FLIGHT_MODEL = 101,
+    /// Component providing pilot control inputs.
+    MARSH_TYPE_CONTROLS = 102,
+    /// Component showing the visual situation to the pilot.
+    MARSH_TYPE_VISUALISATION = 103,
+    /// Component implementing pilot instrument panel.
+    MARSH_TYPE_INSTRUMENTS = 104,
+    /// Component that moves the entire cockpit for motion cueing.
+    MARSH_TYPE_MOTION_PLATFORM = 105,
+    /// Component for in-seat motion cueing.
+    MARSH_TYPE_GSEAT = 106,
+    /// Component providing gaze data of pilot eyes.
+    MARSH_TYPE_EYE_TRACKER = 107,
+    /// Component measuring and actuating forces on pilot control inputs.
+    MARSH_TYPE_CONTROL_LOADING = 108,
+    /// Component providing vibrations for system identification, road rumble, gusts, etc.
+    MARSH_TYPE_VIBRATION_SOURCE = 109,
+    /// Component providing target for the pilot to follow like controls positions, aircraft state, ILS path etc.
+    MARSH_TYPE_PILOT_TARGET = 110,
+    /// Principal component controlling the main scenario of a given test, (unlike lower level MARSH_TYPE_PILOT_TARGET or MARSH_TYPE_MANAGER for overall communication).
+    MARSH_TYPE_EXPERIMENT_DIRECTOR = 111,
 };
 
 /// State flags for ADS-B transponder status report
@@ -6658,67 +6801,12 @@ pub const UAVIONIX_ADSB_OUT_STATUS_NIC_NACP = enum(u8) {
     UAVIONIX_ADSB_NACP_EPU_3_M = 176,
 };
 
-/// Gimbal manager high level capability flags (bitmap). The first 16 bits are identical to the GIMBAL_DEVICE_CAP_FLAGS. However, the gimbal manager does not need to copy the flags from the gimbal but can also enhance the capabilities and thus add flags.
-pub const GIMBAL_MANAGER_CAP_FLAGS = packed struct {
-    pub const is_bitmask = true;
-    bits: u32,
-
-    pub const Type = u32;
-
-    pub inline fn toInt(self: @This()) Type {
-        return self.bits;
-    }
-
-    pub inline fn fromInt(bits: Type) @This() {
-        return @This(){ .bits = bits };
-    }
-
-    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
-        return (self.bits & flag.bits) != 0;
-    }
-
-    pub inline fn set(self: *@This(), comptime flag: @This()) void {
-        self.bits |= flag.bits;
-    }
-
-    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
-        self.bits &= ~flag.bits;
-    }
-
-    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
-        self.bits ^= flag.bits;
-    }
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_RETRACT.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_RETRACT: @This() = .{ .bits = 1 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_NEUTRAL.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_NEUTRAL: @This() = .{ .bits = 2 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_AXIS.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_ROLL_AXIS: @This() = .{ .bits = 4 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_FOLLOW.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_ROLL_FOLLOW: @This() = .{ .bits = 8 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_ROLL_LOCK.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_ROLL_LOCK: @This() = .{ .bits = 16 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_AXIS.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_PITCH_AXIS: @This() = .{ .bits = 32 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_FOLLOW.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_PITCH_FOLLOW: @This() = .{ .bits = 64 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_PITCH_LOCK.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_PITCH_LOCK: @This() = .{ .bits = 128 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_AXIS.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_YAW_AXIS: @This() = .{ .bits = 256 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_FOLLOW.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_YAW_FOLLOW: @This() = .{ .bits = 512 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_LOCK.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_YAW_LOCK: @This() = .{ .bits = 1024 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_SUPPORTS_INFINITE_YAW.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_SUPPORTS_INFINITE_YAW: @This() = .{ .bits = 2048 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_SUPPORTS_YAW_IN_EARTH_FRAME.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_SUPPORTS_YAW_IN_EARTH_FRAME: @This() = .{ .bits = 4096 };
-    /// Based on GIMBAL_DEVICE_CAP_FLAGS_HAS_RC_INPUTS.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_HAS_RC_INPUTS: @This() = .{ .bits = 8192 };
-    /// Gimbal manager supports to point to a local position.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_CAN_POINT_LOCATION_LOCAL: @This() = .{ .bits = 65536 };
-    /// Gimbal manager supports to point to a global latitude, longitude, altitude position.
-    pub const GIMBAL_MANAGER_CAP_FLAGS_CAN_POINT_LOCATION_GLOBAL: @This() = .{ .bits = 131072 };
+pub const MAVLINK_DATA_STREAM_TYPE = enum(u8) {
+    MAVLINK_DATA_STREAM_IMG_JPEG = 0,
+    MAVLINK_DATA_STREAM_IMG_BMP = 1,
+    MAVLINK_DATA_STREAM_IMG_RAW8U = 2,
+    MAVLINK_DATA_STREAM_IMG_RAW32U = 3,
+    MAVLINK_DATA_STREAM_IMG_PGM = 4,
+    MAVLINK_DATA_STREAM_IMG_PNG = 5,
 };
 

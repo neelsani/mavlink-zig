@@ -76,6 +76,12 @@ pub const ardupilotmega = struct {
 };
 
 
+pub const marsh = struct {
+    pub const enums    = @import("marsh/enums.zig");
+    pub const messages = @import("marsh/messages.zig");
+};
+
+
 pub const icarous = struct {
     pub const enums    = @import("icarous/enums.zig");
     pub const messages = @import("icarous/messages.zig");
