@@ -2919,42 +2919,6 @@ pub const PARAM_ACK = enum(u8) {
     PARAM_ACK_IN_PROGRESS = 3,
 };
 
-/// Enum used to indicate true or false (also: success or failure, enabled or disabled, active or inactive).
-pub const BOOL = packed struct {
-    pub const is_bitmask = true;
-    bits: i8,
-
-    pub const Type = i8;
-
-    pub inline fn toInt(self: @This()) Type {
-        return self.bits;
-    }
-
-    pub inline fn fromInt(bits: Type) @This() {
-        return @This(){ .bits = bits };
-    }
-
-    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
-        return (self.bits & flag.bits) != 0;
-    }
-
-    pub inline fn set(self: *@This(), comptime flag: @This()) void {
-        self.bits |= flag.bits;
-    }
-
-    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
-        self.bits &= ~flag.bits;
-    }
-
-    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
-        self.bits ^= flag.bits;
-    }
-    /// False.
-    pub const BOOL_FALSE: @This() = .{ .bits = 0 };
-    /// True.
-    pub const BOOL_TRUE: @This() = .{ .bits = 1 };
-};
-
 /// Definitions for aircraft size
 pub const UAVIONIX_ADSB_OUT_CFG_AIRCRAFT_SIZE = enum(u8) {
     UAVIONIX_ADSB_OUT_CFG_AIRCRAFT_SIZE_NO_DATA = 0,
@@ -4509,6 +4473,42 @@ pub const MAV_BATTERY_TYPE = enum(u8) {
     MAV_BATTERY_TYPE_LION = 3,
     /// Nickel metal hydride battery
     MAV_BATTERY_TYPE_NIMH = 4,
+};
+
+/// Enum used to indicate true or false (also: success or failure, enabled or disabled, active or inactive).
+pub const MAV_BOOL = packed struct {
+    pub const is_bitmask = true;
+    bits: i8,
+
+    pub const Type = i8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
+    /// False.
+    pub const MAV_BOOL_FALSE: @This() = .{ .bits = 0 };
+    /// True.
+    pub const MAV_BOOL_TRUE: @This() = .{ .bits = 1 };
 };
 
 /// Actions being taken to mitigate/prevent fence breach

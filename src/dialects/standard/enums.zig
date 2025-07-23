@@ -49,6 +49,42 @@ pub const MAV_MODE_FLAG = packed struct {
     pub const MAV_MODE_FLAG_CUSTOM_MODE_ENABLED: @This() = .{ .bits = 1 };
 };
 
+/// Enum used to indicate true or false (also: success or failure, enabled or disabled, active or inactive).
+pub const MAV_BOOL = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
+    /// False.
+    pub const MAV_BOOL_FALSE: @This() = .{ .bits = 0 };
+    /// True.
+    pub const MAV_BOOL_TRUE: @This() = .{ .bits = 1 };
+};
+
 /// Micro air vehicle / autopilot classes. This identifies the individual model.
 pub const MAV_AUTOPILOT = enum(u8) {
     /// Generic autopilot, full support for everything
@@ -195,42 +231,6 @@ pub const MAV_TYPE = enum(u8) {
     MAV_TYPE_VTOL_GYRODYNE = 47,
     /// Gripper
     MAV_TYPE_GRIPPER = 48,
-};
-
-/// Enum used to indicate true or false (also: success or failure, enabled or disabled, active or inactive).
-pub const BOOL = packed struct {
-    pub const is_bitmask = true;
-    bits: u32,
-
-    pub const Type = u32;
-
-    pub inline fn toInt(self: @This()) Type {
-        return self.bits;
-    }
-
-    pub inline fn fromInt(bits: Type) @This() {
-        return @This(){ .bits = bits };
-    }
-
-    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
-        return (self.bits & flag.bits) != 0;
-    }
-
-    pub inline fn set(self: *@This(), comptime flag: @This()) void {
-        self.bits |= flag.bits;
-    }
-
-    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
-        self.bits &= ~flag.bits;
-    }
-
-    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
-        self.bits ^= flag.bits;
-    }
-    /// False.
-    pub const BOOL_FALSE: @This() = .{ .bits = 0 };
-    /// True.
-    pub const BOOL_TRUE: @This() = .{ .bits = 1 };
 };
 
 pub const MAV_STATE = enum(u8) {

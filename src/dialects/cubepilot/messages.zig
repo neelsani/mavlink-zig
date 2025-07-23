@@ -3080,8 +3080,8 @@ pub const CAMERA_IMAGE_CAPTURED = struct {
     /// Camera id of a non-MAVLink camera attached to an autopilot (1-6).  0 if the component is a MAVLink camera (with its own component id). Field name is usually camera_device_id.
     camera_id: u8,
 
-    /// Image was captured successfully (BOOL_TRUE). Values not equal to 0 or 1 are invalid.
-    capture_result: enums.BOOL.Type,
+    /// Image was captured successfully (MAV_BOOL_TRUE). Values not equal to 0 or 1 are invalid.
+    capture_result: enums.MAV_BOOL.Type,
 
 };
 
@@ -3272,8 +3272,8 @@ pub const LANDING_TARGET = struct {
     type: enums.LANDING_TARGET_TYPE,
 
     //Extension Field
-    /// Position fields (x, y, z, q, type) contain valid target position information (BOOL_FALSE: invalid values). Values not equal to 0 or 1 are invalid.
-    position_valid: enums.BOOL.Type,
+    /// Position fields (x, y, z, q, type) contain valid target position information (MAV_BOOL_FALSE: invalid values). Values not equal to 0 or 1 are invalid.
+    position_valid: enums.MAV_BOOL.Type,
 
 };
 
