@@ -2231,6 +2231,8 @@ pub const MAV_CMD = enum(u16) {
     MAV_CMD_DO_FOLLOW = 32,
     /// Reposition the MAV after a follow target command has been sent
     MAV_CMD_DO_FOLLOW_REPOSITION = 33,
+    /// Start orbiting on the circumference of a circle defined by the parameters. Setting values to NaN/INT32_MAX (as appropriate) results in using defaults.
+    MAV_CMD_DO_ORBIT = 34,
     /// Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicle's control system to control the vehicle attitude and the attitude of various sensors such as cameras.
     MAV_CMD_NAV_ROI = 80,
     /// Control autonomous path planning on the MAV.

@@ -4432,6 +4432,29 @@ pub const SCALED_IMU3 = struct {
 
 };
 
+/// Vehicle status report that is sent out while orbit execution is in progress (see MAV_CMD_DO_ORBIT).
+pub const ORBIT_EXECUTION_STATUS = struct {
+    pub const MSG_ID = 360;
+    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
+    time_usec: u64,
+
+    /// Radius of the orbit circle. Positive values orbit clockwise, negative values orbit counter-clockwise.
+    radius: f32,
+
+    /// X coordinate of center point. Coordinate system depends on frame field: local = x position in meters * 1e4, global = latitude in degrees * 1e7.
+    x: i32,
+
+    /// Y coordinate of center point.  Coordinate system depends on frame field: local = x position in meters * 1e4, global = latitude in degrees * 1e7.
+    y: i32,
+
+    /// Altitude of center point. Coordinate system depends on frame field.
+    z: f32,
+
+    /// The coordinate system of the fields: x, y, z.
+    frame: enums.MAV_FRAME,
+
+};
+
 /// A forwarded CAN frame as requested by MAV_CMD_CAN_FORWARD.
 pub const CAN_FRAME = struct {
     pub const MSG_ID = 386;

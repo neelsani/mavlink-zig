@@ -3619,6 +3619,18 @@ pub const MLRS_RADIO_LINK_STATS_FLAGS = packed struct {
     pub const MLRS_RADIO_LINK_STATS_FLAGS_TX_TRANSMIT_ANTENNA2: @This() = .{ .bits = 64 };
 };
 
+/// Actuator groups to test in MAV_CMD_ACTUATOR_GROUP_TEST.
+pub const ACTUATOR_TEST_GROUP = enum(u32) {
+    /// Actuators that contribute to roll torque.
+    ACTUATOR_TEST_GROUP_ROLL_TORQUE = 0,
+    /// Actuators that contribute to pitch torque.
+    ACTUATOR_TEST_GROUP_PITCH_TORQUE = 1,
+    /// Actuators that contribute to yaw torque.
+    ACTUATOR_TEST_GROUP_YAW_TORQUE = 2,
+    /// Actuators that affect collective tilt.
+    ACTUATOR_TEST_GROUP_COLLECTIVE_TILT = 3,
+};
+
 /// Winch status flags used in WINCH_STATUS
 pub const MAV_WINCH_STATUS_FLAG = packed struct {
     pub const is_bitmask = true;
@@ -4763,6 +4775,8 @@ pub const MAV_CMD = enum(u16) {
     MAV_CMD_DO_FOLLOW = 32,
     /// Reposition the MAV after a follow target command has been sent
     MAV_CMD_DO_FOLLOW_REPOSITION = 33,
+    /// Start orbiting on the circumference of a circle defined by the parameters. Setting values to NaN/INT32_MAX (as appropriate) results in using defaults.
+    MAV_CMD_DO_ORBIT = 34,
     /// Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicle's control system to control the vehicle attitude and the attitude of various sensors such as cameras.
     MAV_CMD_NAV_ROI = 80,
     /// Control autonomous path planning on the MAV.
@@ -5142,6 +5156,12 @@ pub const MAV_CMD = enum(u16) {
     ///           The system doing the upgrade will report progress using the normal command protocol sequence for a long running operation.
     ///           Command protocol information: https://mavlink.io/en/services/command.html.
     MAV_CMD_DO_UPGRADE = 247,
+    /// Command to test groups of related actuators together.
+    ///           This might include groups such as the actuators that contribute to roll, pitch, or yaw torque, actuators that contribute to thrust in x, y, z axis, tilt mechanisms, flaps and spoilers, and so on.
+    ///           This is similar to MAV_CMD_ACTUATOR_TEST, except that multiple actuators may be affected.
+    ///           Different groups may also affect the same actuators (as in the case of controls that affect torque in different axes).
+    ///           Autopilots must NACK this command with MAV_RESULT_TEMPORARILY_REJECTED while armed.
+    MAV_CMD_ACTUATOR_GROUP_TEST = 309,
     /// Set system and component id.
     ///           This allows moving of a system and all its components to a new system id, or moving a particular component to a new system/component id.
     ///           Recipients must reject command addressed to broadcast system ID.

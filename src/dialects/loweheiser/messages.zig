@@ -65,7 +65,7 @@ pub const LOWEHEISER_GOV_EFI = struct {
     /// Motor RPM.
     efi_rpm: f32,
 
-    /// Injector pulse-width in miliseconds.
+    /// Injector pulse-width in milliseconds.
     efi_pw: f32,
 
     /// Fuel flow rate in litres/hour.
