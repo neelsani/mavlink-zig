@@ -3563,7 +3563,7 @@ pub const AIS_VESSEL = struct {
     /// Bitmask to indicate various statuses including valid data fields
     flags: enums.AIS_FLAGS.Type,
 
-    /// Turn rate
+    /// Turn rate, 0.1 degrees per second
     turn_rate: i8,
 
     /// Navigational status
@@ -4433,41 +4433,38 @@ pub const GLOBAL_POSITION_INT_COV = struct {
 
 };
 
-/// The location of a target measured by MAV's onboard sensors.
-pub const TARGET_RELATIVE = struct {
-    pub const MSG_ID = 511;
-    /// Timestamp (UNIX epoch time)
-    timestamp: u64,
+/// Global position measurement or estimate.
+pub const GLOBAL_POSITION = struct {
+    pub const MSG_ID = 296;
+    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
+    time_usec: u64,
 
-    /// X Position of the target in TARGET_OBS_FRAME
-    x: f32,
+    /// Latitude (WGS84)
+    lat: i32,
 
-    /// Y Position of the target in TARGET_OBS_FRAME
-    y: f32,
+    /// Longitude (WGS84)
+    lon: i32,
 
-    /// Z Position of the target in TARGET_OBS_FRAME
-    z: f32,
+    /// Altitude (MSL - position-system specific value)
+    alt: f32,
 
-    /// Standard deviation of the target's orientation in TARGET_OBS_FRAME
-    yaw_std: f32,
+    /// Altitude (WGS84 elipsoid)
+    alt_ellipsoid: f32,
 
-    /// Quaternion of the target's orientation from the target's frame to the TARGET_OBS_FRAME (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
-    q_target: [4]f32,
+    /// Standard deviation of horizontal position error
+    eph: f32,
 
-    /// Quaternion of the sensor's orientation from TARGET_OBS_FRAME to vehicle-carried NED. (Ignored if set to (0,0,0,0)) (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
-    q_sensor: [4]f32,
+    /// Standard deviation of vertical position error
+    epv: f32,
 
-    /// Standard deviation of the target's position in TARGET_OBS_FRAME
-    pos_std: [3]f32,
-
-    /// The ID of the target if multiple targets are present
+    /// Sensor ID
     id: u8,
 
-    /// Coordinate frame used for following fields.
-    frame: enums.TARGET_OBS_FRAME,
+    /// Source of position/estimate (such as GNSS, estimator, etc.)
+    source: enums.GLOBAL_POSITION_SRC,
 
-    /// Type of target
-    type: enums.LANDING_TARGET_TYPE,
+    /// Status flags
+    flags: enums.GLOBAL_POSITION_FLAGS.Type,
 
 };
 
@@ -4539,6 +4536,44 @@ pub const GLOBAL_VISION_POSITION_ESTIMATE = struct {
     //Extension Field
     /// Estimate reset counter. This should be incremented when the estimate resets in any of the dimensions (position, velocity, attitude, angular speed). This is designed to be used when e.g an external SLAM system detects a loop-closure and the estimate jumps.
     reset_counter: u8,
+
+};
+
+/// The location of a target measured by MAV's onboard sensors.
+pub const TARGET_RELATIVE = struct {
+    pub const MSG_ID = 511;
+    /// Timestamp (UNIX epoch time)
+    timestamp: u64,
+
+    /// X Position of the target in TARGET_OBS_FRAME
+    x: f32,
+
+    /// Y Position of the target in TARGET_OBS_FRAME
+    y: f32,
+
+    /// Z Position of the target in TARGET_OBS_FRAME
+    z: f32,
+
+    /// Standard deviation of the target's orientation in TARGET_OBS_FRAME
+    yaw_std: f32,
+
+    /// Quaternion of the target's orientation from the target's frame to the TARGET_OBS_FRAME (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
+    q_target: [4]f32,
+
+    /// Quaternion of the sensor's orientation from TARGET_OBS_FRAME to vehicle-carried NED. (Ignored if set to (0,0,0,0)) (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
+    q_sensor: [4]f32,
+
+    /// Standard deviation of the target's position in TARGET_OBS_FRAME
+    pos_std: [3]f32,
+
+    /// The ID of the target if multiple targets are present
+    id: u8,
+
+    /// Coordinate frame used for following fields.
+    frame: enums.TARGET_OBS_FRAME,
+
+    /// Type of target
+    type: enums.LANDING_TARGET_TYPE,
 
 };
 
@@ -4701,7 +4736,7 @@ pub const AUTOPILOT_VERSION = struct {
     /// Operating system version number
     os_sw_version: u32,
 
-    /// HW / board version (last 8 bits should be silicon ID, if any). The first 16 bits of this field specify https://github.com/PX4/PX4-Bootloader/blob/master/board_types.txt
+    /// HW / board version (last 8 bits should be silicon ID, if any). The first 16 bits of this field specify a board type from an enumeration stored at https://github.com/PX4/PX4-Bootloader/blob/master/board_types.txt and with extensive additions at https://github.com/ArduPilot/ardupilot/blob/master/Tools/AP_Bootloader/board_types.txt
     board_version: u32,
 
     /// ID of the board vendor

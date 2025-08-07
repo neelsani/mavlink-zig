@@ -379,17 +379,40 @@ pub const MAV_MISSION_TYPE = enum(u8) {
     MAV_MISSION_TYPE_ALL = 255,
 };
 
-pub const MAV_ODID_ID_TYPE = enum(u8) {
-    /// No type defined.
-    MAV_ODID_ID_TYPE_NONE = 0,
-    /// Manufacturer Serial Number (ANSI/CTA-2063 format).
-    MAV_ODID_ID_TYPE_SERIAL_NUMBER = 1,
-    /// CAA (Civil Aviation Authority) registered ID. Format: [ICAO Country Code].[CAA Assigned ID].
-    MAV_ODID_ID_TYPE_CAA_REGISTRATION_ID = 2,
-    /// UTM (Unmanned Traffic Management) assigned UUID (RFC4122).
-    MAV_ODID_ID_TYPE_UTM_ASSIGNED_UUID = 3,
-    /// A 20 byte ID for a specific flight/session. The exact ID type is indicated by the first byte of uas_id and these type values are managed by ICAO.
-    MAV_ODID_ID_TYPE_SPECIFIC_SESSION_ID = 4,
+/// Status flags for GLOBAL_POSITION
+pub const GLOBAL_POSITION_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u8,
+
+    pub const Type = u8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
+    /// Unhealthy sensor/estimator.
+    pub const GLOBAL_POSITION_UNHEALTHY: @This() = .{ .bits = 1 };
+    /// True if the data originates from or is consumed by the primary estimator.
+    pub const GLOBAL_POSITION_PRIMARY: @This() = .{ .bits = 2 };
 };
 
 /// These flags indicate the sensor reporting capabilities for TARGET_ABSOLUTE.
@@ -427,6 +450,31 @@ pub const TARGET_ABSOLUTE_SENSOR_CAPABILITY_FLAGS = packed struct {
     pub const TARGET_ABSOLUTE_SENSOR_CAPABILITY_ACCELERATION: @This() = .{ .bits = 4 };
     pub const TARGET_ABSOLUTE_SENSOR_CAPABILITY_ATTITUDE: @This() = .{ .bits = 8 };
     pub const TARGET_ABSOLUTE_SENSOR_CAPABILITY_RATES: @This() = .{ .bits = 16 };
+};
+
+pub const MAV_ODID_ID_TYPE = enum(u8) {
+    /// No type defined.
+    MAV_ODID_ID_TYPE_NONE = 0,
+    /// Manufacturer Serial Number (ANSI/CTA-2063 format).
+    MAV_ODID_ID_TYPE_SERIAL_NUMBER = 1,
+    /// CAA (Civil Aviation Authority) registered ID. Format: [ICAO Country Code].[CAA Assigned ID].
+    MAV_ODID_ID_TYPE_CAA_REGISTRATION_ID = 2,
+    /// UTM (Unmanned Traffic Management) assigned UUID (RFC4122).
+    MAV_ODID_ID_TYPE_UTM_ASSIGNED_UUID = 3,
+    /// A 20 byte ID for a specific flight/session. The exact ID type is indicated by the first byte of uas_id and these type values are managed by ICAO.
+    MAV_ODID_ID_TYPE_SPECIFIC_SESSION_ID = 4,
+};
+
+/// Actuator groups to test in MAV_CMD_ACTUATOR_GROUP_TEST.
+pub const ACTUATOR_TEST_GROUP = enum(u32) {
+    /// Actuators that contribute to roll torque.
+    ACTUATOR_TEST_GROUP_ROLL_TORQUE = 0,
+    /// Actuators that contribute to pitch torque.
+    ACTUATOR_TEST_GROUP_PITCH_TORQUE = 1,
+    /// Actuators that contribute to yaw torque.
+    ACTUATOR_TEST_GROUP_YAW_TORQUE = 2,
+    /// Actuators that affect collective tilt.
+    ACTUATOR_TEST_GROUP_COLLECTIVE_TILT = 3,
 };
 
 /// Flags in ESTIMATOR_STATUS message
@@ -483,18 +531,6 @@ pub const ESTIMATOR_STATUS_FLAGS = packed struct {
     pub const ESTIMATOR_GPS_GLITCH: @This() = .{ .bits = 1024 };
     /// True if the EKF has detected bad accelerometer data
     pub const ESTIMATOR_ACCEL_ERROR: @This() = .{ .bits = 2048 };
-};
-
-/// Actuator groups to test in MAV_CMD_ACTUATOR_GROUP_TEST.
-pub const ACTUATOR_TEST_GROUP = enum(u32) {
-    /// Actuators that contribute to roll torque.
-    ACTUATOR_TEST_GROUP_ROLL_TORQUE = 0,
-    /// Actuators that contribute to pitch torque.
-    ACTUATOR_TEST_GROUP_PITCH_TORQUE = 1,
-    /// Actuators that contribute to yaw torque.
-    ACTUATOR_TEST_GROUP_YAW_TORQUE = 2,
-    /// Actuators that affect collective tilt.
-    ACTUATOR_TEST_GROUP_COLLECTIVE_TILT = 3,
 };
 
 pub const MAV_ODID_OPERATOR_LOCATION_TYPE = enum(u8) {
@@ -1127,6 +1163,24 @@ pub const GPS_JAMMING_STATE = enum(u8) {
     GPS_JAMMING_STATE_MITIGATED = 2,
     /// The GPS receiver detected signal jamming.
     GPS_JAMMING_STATE_DETECTED = 3,
+};
+
+/// Source for GLOBAL_POSITION measurement or estimate.
+pub const GLOBAL_POSITION_SRC = enum(u8) {
+    /// Source is unknown or not one of the listed types.
+    GLOBAL_POSITION_UNKNOWN = 0,
+    /// Global Navigation Satellite System (e.g.: GPS, Galileo, Glonass, BeiDou).
+    GLOBAL_POSITION_GNSS = 1,
+    /// Vision system (e.g.: map matching).
+    GLOBAL_POSITION_VISION = 2,
+    /// Pseudo-satellite system (performs GNSS-like function, but usually with transceiver beacons).
+    GLOBAL_POSITION_PSEUDOLITES = 3,
+    /// Terrain referenced navigation.
+    GLOBAL_POSITION_TRN = 4,
+    /// Magnetic positioning.
+    GLOBAL_POSITION_MAGNETIC = 5,
+    /// Estimated position based on various sensors (eg. a Kalman Filter).
+    GLOBAL_POSITION_ESTIMATOR = 6,
 };
 
 pub const MAV_ODID_HOR_ACC = enum(u8) {
@@ -3673,24 +3727,24 @@ pub const RC_TYPE = enum(u32) {
 /// Navigational status of AIS vessel, enum duplicated from AIS standard, https://gpsd.gitlab.io/gpsd/AIVDM.html
 pub const AIS_NAV_STATUS = enum(u8) {
     /// Under way using engine.
-    UNDER_WAY = 0,
-    AIS_NAV_ANCHORED = 1,
-    AIS_NAV_UN_COMMANDED = 2,
-    AIS_NAV_RESTRICTED_MANOEUVERABILITY = 3,
-    AIS_NAV_DRAUGHT_CONSTRAINED = 4,
-    AIS_NAV_MOORED = 5,
-    AIS_NAV_AGROUND = 6,
-    AIS_NAV_FISHING = 7,
-    AIS_NAV_SAILING = 8,
-    AIS_NAV_RESERVED_HSC = 9,
-    AIS_NAV_RESERVED_WIG = 10,
-    AIS_NAV_RESERVED_1 = 11,
-    AIS_NAV_RESERVED_2 = 12,
-    AIS_NAV_RESERVED_3 = 13,
+    AIS_NAV_STATUS_UNDER_WAY = 0,
+    AIS_NAV_STATUS_ANCHORED = 1,
+    AIS_NAV_STATUS_UN_COMMANDED = 2,
+    AIS_NAV_STATUS_RESTRICTED_MANOEUVERABILITY = 3,
+    AIS_NAV_STATUS_DRAUGHT_CONSTRAINED = 4,
+    AIS_NAV_STATUS_MOORED = 5,
+    AIS_NAV_STATUS_AGROUND = 6,
+    AIS_NAV_STATUS_FISHING = 7,
+    AIS_NAV_STATUS_SAILING = 8,
+    AIS_NAV_STATUS_RESERVED_HSC = 9,
+    AIS_NAV_STATUS_RESERVED_WIG = 10,
+    AIS_NAV_STATUS_RESERVED_1 = 11,
+    AIS_NAV_STATUS_RESERVED_2 = 12,
+    AIS_NAV_STATUS_RESERVED_3 = 13,
     /// Search And Rescue Transponder.
-    AIS_NAV_AIS_SART = 14,
+    AIS_NAV_STATUS_AIS_SART = 14,
     /// Not available (default).
-    AIS_NAV_UNKNOWN = 15,
+    AIS_NAV_STATUS_UNKNOWN = 15,
 };
 
 pub const MAV_ODID_TIME_ACC = enum(u8) {
@@ -3996,6 +4050,14 @@ pub const ORBIT_YAW_BEHAVIOUR = enum(u32) {
     ORBIT_YAW_BEHAVIOUR_UNCHANGED = 5,
 };
 
+/// Enumeration of the ADSB altimeter types
+pub const ADSB_ALTITUDE_TYPE = enum(u8) {
+    /// Altitude reported from a Baro source using QNH reference
+    ADSB_ALTITUDE_TYPE_PRESSURE_QNH = 0,
+    /// Altitude reported from a GNSS source
+    ADSB_ALTITUDE_TYPE_GEOMETRIC = 1,
+};
+
 /// Autopilot has a connected gripper. MAVLink Grippers would set MAV_TYPE_GRIPPER instead.
 pub const MAV_PROTOCOL_CAPABILITY = packed struct {
     pub const is_bitmask = true;
@@ -4068,14 +4130,6 @@ pub const MAV_PROTOCOL_CAPABILITY = packed struct {
     pub const MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_C_CAST: @This() = .{ .bits = 131072 };
     /// This component implements/is a gimbal manager. This means the GIMBAL_MANAGER_INFORMATION, and other messages can be requested.
     pub const MAV_PROTOCOL_CAPABILITY_COMPONENT_IMPLEMENTS_GIMBAL_MANAGER: @This() = .{ .bits = 262144 };
-};
-
-/// Enumeration of the ADSB altimeter types
-pub const ADSB_ALTITUDE_TYPE = enum(u8) {
-    /// Altitude reported from a Baro source using QNH reference
-    ADSB_ALTITUDE_TYPE_PRESSURE_QNH = 0,
-    /// Altitude reported from a GNSS source
-    ADSB_ALTITUDE_TYPE_GEOMETRIC = 1,
 };
 
 /// These flags indicate status such as data validity of each data source. Set = data valid
@@ -4473,28 +4527,6 @@ pub const POSITION_TARGET_TYPEMASK = packed struct {
     pub const POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE: @This() = .{ .bits = 2048 };
 };
 
-/// These values define the type of firmware release.  These values indicate the first version or release of this type.  For example the first alpha release would be 64, the second would be 65.
-pub const FIRMWARE_VERSION_TYPE = enum(u32) {
-    /// development release
-    FIRMWARE_VERSION_TYPE_DEV = 0,
-    /// alpha release
-    FIRMWARE_VERSION_TYPE_ALPHA = 64,
-    /// beta release
-    FIRMWARE_VERSION_TYPE_BETA = 128,
-    /// release candidate
-    FIRMWARE_VERSION_TYPE_RC = 192,
-    /// official stable release
-    FIRMWARE_VERSION_TYPE_OFFICIAL = 255,
-};
-
-/// Specifies the conditions under which the MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN command should be accepted.
-pub const REBOOT_SHUTDOWN_CONDITIONS = enum(u32) {
-    /// Reboot/Shutdown only if allowed by safety checks, such as being landed.
-    REBOOT_SHUTDOWN_CONDITIONS_SAFETY_INTERLOCKED = 0,
-    /// Force reboot/shutdown of the autopilot/component regardless of system state.
-    REBOOT_SHUTDOWN_CONDITIONS_FORCE = 20190226,
-};
-
 /// Enumeration of estimator types
 pub const MAV_ESTIMATOR_TYPE = enum(u8) {
     /// Unknown type of the estimator.
@@ -4517,6 +4549,14 @@ pub const MAV_ESTIMATOR_TYPE = enum(u8) {
     MAV_ESTIMATOR_TYPE_AUTOPILOT = 8,
 };
 
+/// Specifies the conditions under which the MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN command should be accepted.
+pub const REBOOT_SHUTDOWN_CONDITIONS = enum(u32) {
+    /// Reboot/Shutdown only if allowed by safety checks, such as being landed.
+    REBOOT_SHUTDOWN_CONDITIONS_SAFETY_INTERLOCKED = 0,
+    /// Force reboot/shutdown of the autopilot/component regardless of system state.
+    REBOOT_SHUTDOWN_CONDITIONS_FORCE = 20190226,
+};
+
 /// Video stream types
 pub const VIDEO_STREAM_TYPE = enum(u8) {
     /// Stream is RTSP
@@ -4537,6 +4577,20 @@ pub const NAV_VTOL_LAND_OPTIONS = enum(u32) {
     NAV_VTOL_LAND_OPTIONS_FW_DESCENT = 1,
     /// Land in multicopter mode on reaching the landing coordinates (the whole landing is by "hover descent").
     NAV_VTOL_LAND_OPTIONS_HOVER_DESCENT = 2,
+};
+
+/// These values define the type of firmware release.  These values indicate the first version or release of this type.  For example the first alpha release would be 64, the second would be 65.
+pub const FIRMWARE_VERSION_TYPE = enum(u32) {
+    /// development release
+    FIRMWARE_VERSION_TYPE_DEV = 0,
+    /// alpha release
+    FIRMWARE_VERSION_TYPE_ALPHA = 64,
+    /// beta release
+    FIRMWARE_VERSION_TYPE_BETA = 128,
+    /// release candidate
+    FIRMWARE_VERSION_TYPE_RC = 192,
+    /// official stable release
+    FIRMWARE_VERSION_TYPE_OFFICIAL = 255,
 };
 
 pub const MAV_ODID_SPEED_ACC = enum(u8) {

@@ -1200,6 +1200,24 @@ pub const GOPRO_HEARTBEAT_STATUS = enum(u8) {
     GOPRO_HEARTBEAT_STATUS_ERROR = 3,
 };
 
+/// Source for GLOBAL_POSITION measurement or estimate.
+pub const GLOBAL_POSITION_SRC = enum(u8) {
+    /// Source is unknown or not one of the listed types.
+    GLOBAL_POSITION_UNKNOWN = 0,
+    /// Global Navigation Satellite System (e.g.: GPS, Galileo, Glonass, BeiDou).
+    GLOBAL_POSITION_GNSS = 1,
+    /// Vision system (e.g.: map matching).
+    GLOBAL_POSITION_VISION = 2,
+    /// Pseudo-satellite system (performs GNSS-like function, but usually with transceiver beacons).
+    GLOBAL_POSITION_PSEUDOLITES = 3,
+    /// Terrain referenced navigation.
+    GLOBAL_POSITION_TRN = 4,
+    /// Magnetic positioning.
+    GLOBAL_POSITION_MAGNETIC = 5,
+    /// Estimated position based on various sensors (eg. a Kalman Filter).
+    GLOBAL_POSITION_ESTIMATOR = 6,
+};
+
 pub const MAV_ODID_OPERATOR_ID_TYPE = enum(u8) {
     /// CAA (Civil Aviation Authority) registered operator ID.
     MAV_ODID_OPERATOR_ID_TYPE_CAA = 0,
@@ -2153,24 +2171,24 @@ pub const CAMERA_ZOOM_TYPE = enum(u32) {
 /// Navigational status of AIS vessel, enum duplicated from AIS standard, https://gpsd.gitlab.io/gpsd/AIVDM.html
 pub const AIS_NAV_STATUS = enum(u8) {
     /// Under way using engine.
-    UNDER_WAY = 0,
-    AIS_NAV_ANCHORED = 1,
-    AIS_NAV_UN_COMMANDED = 2,
-    AIS_NAV_RESTRICTED_MANOEUVERABILITY = 3,
-    AIS_NAV_DRAUGHT_CONSTRAINED = 4,
-    AIS_NAV_MOORED = 5,
-    AIS_NAV_AGROUND = 6,
-    AIS_NAV_FISHING = 7,
-    AIS_NAV_SAILING = 8,
-    AIS_NAV_RESERVED_HSC = 9,
-    AIS_NAV_RESERVED_WIG = 10,
-    AIS_NAV_RESERVED_1 = 11,
-    AIS_NAV_RESERVED_2 = 12,
-    AIS_NAV_RESERVED_3 = 13,
+    AIS_NAV_STATUS_UNDER_WAY = 0,
+    AIS_NAV_STATUS_ANCHORED = 1,
+    AIS_NAV_STATUS_UN_COMMANDED = 2,
+    AIS_NAV_STATUS_RESTRICTED_MANOEUVERABILITY = 3,
+    AIS_NAV_STATUS_DRAUGHT_CONSTRAINED = 4,
+    AIS_NAV_STATUS_MOORED = 5,
+    AIS_NAV_STATUS_AGROUND = 6,
+    AIS_NAV_STATUS_FISHING = 7,
+    AIS_NAV_STATUS_SAILING = 8,
+    AIS_NAV_STATUS_RESERVED_HSC = 9,
+    AIS_NAV_STATUS_RESERVED_WIG = 10,
+    AIS_NAV_STATUS_RESERVED_1 = 11,
+    AIS_NAV_STATUS_RESERVED_2 = 12,
+    AIS_NAV_STATUS_RESERVED_3 = 13,
     /// Search And Rescue Transponder.
-    AIS_NAV_AIS_SART = 14,
+    AIS_NAV_STATUS_AIS_SART = 14,
     /// Not available (default).
-    AIS_NAV_UNKNOWN = 15,
+    AIS_NAV_STATUS_UNKNOWN = 15,
 };
 
 /// The ROI (region of interest) for the vehicle. This can be
@@ -2879,28 +2897,6 @@ pub const MOTION_PLATFORM_HEALTH = enum(u32) {
     MOTION_PLATFORM_HEALTH_CRITICAL = 3,
 };
 
-/// These values define the type of firmware release.  These values indicate the first version or release of this type.  For example the first alpha release would be 64, the second would be 65.
-pub const FIRMWARE_VERSION_TYPE = enum(u32) {
-    /// development release
-    FIRMWARE_VERSION_TYPE_DEV = 0,
-    /// alpha release
-    FIRMWARE_VERSION_TYPE_ALPHA = 64,
-    /// beta release
-    FIRMWARE_VERSION_TYPE_BETA = 128,
-    /// release candidate
-    FIRMWARE_VERSION_TYPE_RC = 192,
-    /// official stable release
-    FIRMWARE_VERSION_TYPE_OFFICIAL = 255,
-};
-
-/// Specifies the conditions under which the MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN command should be accepted.
-pub const REBOOT_SHUTDOWN_CONDITIONS = enum(u32) {
-    /// Reboot/Shutdown only if allowed by safety checks, such as being landed.
-    REBOOT_SHUTDOWN_CONDITIONS_SAFETY_INTERLOCKED = 0,
-    /// Force reboot/shutdown of the autopilot/component regardless of system state.
-    REBOOT_SHUTDOWN_CONDITIONS_FORCE = 20190226,
-};
-
 /// Video stream types
 pub const VIDEO_STREAM_TYPE = enum(u8) {
     /// Stream is RTSP
@@ -2913,6 +2909,14 @@ pub const VIDEO_STREAM_TYPE = enum(u8) {
     VIDEO_STREAM_TYPE_MPEG_TS = 3,
 };
 
+/// Specifies the conditions under which the MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN command should be accepted.
+pub const REBOOT_SHUTDOWN_CONDITIONS = enum(u32) {
+    /// Reboot/Shutdown only if allowed by safety checks, such as being landed.
+    REBOOT_SHUTDOWN_CONDITIONS_SAFETY_INTERLOCKED = 0,
+    /// Force reboot/shutdown of the autopilot/component regardless of system state.
+    REBOOT_SHUTDOWN_CONDITIONS_FORCE = 20190226,
+};
+
 pub const NAV_VTOL_LAND_OPTIONS = enum(u32) {
     /// Default autopilot landing behaviour.
     NAV_VTOL_LAND_OPTIONS_DEFAULT = 0,
@@ -2921,6 +2925,20 @@ pub const NAV_VTOL_LAND_OPTIONS = enum(u32) {
     NAV_VTOL_LAND_OPTIONS_FW_DESCENT = 1,
     /// Land in multicopter mode on reaching the landing coordinates (the whole landing is by "hover descent").
     NAV_VTOL_LAND_OPTIONS_HOVER_DESCENT = 2,
+};
+
+/// These values define the type of firmware release.  These values indicate the first version or release of this type.  For example the first alpha release would be 64, the second would be 65.
+pub const FIRMWARE_VERSION_TYPE = enum(u32) {
+    /// development release
+    FIRMWARE_VERSION_TYPE_DEV = 0,
+    /// alpha release
+    FIRMWARE_VERSION_TYPE_ALPHA = 64,
+    /// beta release
+    FIRMWARE_VERSION_TYPE_BETA = 128,
+    /// release candidate
+    FIRMWARE_VERSION_TYPE_RC = 192,
+    /// official stable release
+    FIRMWARE_VERSION_TYPE_OFFICIAL = 255,
 };
 
 /// Mode currently commanded by pilot
@@ -3566,6 +3584,42 @@ pub const MAV_MISSION_TYPE = enum(u8) {
     MAV_MISSION_TYPE_RALLY = 2,
     /// Only used in MISSION_CLEAR_ALL to clear all mission types.
     MAV_MISSION_TYPE_ALL = 255,
+};
+
+/// Status flags for GLOBAL_POSITION
+pub const GLOBAL_POSITION_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u8,
+
+    pub const Type = u8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
+    /// Unhealthy sensor/estimator.
+    pub const GLOBAL_POSITION_UNHEALTHY: @This() = .{ .bits = 1 };
+    /// True if the data originates from or is consumed by the primary estimator.
+    pub const GLOBAL_POSITION_PRIMARY: @This() = .{ .bits = 2 };
 };
 
 /// RADIO_LINK_STATS flags (bitmask).
@@ -6239,6 +6293,14 @@ pub const ORBIT_YAW_BEHAVIOUR = enum(u32) {
     ORBIT_YAW_BEHAVIOUR_UNCHANGED = 5,
 };
 
+/// Enumeration of the ADSB altimeter types
+pub const ADSB_ALTITUDE_TYPE = enum(u8) {
+    /// Altitude reported from a Baro source using QNH reference
+    ADSB_ALTITUDE_TYPE_PRESSURE_QNH = 0,
+    /// Altitude reported from a GNSS source
+    ADSB_ALTITUDE_TYPE_GEOMETRIC = 1,
+};
+
 /// Autopilot has a connected gripper. MAVLink Grippers would set MAV_TYPE_GRIPPER instead.
 pub const MAV_PROTOCOL_CAPABILITY = packed struct {
     pub const is_bitmask = true;
@@ -6311,14 +6373,6 @@ pub const MAV_PROTOCOL_CAPABILITY = packed struct {
     pub const MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_C_CAST: @This() = .{ .bits = 131072 };
     /// This component implements/is a gimbal manager. This means the GIMBAL_MANAGER_INFORMATION, and other messages can be requested.
     pub const MAV_PROTOCOL_CAPABILITY_COMPONENT_IMPLEMENTS_GIMBAL_MANAGER: @This() = .{ .bits = 262144 };
-};
-
-/// Enumeration of the ADSB altimeter types
-pub const ADSB_ALTITUDE_TYPE = enum(u8) {
-    /// Altitude reported from a Baro source using QNH reference
-    ADSB_ALTITUDE_TYPE_PRESSURE_QNH = 0,
-    /// Altitude reported from a GNSS source
-    ADSB_ALTITUDE_TYPE_GEOMETRIC = 1,
 };
 
 pub const SCRIPTING_CMD = enum(u32) {

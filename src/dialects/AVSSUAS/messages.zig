@@ -2595,7 +2595,7 @@ pub const AIS_VESSEL = struct {
     /// Bitmask to indicate various statuses including valid data fields
     flags: enums.AIS_FLAGS.Type,
 
-    /// Turn rate
+    /// Turn rate, 0.1 degrees per second
     turn_rate: i8,
 
     /// Navigational status
@@ -3080,7 +3080,7 @@ pub const AUTOPILOT_VERSION = struct {
     /// Operating system version number
     os_sw_version: u32,
 
-    /// HW / board version (last 8 bits should be silicon ID, if any). The first 16 bits of this field specify https://github.com/PX4/PX4-Bootloader/blob/master/board_types.txt
+    /// HW / board version (last 8 bits should be silicon ID, if any). The first 16 bits of this field specify a board type from an enumeration stored at https://github.com/PX4/PX4-Bootloader/blob/master/board_types.txt and with extensive additions at https://github.com/ArduPilot/ardupilot/blob/master/Tools/AP_Bootloader/board_types.txt
     board_version: u32,
 
     /// ID of the board vendor

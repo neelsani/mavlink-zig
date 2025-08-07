@@ -2580,7 +2580,7 @@ pub const AIS_VESSEL = struct {
     /// Bitmask to indicate various statuses including valid data fields
     flags: enums.AIS_FLAGS.Type,
 
-    /// Turn rate
+    /// Turn rate, 0.1 degrees per second
     turn_rate: i8,
 
     /// Navigational status
@@ -2930,6 +2930,41 @@ pub const AIRSPEED = struct {
 
 };
 
+/// Global position measurement or estimate.
+pub const GLOBAL_POSITION = struct {
+    pub const MSG_ID = 296;
+    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
+    time_usec: u64,
+
+    /// Latitude (WGS84)
+    lat: i32,
+
+    /// Longitude (WGS84)
+    lon: i32,
+
+    /// Altitude (MSL - position-system specific value)
+    alt: f32,
+
+    /// Altitude (WGS84 elipsoid)
+    alt_ellipsoid: f32,
+
+    /// Standard deviation of horizontal position error
+    eph: f32,
+
+    /// Standard deviation of vertical position error
+    epv: f32,
+
+    /// Sensor ID
+    id: u8,
+
+    /// Source of position/estimate (such as GNSS, estimator, etc.)
+    source: enums.GLOBAL_POSITION_SRC,
+
+    /// Status flags
+    flags: enums.GLOBAL_POSITION_FLAGS.Type,
+
+};
+
 /// The filtered global position (e.g. fused GPS and accelerometers). The position is in GPS-frame (right-handed, Z-up). It  is designed as scaled integer message since the resolution of float is not sufficient. NOTE: This message is intended for onboard networks / companion computers and higher-bandwidth links and optimized for accuracy and completeness. Please use the GLOBAL_POSITION_INT message for a minimal subset.
 pub const GLOBAL_POSITION_INT_COV = struct {
     pub const MSG_ID = 63;
@@ -3164,7 +3199,7 @@ pub const AUTOPILOT_VERSION = struct {
     /// Operating system version number
     os_sw_version: u32,
 
-    /// HW / board version (last 8 bits should be silicon ID, if any). The first 16 bits of this field specify https://github.com/PX4/PX4-Bootloader/blob/master/board_types.txt
+    /// HW / board version (last 8 bits should be silicon ID, if any). The first 16 bits of this field specify a board type from an enumeration stored at https://github.com/PX4/PX4-Bootloader/blob/master/board_types.txt and with extensive additions at https://github.com/ArduPilot/ardupilot/blob/master/Tools/AP_Bootloader/board_types.txt
     board_version: u32,
 
     /// ID of the board vendor

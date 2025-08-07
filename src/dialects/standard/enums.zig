@@ -85,6 +85,20 @@ pub const MAV_BOOL = packed struct {
     pub const MAV_BOOL_TRUE: @This() = .{ .bits = 1 };
 };
 
+/// These values define the type of firmware release.  These values indicate the first version or release of this type.  For example the first alpha release would be 64, the second would be 65.
+pub const FIRMWARE_VERSION_TYPE = enum(u32) {
+    /// development release
+    FIRMWARE_VERSION_TYPE_DEV = 0,
+    /// alpha release
+    FIRMWARE_VERSION_TYPE_ALPHA = 64,
+    /// beta release
+    FIRMWARE_VERSION_TYPE_BETA = 128,
+    /// release candidate
+    FIRMWARE_VERSION_TYPE_RC = 192,
+    /// official stable release
+    FIRMWARE_VERSION_TYPE_OFFICIAL = 255,
+};
+
 /// Micro air vehicle / autopilot classes. This identifies the individual model.
 pub const MAV_AUTOPILOT = enum(u8) {
     /// Generic autopilot, full support for everything
@@ -586,5 +600,79 @@ pub const MAV_COMPONENT = enum(u32) {
     MAV_COMP_ID_ILLUMINATOR = 243,
     /// Deprecated, don't use. Component for handling system messages (e.g. to ARM, takeoff, etc.).
     MAV_COMP_ID_SYSTEM_CONTROL = 250,
+};
+
+/// Autopilot has a connected gripper. MAVLink Grippers would set MAV_TYPE_GRIPPER instead.
+pub const MAV_PROTOCOL_CAPABILITY = packed struct {
+    pub const is_bitmask = true;
+    bits: u64,
+
+    pub const Type = u64;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
+    /// Autopilot supports the MISSION_ITEM float message type.
+    ///           Note that MISSION_ITEM is deprecated, and autopilots should use MISSION_INT instead.
+    pub const MAV_PROTOCOL_CAPABILITY_MISSION_FLOAT: @This() = .{ .bits = 1 };
+    /// Autopilot supports the new param float message type.
+    pub const MAV_PROTOCOL_CAPABILITY_PARAM_FLOAT: @This() = .{ .bits = 2 };
+    /// Autopilot supports MISSION_ITEM_INT scaled integer message type.
+    ///           Note that this flag must always be set if missions are supported, because missions must always use MISSION_ITEM_INT (rather than MISSION_ITEM, which is deprecated).
+    pub const MAV_PROTOCOL_CAPABILITY_MISSION_INT: @This() = .{ .bits = 4 };
+    /// Autopilot supports COMMAND_INT scaled integer message type.
+    pub const MAV_PROTOCOL_CAPABILITY_COMMAND_INT: @This() = .{ .bits = 8 };
+    /// Parameter protocol uses byte-wise encoding of parameter values into param_value (float) fields: https://mavlink.io/en/services/parameter.html#parameter-encoding.
+    ///           Note that either this flag or MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_C_CAST should be set if the parameter protocol is supported.
+    pub const MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_BYTEWISE: @This() = .{ .bits = 16 };
+    /// Autopilot supports the File Transfer Protocol v1: https://mavlink.io/en/services/ftp.html.
+    pub const MAV_PROTOCOL_CAPABILITY_FTP: @This() = .{ .bits = 32 };
+    /// Autopilot supports commanding attitude offboard.
+    pub const MAV_PROTOCOL_CAPABILITY_SET_ATTITUDE_TARGET: @This() = .{ .bits = 64 };
+    /// Autopilot supports commanding position and velocity targets in local NED frame.
+    pub const MAV_PROTOCOL_CAPABILITY_SET_POSITION_TARGET_LOCAL_NED: @This() = .{ .bits = 128 };
+    /// Autopilot supports commanding position and velocity targets in global scaled integers.
+    pub const MAV_PROTOCOL_CAPABILITY_SET_POSITION_TARGET_GLOBAL_INT: @This() = .{ .bits = 256 };
+    /// Autopilot supports terrain protocol / data handling.
+    pub const MAV_PROTOCOL_CAPABILITY_TERRAIN: @This() = .{ .bits = 512 };
+    /// Reserved for future use.
+    pub const MAV_PROTOCOL_CAPABILITY_RESERVED3: @This() = .{ .bits = 1024 };
+    /// Autopilot supports the MAV_CMD_DO_FLIGHTTERMINATION command (flight termination).
+    pub const MAV_PROTOCOL_CAPABILITY_FLIGHT_TERMINATION: @This() = .{ .bits = 2048 };
+    /// Autopilot supports onboard compass calibration.
+    pub const MAV_PROTOCOL_CAPABILITY_COMPASS_CALIBRATION: @This() = .{ .bits = 4096 };
+    /// Autopilot supports MAVLink version 2.
+    pub const MAV_PROTOCOL_CAPABILITY_MAVLINK2: @This() = .{ .bits = 8192 };
+    /// Autopilot supports mission fence protocol.
+    pub const MAV_PROTOCOL_CAPABILITY_MISSION_FENCE: @This() = .{ .bits = 16384 };
+    /// Autopilot supports mission rally point protocol.
+    pub const MAV_PROTOCOL_CAPABILITY_MISSION_RALLY: @This() = .{ .bits = 32768 };
+    /// Reserved for future use.
+    pub const MAV_PROTOCOL_CAPABILITY_RESERVED2: @This() = .{ .bits = 65536 };
+    /// Parameter protocol uses C-cast of parameter values to set the param_value (float) fields: https://mavlink.io/en/services/parameter.html#parameter-encoding.
+    ///           Note that either this flag or MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_BYTEWISE should be set if the parameter protocol is supported.
+    pub const MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_C_CAST: @This() = .{ .bits = 131072 };
+    /// This component implements/is a gimbal manager. This means the GIMBAL_MANAGER_INFORMATION, and other messages can be requested.
+    pub const MAV_PROTOCOL_CAPABILITY_COMPONENT_IMPLEMENTS_GIMBAL_MANAGER: @This() = .{ .bits = 262144 };
 };
 
