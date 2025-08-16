@@ -1280,6 +1280,20 @@ pub const MAV_TUNNEL_PAYLOAD_TYPE = enum(u16) {
     MAV_TUNNEL_PAYLOAD_TYPE_MODALAI_IO_UART_PASSTHRU = 212,
 };
 
+/// Reboot/shutdown action for selected component in MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN.
+pub const REBOOT_SHUTDOWN_ACTION = enum(u32) {
+    /// Do nothing.
+    REBOOT_SHUTDOWN_ACTION_NONE = 0,
+    /// Reboot component.
+    REBOOT_SHUTDOWN_ACTION_REBOOT = 1,
+    /// Shutdown component.
+    REBOOT_SHUTDOWN_ACTION_SHUTDOWN = 2,
+    /// Reboot component and keep it in the bootloader until upgraded.
+    REBOOT_SHUTDOWN_ACTION_REBOOT_TO_BOOTLOADER = 3,
+    /// Power on component. Do nothing if component is already powered (ACK command with MAV_RESULT_ACCEPTED).
+    REBOOT_SHUTDOWN_ACTION_POWER_ON = 4,
+};
+
 /// Actions for reading/writing parameters between persistent and volatile storage when using MAV_CMD_PREFLIGHT_STORAGE.
 ///         (Commonly parameters are loaded from persistent storage (flash/EEPROM) into volatile storage (RAM) on startup and written back when they are changed.)
 pub const PREFLIGHT_STORAGE_PARAMETER_ACTION = enum(u32) {
@@ -1395,6 +1409,8 @@ pub const MAV_TYPE = enum(u8) {
     MAV_TYPE_VTOL_GYRODYNE = 47,
     /// Gripper
     MAV_TYPE_GRIPPER = 48,
+    /// Radio
+    MAV_TYPE_RADIO = 49,
 };
 
 /// Airborne status of UAS.
@@ -3202,6 +3218,12 @@ pub const MAV_COMPONENT = enum(u32) {
     MAV_COMP_ID_CAMERA5 = 104,
     /// Camera #6.
     MAV_COMP_ID_CAMERA6 = 105,
+    /// Radio #1.
+    MAV_COMP_ID_RADIO = 110,
+    /// Radio #2.
+    MAV_COMP_ID_RADIO2 = 111,
+    /// Radio #3.
+    MAV_COMP_ID_RADIO3 = 112,
     /// Servo #1.
     MAV_COMP_ID_SERVO1 = 140,
     /// Servo #2.
@@ -3851,14 +3873,42 @@ pub const ADSB_FLAGS = packed struct {
     pub const ADSB_FLAGS_SOURCE_UAT: @This() = .{ .bits = 32768 };
 };
 
-/// Camera tracking status flags
-pub const CAMERA_TRACKING_STATUS_FLAGS = enum(u8) {
+/// Camera tracking target is obscured and is being predicted
+pub const CAMERA_TRACKING_STATUS_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u8,
+
+    pub const Type = u8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// Camera is not tracking
-    CAMERA_TRACKING_STATUS_FLAGS_IDLE = 0,
+    pub const CAMERA_TRACKING_STATUS_FLAGS_IDLE: @This() = .{ .bits = 0 };
     /// Camera is tracking
-    CAMERA_TRACKING_STATUS_FLAGS_ACTIVE = 1,
+    pub const CAMERA_TRACKING_STATUS_FLAGS_ACTIVE: @This() = .{ .bits = 1 };
     /// Camera tracking in error state
-    CAMERA_TRACKING_STATUS_FLAGS_ERROR = 2,
+    pub const CAMERA_TRACKING_STATUS_FLAGS_ERROR: @This() = .{ .bits = 2 };
 };
 
 /// MAV FTP error codes (https://mavlink.io/en/services/ftp.html)
@@ -4303,7 +4353,7 @@ pub const FENCE_MITIGATE = enum(u8) {
     FENCE_MITIGATE_VEL_LIMIT = 2,
 };
 
-/// Camera capability flags (Bitmap)
+/// Camera supports Moving Target Indicators (MTI) on the camera view (using MAV_CMD_CAMERA_START_MTI).
 pub const CAMERA_CAP_FLAGS = packed struct {
     pub const is_bitmask = true;
     bits: u32,

@@ -264,6 +264,8 @@ pub const MAV_TYPE = enum(u8) {
     MAV_TYPE_VTOL_GYRODYNE = 47,
     /// Gripper
     MAV_TYPE_GRIPPER = 48,
+    /// Radio
+    MAV_TYPE_RADIO = 49,
 };
 
 /// Legacy component ID values for particular types of hardware/software that might make up a MAVLink system (autopilot, cameras, servos, avoidance systems etc.).
@@ -444,6 +446,12 @@ pub const MAV_COMPONENT = enum(u32) {
     MAV_COMP_ID_CAMERA5 = 104,
     /// Camera #6.
     MAV_COMP_ID_CAMERA6 = 105,
+    /// Radio #1.
+    MAV_COMP_ID_RADIO = 110,
+    /// Radio #2.
+    MAV_COMP_ID_RADIO2 = 111,
+    /// Radio #3.
+    MAV_COMP_ID_RADIO3 = 112,
     /// Servo #1.
     MAV_COMP_ID_SERVO1 = 140,
     /// Servo #2.

@@ -1386,7 +1386,7 @@ pub const CAMERA_TRACKING_IMAGE_STATUS = struct {
     rec_bottom_y: f32,
 
     /// Current tracking status
-    tracking_status: enums.CAMERA_TRACKING_STATUS_FLAGS,
+    tracking_status: enums.CAMERA_TRACKING_STATUS_FLAGS.Type,
 
     /// Current tracking mode
     tracking_mode: enums.CAMERA_TRACKING_MODE,
@@ -2070,7 +2070,7 @@ pub const CAMERA_TRACKING_GEO_STATUS = struct {
     hdg_acc: f32,
 
     /// Current tracking status
-    tracking_status: enums.CAMERA_TRACKING_STATUS_FLAGS,
+    tracking_status: enums.CAMERA_TRACKING_STATUS_FLAGS.Type,
 
     //Extension Field
     /// Camera id of a non-MAVLink camera attached to an autopilot (1-6).  0 if the component is a MAVLink camera (with its own component id).
