@@ -2722,10 +2722,12 @@ pub const CAMERA_TRACKING_TARGET_DATA = packed struct {
 
 /// Gripper actions.
 pub const GRIPPER_ACTIONS = enum(u32) {
-    /// Gripper release cargo.
-    GRIPPER_ACTION_RELEASE = 0,
-    /// Gripper grab onto cargo.
-    GRIPPER_ACTION_GRAB = 1,
+    /// Gripper commence open. Often used to release cargo.
+    GRIPPER_ACTION_OPEN = 0,
+    /// Gripper commence close. Often used to grab onto cargo.
+    GRIPPER_ACTION_CLOSE = 1,
+    /// Gripper stop (maintain current grip position).
+    GRIPPER_ACTION_STOP = 2,
 };
 
 /// These encode the sensors whose status is sent as part of the SYS_STATUS message in the extended fields.

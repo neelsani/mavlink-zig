@@ -2712,10 +2712,12 @@ pub const CAN_FILTER_OP = enum(u8) {
 
 /// Gripper actions.
 pub const GRIPPER_ACTIONS = enum(u32) {
-    /// Gripper release cargo.
-    GRIPPER_ACTION_RELEASE = 0,
-    /// Gripper grab onto cargo.
-    GRIPPER_ACTION_GRAB = 1,
+    /// Gripper commence open. Often used to release cargo.
+    GRIPPER_ACTION_OPEN = 0,
+    /// Gripper commence close. Often used to grab onto cargo.
+    GRIPPER_ACTION_CLOSE = 1,
+    /// Gripper stop (maintain current grip position).
+    GRIPPER_ACTION_STOP = 2,
 };
 
 /// Speed setpoint types used in MAV_CMD_DO_CHANGE_SPEED
