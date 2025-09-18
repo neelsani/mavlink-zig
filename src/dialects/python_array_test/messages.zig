@@ -524,7 +524,7 @@ pub const CAMERA_INFORMATION = struct {
     /// Timestamp (time since system boot).
     time_boot_ms: u32,
 
-    /// Version of the camera firmware, encoded as: `(Dev & 0xff) << 24 \| (Patch & 0xff) << 16 \| (Minor & 0xff) << 8 \| (Major & 0xff)`. Use 0 if not known.
+    /// Version of the camera firmware, encoded as: `(Dev & 0xff) << 24 + (Patch & 0xff) << 16 + (Minor & 0xff) << 8 + (Major & 0xff)`. Use 0 if not known.
     firmware_version: u32,
 
     /// Focal length. Use NaN if not known.
@@ -4416,10 +4416,10 @@ pub const GIMBAL_DEVICE_INFORMATION = struct {
     /// Timestamp (time since system boot).
     time_boot_ms: u32,
 
-    /// Version of the gimbal firmware, encoded as: `(Dev & 0xff) << 24 \| (Patch & 0xff) << 16 \| (Minor & 0xff) << 8 \| (Major & 0xff)`.
+    /// Version of the gimbal firmware, encoded as: `(Dev & 0xff) << 24 + (Patch & 0xff) << 16 + (Minor & 0xff) << 8 + (Major & 0xff)`.
     firmware_version: u32,
 
-    /// Version of the gimbal hardware, encoded as: `(Dev & 0xff) << 24 \| (Patch & 0xff) << 16 \| (Minor & 0xff) << 8 \| (Major & 0xff)`.
+    /// Version of the gimbal hardware, encoded as: `(Dev & 0xff) << 24 + (Patch & 0xff) << 16 + (Minor & 0xff) << 8 + (Major & 0xff)`.
     hardware_version: u32,
 
     /// Minimum hardware roll angle (positive: rolling to the right, negative: rolling to the left). NAN if unknown.
