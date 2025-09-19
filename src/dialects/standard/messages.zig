@@ -3,6 +3,38 @@
 
 const enums = @import("enums.zig");
 
+/// The filtered global position (e.g. fused GPS and accelerometers). The position is in GPS-frame (right-handed, Z-up). It is designed as scaled integer message since the resolution of float is not sufficient.
+pub const GLOBAL_POSITION_INT = struct {
+    pub const MSG_ID = 33;
+    /// Timestamp (time since system boot).
+    time_boot_ms: u32,
+
+    /// Latitude, expressed
+    lat: i32,
+
+    /// Longitude, expressed
+    lon: i32,
+
+    /// Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.
+    alt: i32,
+
+    /// Altitude above home
+    relative_alt: i32,
+
+    /// Ground X Speed (Latitude, positive north)
+    vx: i16,
+
+    /// Ground Y Speed (Longitude, positive east)
+    vy: i16,
+
+    /// Ground Z Speed (Altitude, positive down)
+    vz: i16,
+
+    /// Vehicle heading (yaw angle), 0.0..359.99 degrees. If unknown, set to: UINT16_MAX
+    hdg: u16,
+
+};
+
 /// Version and capability of autopilot software. This should be emitted in response to a request with MAV_CMD_REQUEST_MESSAGE.
 pub const AUTOPILOT_VERSION = struct {
     pub const MSG_ID = 148;
