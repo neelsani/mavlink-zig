@@ -9920,6 +9920,20 @@ pub const OSD_PARAM_SHOW_CONFIG_REPLY = struct {
 
 };
 
+/// Send a key-value pair as string. The use of this message is discouraged for normal packets, but a quite efficient way for testing new messages and getting experimental debug output.
+pub const NAMED_VALUE_STRING = struct {
+    pub const MSG_ID = 11060;
+    /// Value of the debug variable
+    value: [64]u8,
+
+    /// Name of the debug variable
+    name: [10]u8,
+
+    /// Timestamp (time since system boot).
+    time_boot_ms: u32,
+
+};
+
 /// Odometry message to communicate odometry information with an external interface. Fits ROS REP 147 standard for aerial vehicles (http://www.ros.org/reps/rep-0147.html).
 pub const ODOMETRY = struct {
     pub const MSG_ID = 331;

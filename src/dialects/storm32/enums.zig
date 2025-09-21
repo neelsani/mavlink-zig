@@ -938,6 +938,8 @@ pub const COPTER_MODE = enum(u32) {
     COPTER_MODE_AUTO_RTL = 27,
     /// TURTLE
     COPTER_MODE_TURTLE = 28,
+    /// RATE_ACRO
+    COPTER_MODE_RATE_ACRO = 29,
 };
 
 /// Transceiver RF control flags for ADS-B transponder dynamic reports
