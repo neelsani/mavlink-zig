@@ -146,9 +146,37 @@ pub const UAVIONIX_ADSB_OUT_STATUS_NIC_NACP = enum(u8) {
 };
 
 /// Flags for CURRENT_EVENT_SEQUENCE.
-pub const MAV_EVENT_CURRENT_SEQUENCE_FLAGS = enum(u32) {
+pub const MAV_EVENT_CURRENT_SEQUENCE_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u32,
+
+    pub const Type = u32;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
     /// A sequence reset has happened (e.g. vehicle reboot).
-    MAV_EVENT_CURRENT_SEQUENCE_FLAGS_RESET = 1,
+    pub const MAV_EVENT_CURRENT_SEQUENCE_FLAGS_RESET: @This() = .{ .bits = 1 };
 };
 
 /// Result from a MAVLink command (MAV_CMD)
