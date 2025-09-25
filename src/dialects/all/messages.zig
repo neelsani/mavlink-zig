@@ -2741,6 +2741,75 @@ pub const GPS2_RTK = struct {
 
 };
 
+/// Hardware status sent by an onboard computer.
+pub const ONBOARD_COMPUTER_STATUS = struct {
+    pub const MSG_ID = 390;
+    /// Combined CPU usage as the last 10 slices of 100 MS (a histogram). This allows to identify spikes in load that max out the system, but only for a short amount of time. A value of UINT8_MAX implies the field is unused.
+    cpu_combined: [10]u8,
+
+    /// Combined GPU usage as the last 10 slices of 100 MS (a histogram). This allows to identify spikes in load that max out the system, but only for a short amount of time. A value of UINT8_MAX implies the field is unused.
+    gpu_combined: [10]u8,
+
+    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
+    time_usec: u64,
+
+    /// CPU usage on the component in percent (100 - idle). A value of UINT8_MAX implies the field is unused.
+    cpu_cores: [8]u8,
+
+    /// Temperature of the CPU core. A value of INT8_MAX implies the field is unused.
+    temperature_core: [8]i8,
+
+    /// Link type: 0-9: UART, 10-19: Wired network, 20-29: Wifi, 30-39: Point-to-point proprietary, 40-49: Mesh proprietary
+    link_type: [6]u32,
+
+    /// Network traffic from the component system. A value of UINT32_MAX implies the field is unused.
+    link_tx_rate: [6]u32,
+
+    /// Network traffic to the component system. A value of UINT32_MAX implies the field is unused.
+    link_rx_rate: [6]u32,
+
+    /// Network capacity from the component system. A value of UINT32_MAX implies the field is unused.
+    link_tx_max: [6]u32,
+
+    /// Network capacity to the component system. A value of UINT32_MAX implies the field is unused.
+    link_rx_max: [6]u32,
+
+    /// Time since system boot.
+    uptime: u32,
+
+    /// GPU usage on the component in percent (100 - idle). A value of UINT8_MAX implies the field is unused.
+    gpu_cores: [4]u8,
+
+    /// Fan speeds. A value of INT16_MAX implies the field is unused.
+    fan_speed: [4]i16,
+
+    /// Amount of used RAM on the component system. A value of UINT32_MAX implies the field is unused.
+    ram_usage: u32,
+
+    /// Total amount of RAM on the component system. A value of UINT32_MAX implies the field is unused.
+    ram_total: u32,
+
+    /// Storage type: 0: HDD, 1: SSD, 2: EMMC, 3: SD card (non-removable), 4: SD card (removable). A value of UINT32_MAX implies the field is unused.
+    storage_type: [4]u32,
+
+    /// Amount of used storage space on the component system. A value of UINT32_MAX implies the field is unused.
+    storage_usage: [4]u32,
+
+    /// Total amount of storage space on the component system. A value of UINT32_MAX implies the field is unused.
+    storage_total: [4]u32,
+
+    /// Type of the onboard computer: 0: Mission computer primary, 1: Mission computer backup 1, 2: Mission computer backup 2, 3: Compute node, 4-5: Compute spares, 6-9: Payload computers.
+    type: u8,
+
+    /// Temperature of the board. A value of INT8_MAX implies the field is unused.
+    temperature_board: i8,
+
+    //Extension Field
+    /// Bitmap of status flags.
+    status_flags: enums.COMPUTER_STATUS_FLAGS.Type,
+
+};
+
 /// Drone IMU data. Quaternion order is w, x, y, z and a zero rotation would be expressed as (1 0 0 0).
 pub const AVSS_DRONE_IMU = struct {
     pub const MSG_ID = 60052;
@@ -8074,7 +8143,8 @@ pub const ADAP_TUNING = struct {
 
 };
 
-/// This message provides an API for manually controlling the vehicle using standard joystick axes nomenclature, along with a joystick-like input device. Unused axes can be disabled and buttons states are transmitted as individual on/off bits of a bitmask
+/// Manual (joystick) control message.
+///         This message represents movement axes and button using standard joystick axes nomenclature. Unused axes can be disabled and buttons states are transmitted as individual on/off bits of a bitmask. For more information see https://mavlink.io/en/manual_control.html
 pub const MANUAL_CONTROL = struct {
     pub const MSG_ID = 69;
     /// X-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to forward(1000)-backward(-1000) movement on a joystick and the pitch of a vehicle.

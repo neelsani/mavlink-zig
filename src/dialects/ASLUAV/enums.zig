@@ -3036,6 +3036,22 @@ pub const STORAGE_TYPE = enum(u8) {
     STORAGE_TYPE_OTHER = 254,
 };
 
+/// Parameter protocol error types (see PARAM_ERROR).
+pub const MAV_PARAM_ERROR = enum(u32) {
+    /// No error occurred (not expected in PARAM_ERROR but may be used in future implementations.
+    MAV_PARAM_ERROR_NO_ERROR = 0,
+    /// Parameter does not exist
+    MAV_PARAM_ERROR_DOES_NOT_EXIST = 1,
+    /// Parameter value does not fit within accepted range
+    MAV_PARAM_ERROR_VALUE_OUT_OF_RANGE = 2,
+    /// Caller is not permitted to set the value of this parameter
+    MAV_PARAM_ERROR_PERMISSION_DENIED = 3,
+    /// Unknown component specified
+    MAV_PARAM_ERROR_COMPONENT_NOT_FOUND = 4,
+    /// Parameter is read-only
+    MAV_PARAM_ERROR_READ_ONLY = 5,
+};
+
 /// Enumeration of landed detector states
 pub const MAV_LANDED_STATE = enum(u8) {
     /// MAV landed state is unknown
@@ -3628,6 +3644,46 @@ pub const FAILURE_TYPE = enum(u32) {
     FAILURE_TYPE_DELAYED = 6,
     /// Unit is sometimes working, sometimes not.
     FAILURE_TYPE_INTERMITTENT = 7,
+};
+
+/// Flags used to report computer status.
+pub const COMPUTER_STATUS_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
+    /// Indicates if the system is experiencing voltage outside of acceptable range.
+    pub const COMPUTER_STATUS_FLAGS_UNDER_VOLTAGE: @This() = .{ .bits = 1 };
+    /// Indicates if CPU throttling is active.
+    pub const COMPUTER_STATUS_FLAGS_CPU_THROTTLE: @This() = .{ .bits = 2 };
+    /// Indicates if thermal throttling is active.
+    pub const COMPUTER_STATUS_FLAGS_THERMAL_THROTTLE: @This() = .{ .bits = 4 };
+    /// Indicates if main disk is full.
+    pub const COMPUTER_STATUS_FLAGS_DISK_FULL: @This() = .{ .bits = 8 };
 };
 
 /// Flags for gimbal device (lower level) operation.

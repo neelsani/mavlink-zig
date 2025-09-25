@@ -4810,6 +4810,22 @@ pub const LIMITS_STATE = enum(u8) {
     LIMITS_RECOVERED = 5,
 };
 
+/// Parameter protocol error types (see PARAM_ERROR).
+pub const MAV_PARAM_ERROR = enum(u32) {
+    /// No error occurred (not expected in PARAM_ERROR but may be used in future implementations.
+    MAV_PARAM_ERROR_NO_ERROR = 0,
+    /// Parameter does not exist
+    MAV_PARAM_ERROR_DOES_NOT_EXIST = 1,
+    /// Parameter value does not fit within accepted range
+    MAV_PARAM_ERROR_VALUE_OUT_OF_RANGE = 2,
+    /// Caller is not permitted to set the value of this parameter
+    MAV_PARAM_ERROR_PERMISSION_DENIED = 3,
+    /// Unknown component specified
+    MAV_PARAM_ERROR_COMPONENT_NOT_FOUND = 4,
+    /// Parameter is read-only
+    MAV_PARAM_ERROR_READ_ONLY = 5,
+};
+
 /// Enumeration of landed detector states
 pub const MAV_LANDED_STATE = enum(u8) {
     /// MAV landed state is unknown
@@ -5229,6 +5245,46 @@ pub const MAV_ODID_TIME_ACC = enum(u8) {
     MAV_ODID_TIME_ACC_1_4_SECOND = 14,
     /// The timestamp accuracy is smaller than or equal to 1.5 second.
     MAV_ODID_TIME_ACC_1_5_SECOND = 15,
+};
+
+/// Flags used to report computer status.
+pub const COMPUTER_STATUS_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u16,
+
+    pub const Type = u16;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
+    /// Indicates if the system is experiencing voltage outside of acceptable range.
+    pub const COMPUTER_STATUS_FLAGS_UNDER_VOLTAGE: @This() = .{ .bits = 1 };
+    /// Indicates if CPU throttling is active.
+    pub const COMPUTER_STATUS_FLAGS_CPU_THROTTLE: @This() = .{ .bits = 2 };
+    /// Indicates if thermal throttling is active.
+    pub const COMPUTER_STATUS_FLAGS_THERMAL_THROTTLE: @This() = .{ .bits = 4 };
+    /// Indicates if main disk is full.
+    pub const COMPUTER_STATUS_FLAGS_DISK_FULL: @This() = .{ .bits = 8 };
 };
 
 /// Enumeration for battery charge states.
