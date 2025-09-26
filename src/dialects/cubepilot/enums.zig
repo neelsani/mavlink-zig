@@ -183,7 +183,7 @@ pub const MAV_EVENT_CURRENT_SEQUENCE_FLAGS = packed struct {
     pub const MAV_EVENT_CURRENT_SEQUENCE_FLAGS_RESET: @This() = .{ .bits = 1 };
 };
 
-/// Result from a MAVLink command (MAV_CMD)
+/// Command has been rejected because source system is not in control of the target system/component.
 pub const MAV_RESULT = enum(u8) {
     /// Command is valid (is supported and has valid parameters), and was executed.
     MAV_RESULT_ACCEPTED = 0,
