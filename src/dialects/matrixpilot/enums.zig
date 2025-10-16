@@ -3028,6 +3028,12 @@ pub const MAV_PARAM_ERROR = enum(u32) {
     MAV_PARAM_ERROR_COMPONENT_NOT_FOUND = 4,
     /// Parameter is read-only
     MAV_PARAM_ERROR_READ_ONLY = 5,
+    /// Parameter data type (MAV_PARAM_TYPE) is not supported by flight stack (at all)
+    MAV_PARAM_ERROR_TYPE_UNSUPPORTED = 6,
+    /// Parameter type does not match expected type
+    MAV_PARAM_ERROR_TYPE_MISMATCH = 7,
+    /// Parameter exists but reading failed
+    MAV_PARAM_ERROR_READ_FAIL = 8,
 };
 
 /// Enumeration of landed detector states
