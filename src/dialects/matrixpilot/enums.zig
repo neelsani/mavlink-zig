@@ -3889,7 +3889,7 @@ pub const MAV_PROTOCOL_CAPABILITY = packed struct {
         self.bits ^= flag.bits;
     }
     /// Autopilot supports the MISSION_ITEM float message type.
-    ///           Note that MISSION_ITEM is deprecated, and autopilots should use MISSION_INT instead.
+    ///           Note that MISSION_ITEM is deprecated, and autopilots should use MISSION_ITEM_INT instead.
     pub const MAV_PROTOCOL_CAPABILITY_MISSION_FLOAT: @This() = .{ .bits = 1 };
     /// Autopilot supports the new param float message type.
     pub const MAV_PROTOCOL_CAPABILITY_PARAM_FLOAT: @This() = .{ .bits = 2 };
