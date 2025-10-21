@@ -4761,7 +4761,7 @@ pub const MAV_BATTERY_TYPE = enum(u8) {
     MAV_BATTERY_TYPE_NIMH = 4,
 };
 
-/// Battery status flags for fault, health and state indication.
+/// Circular fence area centered on home. The vehicle must stay inside this area. If home is moved, the fence moves.
 pub const MAV_BATTERY_STATUS_FLAGS = packed struct {
     pub const is_bitmask = true;
     bits: u32,
