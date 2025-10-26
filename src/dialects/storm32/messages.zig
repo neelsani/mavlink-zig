@@ -3776,6 +3776,26 @@ pub const MOUNT_ORIENTATION = struct {
 
 };
 
+/// Airspeed information from a sensor.
+pub const AIRSPEED = struct {
+    pub const MSG_ID = 295;
+    /// Calibrated airspeed (CAS).
+    airspeed: f32,
+
+    /// Raw differential pressure.
+    raw_press: f32,
+
+    /// Temperature.
+    temperature: i16,
+
+    /// Sensor ID.
+    id: u8,
+
+    /// Airspeed sensor flags.
+    flags: enums.AIRSPEED_SENSOR_FLAGS.Type,
+
+};
+
 /// Composite EFI and Governor data from Loweheiser equipment.  This message is created by the EFI unit based on its own data and data received from a governor attached to that EFI unit.
 pub const LOWEHEISER_GOV_EFI = struct {
     pub const MSG_ID = 10151;

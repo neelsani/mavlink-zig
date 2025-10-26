@@ -2984,10 +2984,10 @@ pub const AIRSPEED = struct {
     /// Calibrated airspeed (CAS).
     airspeed: f32,
 
-    /// Raw differential pressure. NaN for value unknown/not supplied.
+    /// Raw differential pressure.
     raw_press: f32,
 
-    /// Temperature. INT16_MAX for value unknown/not supplied.
+    /// Temperature.
     temperature: i16,
 
     /// Sensor ID.

@@ -3668,6 +3668,42 @@ pub const COMPUTER_STATUS_FLAGS = packed struct {
     pub const COMPUTER_STATUS_FLAGS_DISK_FULL: @This() = .{ .bits = 8 };
 };
 
+/// Airspeed sensor flags
+pub const AIRSPEED_SENSOR_FLAGS = packed struct {
+    pub const is_bitmask = true;
+    bits: u8,
+
+    pub const Type = u8;
+
+    pub inline fn toInt(self: @This()) Type {
+        return self.bits;
+    }
+
+    pub inline fn fromInt(bits: Type) @This() {
+        return @This(){ .bits = bits };
+    }
+
+    pub inline fn isSet(self: @This(), comptime flag: @This()) bool {
+        return (self.bits & flag.bits) != 0;
+    }
+
+    pub inline fn set(self: *@This(), comptime flag: @This()) void {
+        self.bits |= flag.bits;
+    }
+
+    pub inline fn unset(self: *@This(), comptime flag: @This()) void {
+        self.bits &= ~flag.bits;
+    }
+
+    pub inline fn toggle(self: *@This(), comptime flag: @This()) void {
+        self.bits ^= flag.bits;
+    }
+    /// Airspeed sensor is unhealthy
+    pub const AIRSPEED_SENSOR_UNHEALTHY: @This() = .{ .bits = 1 };
+    /// True if the data from this sensor is being actively used by the flight controller for guidance, navigation or control.
+    pub const AIRSPEED_SENSOR_USING: @This() = .{ .bits = 2 };
+};
+
 /// Flags for gimbal device (lower level) operation.
 pub const GIMBAL_DEVICE_FLAGS = packed struct {
     pub const is_bitmask = true;

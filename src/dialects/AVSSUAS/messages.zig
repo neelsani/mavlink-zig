@@ -2952,6 +2952,26 @@ pub const MOUNT_ORIENTATION = struct {
 
 };
 
+/// Airspeed information from a sensor.
+pub const AIRSPEED = struct {
+    pub const MSG_ID = 295;
+    /// Calibrated airspeed (CAS).
+    airspeed: f32,
+
+    /// Raw differential pressure.
+    raw_press: f32,
+
+    /// Temperature.
+    temperature: i16,
+
+    /// Sensor ID.
+    id: u8,
+
+    /// Airspeed sensor flags.
+    flags: enums.AIRSPEED_SENSOR_FLAGS.Type,
+
+};
+
 /// The filtered global position (e.g. fused GPS and accelerometers). The position is in GPS-frame (right-handed, Z-up). It  is designed as scaled integer message since the resolution of float is not sufficient. NOTE: This message is intended for onboard networks / companion computers and higher-bandwidth links and optimized for accuracy and completeness. Please use the GLOBAL_POSITION_INT message for a minimal subset.
 pub const GLOBAL_POSITION_INT_COV = struct {
     pub const MSG_ID = 63;
