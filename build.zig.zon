@@ -41,8 +41,8 @@
             .hash = "xml-0.1.0-ZTbP35VkAgAp2cDlvsPuL7SWVZWwPg-V99LmVRSHbCtL",
         },
         .mavlink_defs = .{
-            .url = "git+https://github.com/mavlink/mavlink#ff0432a640198b4e870696dd8dd2536cae28d2aa",
-            .hash = "N-V-__8AAMXvFACvGd_5cX30vIqLnGKX4XtssO3a927V0g8r",
+            .url = "git+https://github.com/mavlink/mavlink#8ec715d4a68600f47e7ceee4b098d66c67c00a1b",
+            .hash = "N-V-__8AADLvFADRloMHYFj4z8hpLd6HtVGisnOCF7BtpDPE",
         },
     },
     .paths = .{
