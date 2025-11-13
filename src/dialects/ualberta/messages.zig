@@ -415,20 +415,33 @@ pub const SET_HOME_POSITION = struct {
 
 };
 
-/// Play vehicle tone/tune (buzzer). Supersedes message PLAY_TUNE.
-pub const PLAY_TUNE_V2 = struct {
-    pub const MSG_ID = 400;
-    /// Tune definition as a NULL-terminated string.
-    tune: [248]u8,
+/// Vehicle status report that is sent out while figure eight execution is in progress (see MAV_CMD_DO_FIGURE_EIGHT).
+///         This may typically send at low rates: of the order of 2Hz.
+pub const FIGURE_EIGHT_EXECUTION_STATUS = struct {
+    pub const MSG_ID = 361;
+    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
+    time_usec: u64,
 
-    /// Tune format
-    format: enums.TUNE_FORMAT,
+    /// Major axis radius of the figure eight. Positive: orbit the north circle clockwise. Negative: orbit the north circle counter-clockwise.
+    major_radius: f32,
 
-    /// System ID
-    target_system: u8,
+    /// Minor axis radius of the figure eight. Defines the radius of two circles that make up the figure.
+    minor_radius: f32,
 
-    /// Component ID
-    target_component: u8,
+    /// Orientation of the figure eight major axis with respect to true north in [-pi,pi).
+    orientation: f32,
+
+    /// X coordinate of center point. Coordinate system depends on frame field.
+    x: i32,
+
+    /// Y coordinate of center point. Coordinate system depends on frame field.
+    y: i32,
+
+    /// Altitude of center point. Coordinate system depends on frame field.
+    z: f32,
+
+    /// The coordinate system of the fields: x, y, z.
+    frame: enums.MAV_FRAME,
 
 };
 
@@ -463,6 +476,23 @@ pub const RADIO_STATUS = struct {
 
     /// Remote background noise level. These are device dependent RSSI values (scale as approx 2x dB on SiK radios). Values: [0-254], UINT8_MAX: invalid/unknown.
     remnoise: u8,
+
+};
+
+/// Play vehicle tone/tune (buzzer). Supersedes message PLAY_TUNE.
+pub const PLAY_TUNE_V2 = struct {
+    pub const MSG_ID = 400;
+    /// Tune definition as a NULL-terminated string.
+    tune: [248]u8,
+
+    /// Tune format
+    format: enums.TUNE_FORMAT,
+
+    /// System ID
+    target_system: u8,
+
+    /// Component ID
+    target_component: u8,
 
 };
 
@@ -1384,6 +1414,38 @@ pub const CAMERA_TRACKING_IMAGE_STATUS = struct {
 
 };
 
+/// Wind estimate from vehicle. Note that despite the name, this message does not actually contain any covariances but instead variability and accuracy fields in terms of standard deviation (1-STD).
+pub const WIND_COV = struct {
+    pub const MSG_ID = 231;
+    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
+    time_usec: u64,
+
+    /// Wind in North (NED) direction (NAN if unknown)
+    wind_x: f32,
+
+    /// Wind in East (NED) direction (NAN if unknown)
+    wind_y: f32,
+
+    /// Wind in down (NED) direction (NAN if unknown)
+    wind_z: f32,
+
+    /// Variability of wind in XY, 1-STD estimated from a 1 Hz lowpassed wind estimate (NAN if unknown)
+    var_horiz: f32,
+
+    /// Variability of wind in Z, 1-STD estimated from a 1 Hz lowpassed wind estimate (NAN if unknown)
+    var_vert: f32,
+
+    /// Altitude (MSL) that this measurement was taken at (NAN if unknown)
+    wind_alt: f32,
+
+    /// Horizontal speed 1-STD accuracy (0 if unknown)
+    horiz_accuracy: f32,
+
+    /// Vertical speed 1-STD accuracy (0 if unknown)
+    vert_accuracy: f32,
+
+};
+
 /// The RAW IMU readings for secondary 9DOF sensor setup. This message should contain the scaled values to the described units
 pub const SCALED_IMU2 = struct {
     pub const MSG_ID = 116;
@@ -1420,38 +1482,6 @@ pub const SCALED_IMU2 = struct {
     //Extension Field
     /// Temperature, 0: IMU does not provide temperature values. If the IMU is at 0C it must send 1 (0.01C).
     temperature: i16,
-
-};
-
-/// Wind estimate from vehicle. Note that despite the name, this message does not actually contain any covariances but instead variability and accuracy fields in terms of standard deviation (1-STD).
-pub const WIND_COV = struct {
-    pub const MSG_ID = 231;
-    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
-    time_usec: u64,
-
-    /// Wind in North (NED) direction (NAN if unknown)
-    wind_x: f32,
-
-    /// Wind in East (NED) direction (NAN if unknown)
-    wind_y: f32,
-
-    /// Wind in down (NED) direction (NAN if unknown)
-    wind_z: f32,
-
-    /// Variability of wind in XY, 1-STD estimated from a 1 Hz lowpassed wind estimate (NAN if unknown)
-    var_horiz: f32,
-
-    /// Variability of wind in Z, 1-STD estimated from a 1 Hz lowpassed wind estimate (NAN if unknown)
-    var_vert: f32,
-
-    /// Altitude (MSL) that this measurement was taken at (NAN if unknown)
-    wind_alt: f32,
-
-    /// Horizontal speed 1-STD accuracy (0 if unknown)
-    horiz_accuracy: f32,
-
-    /// Vertical speed 1-STD accuracy (0 if unknown)
-    vert_accuracy: f32,
 
 };
 

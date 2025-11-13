@@ -567,20 +567,33 @@ pub const SET_HOME_POSITION = struct {
 
 };
 
-/// Play vehicle tone/tune (buzzer). Supersedes message PLAY_TUNE.
-pub const PLAY_TUNE_V2 = struct {
-    pub const MSG_ID = 400;
-    /// Tune definition as a NULL-terminated string.
-    tune: [248]u8,
+/// Vehicle status report that is sent out while figure eight execution is in progress (see MAV_CMD_DO_FIGURE_EIGHT).
+///         This may typically send at low rates: of the order of 2Hz.
+pub const FIGURE_EIGHT_EXECUTION_STATUS = struct {
+    pub const MSG_ID = 361;
+    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
+    time_usec: u64,
 
-    /// Tune format
-    format: enums.TUNE_FORMAT,
+    /// Major axis radius of the figure eight. Positive: orbit the north circle clockwise. Negative: orbit the north circle counter-clockwise.
+    major_radius: f32,
 
-    /// System ID
-    target_system: u8,
+    /// Minor axis radius of the figure eight. Defines the radius of two circles that make up the figure.
+    minor_radius: f32,
 
-    /// Component ID
-    target_component: u8,
+    /// Orientation of the figure eight major axis with respect to true north in [-pi,pi).
+    orientation: f32,
+
+    /// X coordinate of center point. Coordinate system depends on frame field.
+    x: i32,
+
+    /// Y coordinate of center point. Coordinate system depends on frame field.
+    y: i32,
+
+    /// Altitude of center point. Coordinate system depends on frame field.
+    z: f32,
+
+    /// The coordinate system of the fields: x, y, z.
+    frame: enums.MAV_FRAME,
 
 };
 
@@ -615,6 +628,23 @@ pub const RADIO_STATUS = struct {
 
     /// Remote background noise level. These are device dependent RSSI values (scale as approx 2x dB on SiK radios). Values: [0-254], UINT8_MAX: invalid/unknown.
     remnoise: u8,
+
+};
+
+/// Play vehicle tone/tune (buzzer). Supersedes message PLAY_TUNE.
+pub const PLAY_TUNE_V2 = struct {
+    pub const MSG_ID = 400;
+    /// Tune definition as a NULL-terminated string.
+    tune: [248]u8,
+
+    /// Tune format
+    format: enums.TUNE_FORMAT,
+
+    /// System ID
+    target_system: u8,
+
+    /// Component ID
+    target_component: u8,
 
 };
 
@@ -1087,14 +1117,6 @@ pub const DEVICE_OP_WRITE_REPLY = struct {
 
 };
 
-/// Array test #1.
-pub const ARRAY_TEST_1 = struct {
-    pub const MSG_ID = 17151;
-    /// Value array
-    ar_u32: [4]u32,
-
-};
-
 /// Setup a MAVLink2 signing key. If called with secret_key of all zero and zero initial_timestamp will disable signing
 pub const SETUP_SIGNING = struct {
     pub const MSG_ID = 256;
@@ -1247,32 +1269,6 @@ pub const GIMBAL_MANAGER_STATUS = struct {
 
 };
 
-/// Vibration levels and accelerometer clipping
-pub const VIBRATION = struct {
-    pub const MSG_ID = 241;
-    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
-    time_usec: u64,
-
-    /// Vibration levels on X-axis
-    vibration_x: f32,
-
-    /// Vibration levels on Y-axis
-    vibration_y: f32,
-
-    /// Vibration levels on Z-axis
-    vibration_z: f32,
-
-    /// first accelerometer clipping count
-    clipping_0: u32,
-
-    /// second accelerometer clipping count
-    clipping_1: u32,
-
-    /// third accelerometer clipping count
-    clipping_2: u32,
-
-};
-
 /// Status of the SatCom link
 pub const SATCOM_LINK_STATUS = struct {
     pub const MSG_ID = 8015;
@@ -1302,22 +1298,37 @@ pub const SATCOM_LINK_STATUS = struct {
 
 };
 
+/// Vibration levels and accelerometer clipping
+pub const VIBRATION = struct {
+    pub const MSG_ID = 241;
+    /// Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.
+    time_usec: u64,
+
+    /// Vibration levels on X-axis
+    vibration_x: f32,
+
+    /// Vibration levels on Y-axis
+    vibration_y: f32,
+
+    /// Vibration levels on Z-axis
+    vibration_z: f32,
+
+    /// first accelerometer clipping count
+    clipping_0: u32,
+
+    /// second accelerometer clipping count
+    clipping_1: u32,
+
+    /// third accelerometer clipping count
+    clipping_2: u32,
+
+};
+
 /// Response to the authorization request
 pub const AIRLINK_AUTH_RESPONSE = struct {
     pub const MSG_ID = 52001;
     /// Response type
     resp_type: enums.AIRLINK_AUTH_RESPONSE_TYPE,
-
-};
-
-/// Request that the vehicle report terrain height at the given location (expected response is a TERRAIN_REPORT). Used by GCS to check if vehicle has all terrain data needed for a mission.
-pub const TERRAIN_CHECK = struct {
-    pub const MSG_ID = 135;
-    /// Latitude
-    lat: i32,
-
-    /// Longitude
-    lon: i32,
 
 };
 
@@ -1332,6 +1343,17 @@ pub const CHANGE_OPERATOR_CONTROL_ACK = struct {
 
     /// 0: ACK, 1: NACK: Wrong passkey, 2: NACK: Unsupported passkey encryption method, 3: NACK: Already under control
     ack: u8,
+
+};
+
+/// Request that the vehicle report terrain height at the given location (expected response is a TERRAIN_REPORT). Used by GCS to check if vehicle has all terrain data needed for a mission.
+pub const TERRAIN_CHECK = struct {
+    pub const MSG_ID = 135;
+    /// Latitude
+    lat: i32,
+
+    /// Longitude
+    lon: i32,
 
 };
 
@@ -1373,6 +1395,14 @@ pub const DATA16 = struct {
 
     /// Data length.
     len: u8,
+
+};
+
+/// Array test #1.
+pub const ARRAY_TEST_1 = struct {
+    pub const MSG_ID = 17151;
+    /// Value array
+    ar_u32: [4]u32,
 
 };
 
